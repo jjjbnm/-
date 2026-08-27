@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>רצף | בית תמיכה</title>
+
+<!-- Web App Manifest (JSON) — turns this into an installable app on the phone's home screen -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"רצף - בית תמיכה","short_name":"רצף","start_url":".","display":"standalone","background_color":"%23f3f4f9","theme_color":"%233b63e0","lang":"he","dir":"rtl","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%233b63e0%27/%3E%3Ctext x=%2750%27 y=%2766%27 font-size=%2748%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3E%D7%A8%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<meta name="theme-color" content="#3b63e0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="רצף">
+
+<!-- JSON-LD structured data — helps search engines understand this page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "רצף",
+  "description": "בית התמיכה הרשמי של קבוצת רצף ב-TikTok — חוקים, סטטוסים, מנויים ותשלומים.",
+  "sameAs": []
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,6 +36,7 @@
     --muted:#656b80;
     --accent:#3b63e0;
     --accent2:#7c3aed;
+    --glass-blur:18px;
 
     --c-green:#22c55e;
     --c-yellow:#eab308;
@@ -24,6 +44,14 @@
     --c-red:#ef4444;
     --c-black:#6b7280;
     --c-skull:#7c1230;
+  }
+  html[data-theme="dark"]{
+    --bg:#0a0c12;
+    --bg2:#11141d;
+    --glass:rgba(255,255,255,0.045);
+    --glass-border:rgba(255,255,255,0.09);
+    --text:#eef0f5;
+    --muted:#9aa1b4;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
@@ -51,8 +79,8 @@
   .glass{
     background:var(--glass);
     border:1px solid var(--glass-border);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
+    backdrop-filter:blur(var(--glass-blur));
+    -webkit-backdrop-filter:blur(var(--glass-blur));
     border-radius:20px;
     box-shadow:0 8px 30px rgba(20,23,40,0.06);
   }
@@ -80,12 +108,14 @@
     text-decoration:none; color:var(--text); border:1px solid var(--glass-border);
     transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
     cursor:pointer;
+    backdrop-filter:blur(var(--glass-blur));
+    -webkit-backdrop-filter:blur(var(--glass-blur));
   }
   .btn:hover{transform:translateY(-2px);}
   .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; box-shadow:0 8px 24px rgba(91,140,255,0.28);}
   .btn-primary:hover{box-shadow:0 12px 30px rgba(139,92,246,0.35);}
-  .btn-ghost{background:var(--glass); backdrop-filter:blur(12px);}
-  .btn-tiktok{background:#0d0d0d; border:1px solid #2b2b2b; color:#fff;}
+  .btn-ghost{background:var(--glass);}
+  .btn-tiktok{background:rgba(0,0,0,0.9); border:1px solid #000; color:#fff;}
   .btn svg{width:18px; height:18px;}
 
   section{padding:50px 0;}
@@ -188,6 +218,35 @@
   .shop-item .price.free{color:#15803d;}
   .shop-item .note{font-size:12px; color:var(--muted);}
   .shop-item .note.warn{color:#b91c1c;}
+
+  /* settings */
+  .settings-card{padding:24px 22px; margin-bottom:16px;}
+  .settings-card h3{font-size:15px; margin-bottom:14px;}
+  .swatch-row{display:flex; gap:12px; flex-wrap:wrap;}
+  .swatch{
+    width:44px; height:44px; border-radius:50%; cursor:pointer; border:3px solid transparent;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .swatch:hover{transform:scale(1.08);}
+  .swatch.active{border-color:var(--text);}
+  .toggle-row{display:flex; align-items:center; justify-content:space-between;}
+  .toggle-switch{
+    width:52px; height:30px; border-radius:999px; background:var(--glass-border);
+    position:relative; cursor:pointer; transition:background .2s ease; border:none;
+  }
+  .toggle-switch::after{
+    content:''; position:absolute; top:3px; right:3px; width:24px; height:24px; border-radius:50%;
+    background:#fff; transition:right .2s ease; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  }
+  .toggle-switch.on{background:linear-gradient(135deg,var(--accent),var(--accent2));}
+  .toggle-switch.on::after{right:25px;}
+  .blur-slider{width:100%; margin-top:10px; accent-color:var(--accent);}
+  .lang-row{display:flex; gap:10px;}
+  .lang-btn{
+    flex:1; padding:10px; border-radius:12px; border:1px solid var(--glass-border);
+    background:var(--bg); color:var(--muted); font-family:'Assistant'; font-weight:700; cursor:pointer;
+  }
+  .lang-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none;}
   .buy-btn{
     margin-top:8px; padding:9px; border-radius:10px; border:none; cursor:pointer;
     font-family:'Assistant'; font-weight:700; font-size:13px; color:#fff;
@@ -324,6 +383,8 @@
   .modal-actions{display:flex; gap:10px;}
   .modal-actions .btn{flex:1; justify-content:center; padding:12px;}
 </style>
+<!-- TypeScript compiler (runs in-browser to transpile the typed code below) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typescript/5.9.2/typescript.min.js"></script>
 </head>
 <body>
 
@@ -367,18 +428,18 @@
 <div class="wrap">
 
   <header>
-    <div class="badge glass"><span class="dot"></span> קהילת רצף · TikTok</div>
-    <p style="margin-top:8px; font-size:13px; color:var(--muted);">👑 בעלים: <b style="color:var(--text);">הבאן המקורי</b></p>
+    <div class="badge glass"><span class="dot"></span> <span data-i18n="hero_badge">קהילת רצף · TikTok</span></div>
+    <p style="margin-top:8px; font-size:13px; color:var(--muted);">👑 <span data-i18n="hero_owner_label">בעלים</span>: <b style="color:var(--text);">הבאן המקורי</b></p>
     <h1>רצף</h1>
-    <p>בית התמיכה הרשמי של הקבוצה — חוקים, סטטוסים, מנויים והתחברות, במקום אחד.</p>
-    <div class="badge glass" style="margin-top:16px; font-weight:700;">🔥 רצף: <span id="streakDays">335</span> ימים</div>
+    <p data-i18n="hero_subtitle">בית התמיכה הרשמי של הקבוצה — חוקים, סטטוסים, מנויים והתחברות, במקום אחד.</p>
+    <div class="badge glass" style="margin-top:16px; font-weight:700;">🔥 <span data-i18n="hero_streak_label">רצף</span>: <span id="streakDays">335</span> <span data-i18n="hero_days_label">ימים</span></div>
     <div class="cta-row">
       <button type="button" id="tiktokLoginBtn" class="btn btn-tiktok">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
-        התחברות עם TikTok
+        <span data-i18n="hero_login_btn">התחברות עם TikTok</span>
       </button>
-      <a href="#" data-target="contact" class="btn btn-ghost glass tab-jump">עמוד TikTok של רצף</a>
-      <a href="#" data-target="status" class="btn btn-ghost glass tab-jump">בדיקת סטטוס</a>
+      <a href="#" data-target="contact" class="btn btn-ghost glass tab-jump" data-i18n="hero_tiktok_page_btn">עמוד TikTok של רצף</a>
+      <a href="#" data-target="status" class="btn btn-ghost glass tab-jump" data-i18n="hero_check_status_btn">בדיקת סטטוס</a>
     </div>
     <p id="tiktokAuthStatus" style="margin-top:14px; font-size:13.5px; color:var(--muted); display:none;"></p>
     <p style="margin-top:10px; font-size:12.5px; color:var(--muted); max-width:420px; margin-inline:auto;">
@@ -388,20 +449,21 @@
   </header>
 
   <nav class="tabs-nav glass">
-    <button class="tab-btn active" data-target="status">סטטוס</button>
-    <button class="tab-btn" data-target="rules">חוקים</button>
-    <button class="tab-btn" data-target="subs">מנויים</button>
-    <button class="tab-btn" data-target="team">בעלים ומנהלים</button>
-    <button class="tab-btn" data-target="scope">גיל ותנאים</button>
-    <button class="tab-btn" data-target="shop">חנות</button>
-    <button class="tab-btn" data-target="contact">יצירת קשר</button>
+    <button class="tab-btn active" data-target="status" data-i18n="nav_status">סטטוס</button>
+    <button class="tab-btn" data-target="rules" data-i18n="nav_rules">חוקים</button>
+    <button class="tab-btn" data-target="subs" data-i18n="nav_subs">מנויים</button>
+    <button class="tab-btn" data-target="team" data-i18n="nav_team">בעלים ומנהלים</button>
+    <button class="tab-btn" data-target="scope" data-i18n="nav_scope">גיל ותנאים</button>
+    <button class="tab-btn" data-target="shop" data-i18n="nav_shop">חנות</button>
+    <button class="tab-btn" data-target="settings" data-i18n="nav_settings">הגדרות</button>
+    <button class="tab-btn" data-target="contact" data-i18n="nav_contact">יצירת קשר</button>
   </nav>
 
   <!-- STATUS LADDER -->
   <section id="status" class="tab-panel active">
-    <span class="eyebrow">מערכת סטטוס</span>
-    <h2 class="sec-title">איפה אתה עומד בקבוצה</h2>
-    <p class="sec-sub">כל חבר מתחיל ירוק. חריגה מהחוקים מעלה אותך בסולם — הסולם לא מתאפס לבד, מנהל מטפל בכל שלב.</p>
+    <span class="eyebrow" data-i18n="status_eyebrow">מערכת סטטוס</span>
+    <h2 class="sec-title" data-i18n="status_title">איפה אתה עומד בקבוצה</h2>
+    <p class="sec-sub" data-i18n="status_sub">כל חבר מתחיל ירוק. חריגה מהחוקים מעלה אותך בסולם — הסולם לא מתאפס לבד, מנהל מטפל בכל שלב.</p>
 
     <div class="ladder">
       <div class="rung glass" data-lvl="1">
@@ -443,9 +505,9 @@
 
   <!-- RULES -->
   <section id="rules" class="tab-panel">
-    <span class="eyebrow">חוקי הקבוצה</span>
-    <h2 class="sec-title">חוקים</h2>
-    <p class="sec-sub">שלושה חוקי בסיס שחלים על כולם, כל הזמן.</p>
+    <span class="eyebrow" data-i18n="rules_eyebrow">חוקי הקבוצה</span>
+    <h2 class="sec-title" data-i18n="rules_title">חוקים</h2>
+    <p class="sec-sub" data-i18n="rules_sub">שלושה חוקי בסיס שחלים על כולם, כל הזמן.</p>
 
 
     <div class="rules-card glass">
@@ -466,8 +528,8 @@
   <div class="tab-panel" id="subs">
   <!-- SUBSCRIPTION CHANGE -->
   <section id="subs-change">
-    <span class="eyebrow">עדכון מנויים</span>
-    <h2 class="sec-title">מה משתנה</h2>
+    <span class="eyebrow" data-i18n="subschange_eyebrow">עדכון מנויים</span>
+    <h2 class="sec-title" data-i18n="subschange_title">מה משתנה</h2>
 
     <div class="date-strip glass">
       <div class="big">1 בספטמבר 2026</div>
@@ -488,9 +550,9 @@
 
   <!-- VIDEO POSTING SUBSCRIPTIONS -->
   <section id="video-subs">
-    <span class="eyebrow">הרשאת פרסום סרטונים</span>
-    <h2 class="sec-title">מנוי סרטון</h2>
-    <p class="sec-sub">בנפרד ממנויי רצף פלוס — זה המנוי שקובע מה מותר לשלוח בכלל.</p>
+    <span class="eyebrow" data-i18n="videosubs_eyebrow">הרשאת פרסום סרטונים</span>
+    <h2 class="sec-title" data-i18n="videosubs_title">מנוי סרטון</h2>
+    <p class="sec-sub" data-i18n="videosubs_sub">בנפרד ממנויי רצף פלוס — זה המנוי שקובע מה מותר לשלוח בכלל.</p>
 
     <div class="plans">
       <div class="plan glass">
@@ -538,8 +600,8 @@
 
   <!-- PLANS -->
   <section id="plans">
-    <span class="eyebrow">הטבות קהילה</span>
-    <h2 class="sec-title">מנויי רצף פלוס</h2>
+    <span class="eyebrow" data-i18n="plans_eyebrow">הטבות קהילה</span>
+    <h2 class="sec-title" data-i18n="plans_title">מנויי רצף פלוס</h2>
     <p class="sec-sub">מנהלים מקבלים 2₪ הנחה על כל מנוי בתשלום. חברי צוות נבחרים (למשל shirel) מקבלים מנוי בחינם.</p>
 
     <div class="plans">
@@ -598,8 +660,8 @@
 
   <!-- OWNERS & ADMINS -->
   <section id="team" class="tab-panel">
-    <span class="eyebrow">מי מנהל את רצף</span>
-    <h2 class="sec-title">בעלים ומנהלים</h2>
+    <span class="eyebrow" data-i18n="team_eyebrow">מי מנהל את רצף</span>
+    <h2 class="sec-title" data-i18n="team_title">בעלים ומנהלים</h2>
     <p class="sec-sub">הרשימה מתעדכנת ידנית — פנו לבעלים כדי להוסיף מנהל.</p>
 
     <div style="display:flex; flex-direction:column; gap:12px;">
@@ -622,8 +684,8 @@
 
   <!-- AGE / SCOPE -->
   <section id="scope" class="tab-panel">
-    <span class="eyebrow">מי יכול להצטרף</span>
-    <h2 class="sec-title">גיל ותנאים</h2>
+    <span class="eyebrow" data-i18n="scope_eyebrow">מי יכול להצטרף</span>
+    <h2 class="sec-title" data-i18n="scope_title">גיל ותנאים</h2>
     <div class="notice-grid">
       <div class="notice glass">
         <div class="k">15-</div>
@@ -638,9 +700,9 @@
 
   <!-- SHOP -->
   <section id="shop" class="tab-panel">
-    <span class="eyebrow">חנות רצף</span>
-    <h2 class="sec-title">מה אפשר לקנות</h2>
-    <p class="sec-sub">רכישות דרך הבעלים/מנהלים. חלק מהפריטים מסוכנים או מוגבלים — שימו לב להערות.</p>
+    <span class="eyebrow" data-i18n="shop_eyebrow">חנות רצף</span>
+    <h2 class="sec-title" data-i18n="shop_title">מה אפשר לקנות</h2>
+    <p class="sec-sub" data-i18n="shop_sub">רכישות דרך הבעלים/מנהלים. חלק מהפריטים מסוכנים או מוגבלים — שימו לב להערות.</p>
 
     <div class="shop-grid">
       <div class="shop-item glass">
@@ -691,13 +753,99 @@
         <button type="button" class="buy-btn" data-item="להיות מנהל בלי ניסיון" data-price="50">🛒 קנה</button>
       </div>
     </div>
+
+    <div class="settings-card glass" style="margin-top:20px;">
+      <h3>🧮 מחשבון מחיר (כתוב ב-TypeScript)</h3>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <select id="tsCalcItem" style="padding:10px; border-radius:10px; border:1px solid var(--glass-border); background:var(--bg); color:var(--text); font-family:'Assistant';">
+          <option value="1">תג תורם — ₪1</option>
+          <option value="10">תג עשיר — ₪10</option>
+          <option value="5">לקבל ערעור — ₪5</option>
+          <option value="10">שינוי שם/תמונת קבוצה — ₪10</option>
+          <option value="1000">מחיקת הקבוצה — ₪1,000</option>
+          <option value="500">הקיק אנשים — ₪500</option>
+          <option value="700">להיות בעלים חדש — ₪700</option>
+          <option value="50">להיות מנהל בלי ניסיון — ₪50</option>
+        </select>
+        <div class="toggle-row">
+          <span style="font-size:14px; color:var(--muted);">אני מנהל (הנחת 2₪)</span>
+          <input type="checkbox" id="tsCalcAdmin" style="width:20px; height:20px; accent-color:var(--accent);">
+        </div>
+        <div style="font-family:'Rubik'; font-weight:900; font-size:22px; color:var(--accent);" id="tsCalcResult">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings" class="tab-panel">
+    <span class="eyebrow" data-i18n="settings_eyebrow">התאמה אישית</span>
+    <h2 class="sec-title" data-i18n="settings_title">הגדרות</h2>
+    <p class="sec-sub">שנה את המראה של האתר — הצבעים, מצב כהה/בהיר, ועוצמת אפקט הזכוכית.</p>
+
+    <div class="settings-card glass">
+      <h3>🌗 מצב תצוגה</h3>
+      <div class="toggle-row">
+        <span style="font-size:14px; color:var(--muted);">כהה / בהיר</span>
+        <button type="button" class="toggle-switch" id="darkModeToggle"></button>
+      </div>
+    </div>
+
+    <div class="settings-card glass">
+      <h3>🎨 צבע ראשי</h3>
+      <div class="swatch-row" id="colorSwatches">
+        <div class="swatch" data-a="#0A84FF" data-b="#0A84FF" style="background:#0A84FF;" title="iOS Liquid Glass (ברירת מחדל)"></div>
+        <div class="swatch active" data-a="#3b63e0" data-b="#7c3aed" style="background:linear-gradient(135deg,#3b63e0,#7c3aed);"></div>
+        <div class="swatch" data-a="#e0439b" data-b="#f97316" style="background:linear-gradient(135deg,#e0439b,#f97316);"></div>
+        <div class="swatch" data-a="#15803d" data-b="#22c55e" style="background:linear-gradient(135deg,#15803d,#22c55e);"></div>
+        <div class="swatch" data-a="#0891b2" data-b="#22d3ee" style="background:linear-gradient(135deg,#0891b2,#22d3ee);"></div>
+        <div class="swatch" data-a="#b91c1c" data-b="#f97316" style="background:linear-gradient(135deg,#b91c1c,#f97316);"></div>
+        <div class="swatch" data-a="#7c1230" data-b="#ef4444" style="background:linear-gradient(135deg,#7c1230,#ef4444);"></div>
+      </div>
+    </div>
+
+    <div class="settings-card glass">
+      <h3>🖌️ צבעים ספציפיים</h3>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="toggle-row">
+          <span style="font-size:14px; color:var(--muted);">צבע רקע</span>
+          <input type="color" id="bgColorPicker" value="#f3f4f9" style="width:44px; height:32px; border:none; border-radius:8px; background:none; cursor:pointer;">
+        </div>
+        <div class="toggle-row">
+          <span style="font-size:14px; color:var(--muted);">צבע כרטיסי זכוכית</span>
+          <input type="color" id="glassColorPicker" value="#ffffff" style="width:44px; height:32px; border:none; border-radius:8px; background:none; cursor:pointer;">
+        </div>
+        <div class="toggle-row">
+          <span style="font-size:14px; color:var(--muted);">צבע טקסט</span>
+          <input type="color" id="textColorPicker" value="#161a26" style="width:44px; height:32px; border:none; border-radius:8px; background:none; cursor:pointer;">
+        </div>
+        <div class="toggle-row">
+          <span style="font-size:14px; color:var(--muted);">צבע כפתור ראשי</span>
+          <input type="color" id="btnColorPicker" value="#3b63e0" style="width:44px; height:32px; border:none; border-radius:8px; background:none; cursor:pointer;">
+        </div>
+      </div>
+
+    <div class="settings-card glass">
+      <h3>🧊 עוצמת אפקט הזכוכית</h3>
+      <input type="range" id="blurSlider" class="blur-slider" min="0" max="30" value="18">
+    </div>
+
+    <div class="settings-card glass">
+      <h3>🌐 שפה / Language</h3>
+      <div class="lang-row">
+        <button type="button" class="lang-btn active" id="langHe">עברית</button>
+        <button type="button" class="lang-btn" id="langEn">English</button>
+      </div>
+      <p style="font-size:11.5px; color:var(--muted); margin-top:10px;">כותרות וניווט מתורגמים; תוכן מפורט נשאר בעברית.</p>
+    </div>
+
+    <button type="button" id="resetSettingsBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center;">↺ איפוס לברירת מחדל</button>
   </section>
 
   <!-- CONTACT -->
   <footer id="contact" class="tab-panel">
     <div class="contact-card glass">
-      <h2>צריך עזרה?</h2>
-      <p>לשאלות על סטטוס, מנויים או חוקים — פנו ישירות.</p>
+      <h2 data-i18n="contact_title">צריך עזרה?</h2>
+      <p data-i18n="contact_sub">לשאלות על סטטוס, מנויים או חוקים — פנו ישירות.</p>
       <div class="cta-row">
         <a href="https://wa.me/972546020998" target="_blank" class="btn btn-primary">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2z"/></svg>
@@ -709,6 +857,8 @@
     </div>
     <p class="fine">רצף · בית תמיכה — עדכן קישורים, מחיר מנוי הפלוס ופרטי יצירת קשר לפני פרסום.</p>
   </footer>
+
+  <p class="fine" style="margin-top:-10px; margin-bottom:20px;">🛠️ נוצר עם Claude · PayPal · TikTok · Vercel · GitHub — HTML · CSS · JavaScript · TypeScript</p>
 
 </div>
 
@@ -829,7 +979,7 @@
   aiFab.addEventListener('click', () => aiPanel.classList.toggle('open'));
   document.getElementById('aiClose').addEventListener('click', () => aiPanel.classList.remove('open'));
 
-  const AI_CONTEXT = `אתה עוזר AI באתר הרשמי של קבוצת TikTok בשם "רצף". יש לקבוצה אתר תמיכה משלה (האתר הזה שבו אתה נמצא), עם טאבים לסטטוס, חוקים, מנויים, בעלים ומנהלים, חנות, גיל ותנאים, ויצירת קשר — אפשר להפנות לשם כשרלוונטי. הבעלים של הקבוצה נקרא "הבאן המקורי", ו-shirel היא מנהלת. בראש העמוד מוצג מונה "רצף: X ימים" שעולה אוטומטית באחד כל יום.
+  const AI_CONTEXT = `אתה עוזר AI באתר הרשמי של קבוצת TikTok בשם "רצף". יש לקבוצה אתר תמיכה משלה (האתר הזה שבו אתה נמצא), עם טאבים לסטטוס, חוקים, מנויים, בעלים ומנהלים, חנות, הגדרות, גיל ותנאים, ויצירת קשר — אפשר להפנות לשם כשרלוונטי. בטאב "הגדרות" אפשר לשנות מצב כהה/בהיר, צבע ראשי של האתר, ועוצמת אפקט הזכוכית. הבעלים של הקבוצה נקרא "הבאן המקורי", ו-shirel היא מנהלת. בראש העמוד מוצג מונה "רצף: X ימים" שעולה אוטומטית באחד כל יום.
 בטאב "חנות" אפשר לקנות (ולשלם ישירות דרך PayPal באתר): תג תורם (₪1), תג עשיר (₪10), לקבל ערעור (₪5), תג מנהל (חינם, מנהל בלבד), שינוי שם/תמונת קבוצה (₪10, חד פעמי), מחיקת הקבוצה (₪1,000), הקיק אנשים (₪500), להיות בעלים חדש (₪700), להיות מנהל בלי ניסיון (₪50, יכול לגרום לחסימה). גם מנויי הסרטון ומנויי רצף פלוס/פרימיום ניתנים לתשלום ישיר דרך PayPal בעמוד.
 אם מישהו מספר שקיבל אזהרה/סטטוס/באן ומסביר על מה — אל תסתפק בלהפנות אותו לבעלים ולא תגיד לו "אל תסמוך על ה-AI". תעזור לו בפועל: קודם תבדוק מול שלושת החוקים הרשמיים (ספאם, קללות כלפי היוצר/מנהלים/חברים, שינוי שם/תמונת הקבוצה, ואיסור הזכרת עזה/פלסטין/לבנון/איראן/עיראק) האם הסיבה שהוא מתאר בכלל תואמת חוק קיים. אם היא לא תואמת אף חוק רשמי — תגיד לו את זה בבירור וישירות (למשל: "זו לא סיבה שמופיעה בחוקי הקבוצה"), ועדיין תעזור לו לנסח ערעור קצר וברור שמסביר את זה, לשליחה ל"הבאן המקורי": מה קרה, מי נתן את הסטטוס, מתי, ולמה זה לא תואם אף חוק רשמי. אם הסיבה כן תואמת חוק אמיתי — תסביר את זה בכנות ותעזור לו לנסח ערעור שמביע הבנה/התנצלות ובקשה לבדיקה מחדש, בהתאם למה שהוא בוחר.
 אם מישהו מזכיר עצה או תשובה שקיבל מ-AI אחר (כמו Gemini/ChatGPT) לגבי סטטוס בקבוצה — תתייחס לתוכן שהוא מביא לגופו (תבדוק מול החוקים כמו למעלה), ולא תפטור אותו בביטול גורף על "אל תסמוך על AI".
@@ -921,6 +1071,122 @@
   document.getElementById('bannedToggleBtn').addEventListener('click', function(){
     const panel = document.getElementById('bannedList');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // === language toggle (EN/HE) — headings & nav translated, detailed body text stays Hebrew ===
+  const I18N = {
+    nav_status: 'Status', nav_rules: 'Rules', nav_subs: 'Subscriptions', nav_team: 'Owners & Admins',
+    nav_scope: 'Age & Terms', nav_shop: 'Shop', nav_settings: 'Settings', nav_contact: 'Contact',
+    hero_badge: 'Retzef Community · TikTok', hero_owner_label: 'Owner',
+    hero_subtitle: "The group's official support hub — rules, status, subscriptions and login, in one place.",
+    hero_streak_label: 'Streak', hero_days_label: 'days',
+    hero_login_btn: 'Login with TikTok', hero_tiktok_page_btn: "Retzef's TikTok page", hero_check_status_btn: 'Check status',
+    status_eyebrow: 'Status System', status_title: 'Where you stand in the group', status_sub: 'Everyone starts green. Breaking the rules moves you up the ladder — it never resets on its own, an admin handles every step.',
+    rules_eyebrow: 'Group Rules', rules_title: 'Rules', rules_sub: 'Three base rules that apply to everyone, at all times.',
+    subschange_eyebrow: 'Subscription Update', subschange_title: "What's changing",
+    videosubs_eyebrow: 'Video Posting Permission', videosubs_title: 'Video Subscription', videosubs_sub: "Separate from Retzef Plus — this is the subscription that determines what's allowed to be sent at all.",
+    plans_eyebrow: 'Community Perks', plans_title: 'Retzef Plus Subscriptions',
+    team_eyebrow: 'Who runs Retzef', team_title: 'Owners & Admins',
+    scope_eyebrow: 'Who can join', scope_title: 'Age & Terms',
+    shop_eyebrow: 'Retzef Shop', shop_title: 'What you can buy', shop_sub: 'Purchases go through the owner/admins. Some items are risky or limited — check the notes.',
+    settings_eyebrow: 'Personalization', settings_title: 'Settings',
+    contact_title: 'Need help?', contact_sub: 'Questions about status, subscriptions, or rules — reach out directly.',
+  };
+  const I18N_HE = {}; // captured on first switch to English, so we can restore Hebrew exactly
+  let currentLang = 'he';
+
+  function setLanguage(lang){
+    const nodes = document.querySelectorAll('[data-i18n]');
+    if (lang === 'en') {
+      nodes.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (!(key in I18N_HE)) I18N_HE[key] = el.textContent;
+        if (I18N[key]) el.textContent = I18N[key];
+      });
+      document.documentElement.setAttribute('lang', 'en');
+      document.documentElement.setAttribute('dir', 'ltr');
+    } else {
+      nodes.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (I18N_HE[key]) el.textContent = I18N_HE[key];
+      });
+      document.documentElement.setAttribute('lang', 'he');
+      document.documentElement.setAttribute('dir', 'rtl');
+    }
+    currentLang = lang;
+    document.getElementById('langHe').classList.toggle('active', lang === 'he');
+    document.getElementById('langEn').classList.toggle('active', lang === 'en');
+  }
+  document.getElementById('langHe').addEventListener('click', () => setLanguage('he'));
+  document.getElementById('langEn').addEventListener('click', () => setLanguage('en'));
+
+  // === settings tab ===
+  const darkToggle = document.getElementById('darkModeToggle');
+  darkToggle.addEventListener('click', function(){
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    darkToggle.classList.toggle('on', !isDark);
+  });
+
+  document.querySelectorAll('.swatch').forEach(sw => {
+    sw.addEventListener('click', function(){
+      document.documentElement.style.setProperty('--accent', sw.dataset.a);
+      document.documentElement.style.setProperty('--accent2', sw.dataset.b);
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+    });
+  });
+
+  document.getElementById('blurSlider').addEventListener('input', function(e){
+    document.documentElement.style.setProperty('--glass-blur', e.target.value + 'px');
+  });
+
+  document.getElementById('bgColorPicker').addEventListener('input', function(e){
+    document.documentElement.style.setProperty('--bg', e.target.value);
+  });
+  document.getElementById('glassColorPicker').addEventListener('input', function(e){
+    const hex = e.target.value;
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    document.documentElement.style.setProperty('--glass', `rgba(${r},${g},${b},0.55)`);
+    document.documentElement.style.setProperty('--bg2', hex);
+  });
+  document.getElementById('textColorPicker').addEventListener('input', function(e){
+    document.documentElement.style.setProperty('--text', e.target.value);
+  });
+  document.getElementById('btnColorPicker').addEventListener('input', function(e){
+    document.documentElement.style.setProperty('--accent', e.target.value);
+  });
+
+  const DEFAULTS = {
+    theme: 'light',
+    accent: '#3b63e0',
+    accent2: '#7c3aed',
+    bg: '#f3f4f9',
+    bg2: '#ffffff',
+    glass: 'rgba(255,255,255,0.55)',
+    text: '#161a26',
+    blur: '18px',
+  };
+  document.getElementById('resetSettingsBtn').addEventListener('click', function(){
+    const root = document.documentElement;
+    root.setAttribute('data-theme', DEFAULTS.theme);
+    root.style.setProperty('--accent', DEFAULTS.accent);
+    root.style.setProperty('--accent2', DEFAULTS.accent2);
+    root.style.setProperty('--bg', DEFAULTS.bg);
+    root.style.setProperty('--bg2', DEFAULTS.bg2);
+    root.style.setProperty('--glass', DEFAULTS.glass);
+    root.style.setProperty('--text', DEFAULTS.text);
+    root.style.setProperty('--glass-blur', DEFAULTS.blur);
+
+    darkToggle.classList.remove('on');
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    document.querySelector('.swatch[data-a="#3b63e0"]').classList.add('active');
+    document.getElementById('blurSlider').value = 18;
+    document.getElementById('bgColorPicker').value = DEFAULTS.bg;
+    document.getElementById('glassColorPicker').value = DEFAULTS.bg2;
+    document.getElementById('textColorPicker').value = DEFAULTS.text;
+    document.getElementById('btnColorPicker').value = DEFAULTS.accent;
+    setLanguage('he');
   });
 
   // === tab switching ===
@@ -1244,6 +1510,68 @@
     PayPal שלכם. אם ₪ לא נתמך, שנו גם שם וגם בקוד ל-USD.
   ============================================================================
 -->
+
+<!--
+  זה קוד TypeScript אמיתי (עם טיפוסים) — לא JavaScript עם תוספת קוסמטית.
+  דפדפנים לא מריצים TypeScript ישירות, אז ה-<script> הבא מסומן
+  type="text/typescript" (הדפדפן מתעלם ממנו לגמרי) והבוטסטראפ שאחריו
+  לוקח את הטקסט שלו, מקמפל אותו ל-JavaScript עם ספריית ה-TypeScript
+  שנטענה למעלה מ-CDN, ואז מריץ את התוצאה. ה-JS הקיים באתר (הכפתורים,
+  הטאבים, ה-PayPal, TikTok וכו') לא נגע בכלל — זה קוד חדש ונפרד.
+-->
+<script type="text/typescript" id="tsSource">
+interface ShopItem {
+  price: number;
+}
+
+function applyAdminDiscount(price: number, isAdmin: boolean): number {
+  const discount: number = isAdmin ? 2 : 0;
+  const result: number = price - discount;
+  return result > 0 ? result : 0;
+}
+
+function formatILS(amount: number): string {
+  return '₪' + amount.toLocaleString('he-IL');
+}
+
+function calculatePrice(item: ShopItem, isAdmin: boolean): string {
+  const finalPrice: number = applyAdminDiscount(item.price, isAdmin);
+  return formatILS(finalPrice);
+}
+
+function initPriceCalculator(): void {
+  const select = document.getElementById('tsCalcItem') as HTMLSelectElement | null;
+  const adminCheckbox = document.getElementById('tsCalcAdmin') as HTMLInputElement | null;
+  const resultEl = document.getElementById('tsCalcResult') as HTMLElement | null;
+  if (!select || !adminCheckbox || !resultEl) return;
+
+  function update(): void {
+    const price: number = Number(select!.value);
+    const isAdmin: boolean = adminCheckbox!.checked;
+    const item: ShopItem = { price };
+    resultEl!.textContent = calculatePrice(item, isAdmin);
+  }
+
+  select.addEventListener('change', update);
+  adminCheckbox.addEventListener('change', update);
+  update();
+}
+
+initPriceCalculator();
+</script>
+
+<script>
+  // בוטסטראפ: מקמפל את קוד ה-TypeScript שלמעלה ל-JS ומריץ אותו
+  (function runTypeScript(){
+    const src = document.getElementById('tsSource').textContent;
+    const compiled = window.ts.transpileModule(src, {
+      compilerOptions: { module: window.ts.ModuleKind.None, target: window.ts.ScriptTarget.ES2017 }
+    }).outputText;
+    const scriptEl = document.createElement('script');
+    scriptEl.textContent = compiled;
+    document.body.appendChild(scriptEl);
+  })();
+</script>
 
 </body>
 </html>

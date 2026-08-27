@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>רצף | בית תמיכה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f4f9;
+    --bg2:#ffffff;
+    --glass:rgba(255,255,255,0.55);
+    --glass-border:rgba(20,23,40,0.09);
+    --text:#161a26;
+    --muted:#656b80;
+    --accent:#3b63e0;
+    --accent2:#7c3aed;
+
+    --c-green:#22c55e;
+    --c-yellow:#eab308;
+    --c-orange:#f97316;
+    --c-red:#ef4444;
+    --c-black:#6b7280;
+    --c-skull:#7c1230;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Assistant', sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+    position:relative;
+  }
+  h1,h2,h3,.display{font-family:'Rubik', sans-serif;}
+
+  /* ambient blobs */
+  .blob{position:fixed; border-radius:50%; filter:blur(100px); opacity:0.28; z-index:0; pointer-events:none;}
+  .blob1{width:520px; height:520px; background:radial-gradient(circle, var(--accent), transparent 70%); top:-180px; right:-120px; animation:float1 22s ease-in-out infinite;}
+  .blob2{width:460px; height:460px; background:radial-gradient(circle, var(--accent2), transparent 70%); bottom:-160px; left:-140px; animation:float2 26s ease-in-out infinite;}
+  .blob3{width:300px; height:300px; background:radial-gradient(circle, var(--c-red), transparent 70%); top:45%; left:40%; opacity:0.09; animation:float1 30s ease-in-out infinite reverse;}
+  @keyframes float1{0%,100%{transform:translate(0,0);} 50%{transform:translate(-40px,50px);}}
+  @keyframes float2{0%,100%{transform:translate(0,0);} 50%{transform:translate(50px,-40px);}}
+
+  .wrap{position:relative; z-index:1; max-width:920px; margin:0 auto; padding:0 20px;}
+
+  /* glass card base */
+  .glass{
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-radius:20px;
+    box-shadow:0 8px 30px rgba(20,23,40,0.06);
+  }
+
+  /* header */
+  header{padding:60px 0 40px; text-align:center;}
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 16px; border-radius:999px; font-size:13px; color:var(--muted);
+    margin-bottom:20px;
+  }
+  .badge span.dot{width:7px; height:7px; border-radius:50%; background:var(--c-green); box-shadow:0 0 8px var(--c-green);}
+  header h1{
+    font-size:clamp(38px,7vw,64px); font-weight:900;
+    background:linear-gradient(90deg,#161a26,var(--accent) 60%, var(--accent2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:-0.02em;
+  }
+  header p{color:var(--muted); font-size:17px; max-width:520px; margin:14px auto 0;}
+
+  .cta-row{display:flex; gap:14px; justify-content:center; margin-top:32px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 26px; border-radius:14px; font-weight:700; font-size:15px;
+    text-decoration:none; color:var(--text); border:1px solid var(--glass-border);
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    cursor:pointer;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; box-shadow:0 8px 24px rgba(91,140,255,0.28);}
+  .btn-primary:hover{box-shadow:0 12px 30px rgba(139,92,246,0.35);}
+  .btn-ghost{background:var(--glass); backdrop-filter:blur(12px);}
+  .btn-tiktok{background:#0d0d0d; border:1px solid #2b2b2b; color:#fff;}
+  .btn svg{width:18px; height:18px;}
+
+  section{padding:50px 0;}
+  .eyebrow{color:var(--accent); font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; display:block;}
+  .sec-title{font-size:clamp(24px,4vw,32px); font-weight:800; margin-bottom:8px;}
+  .sec-sub{color:var(--muted); margin-bottom:32px; font-size:15px;}
+
+  /* tabs */
+  .tabs-nav{
+    position:sticky; top:14px; z-index:5;
+    display:flex; gap:6px; justify-content:center; flex-wrap:wrap;
+    padding:6px; margin:10px auto 0; width:fit-content; max-width:100%;
+  }
+  .tab-btn{
+    border:none; background:transparent; color:var(--muted);
+    font-family:'Assistant', sans-serif; font-weight:600; font-size:14px;
+    padding:10px 18px; border-radius:14px; cursor:pointer;
+    transition:background .18s ease, color .18s ease;
+    white-space:nowrap;
+  }
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff; box-shadow:0 6px 18px rgba(91,140,255,0.28);
+  }
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+  /* status ladder — signature element */
+  .ladder{position:relative; padding-inline-start:0;}
+  .ladder::before{
+    content:''; position:absolute; top:10px; bottom:10px; right:27px;
+    width:2px; background:linear-gradient(180deg, var(--c-green), var(--c-yellow), var(--c-orange), var(--c-red), var(--c-black), var(--c-skull));
+    opacity:0.5;
+  }
+  .rung{
+    position:relative; display:flex; align-items:flex-start; gap:18px;
+    padding:18px 20px; margin-bottom:12px; padding-inline-end:60px;
+  }
+  .rung .node{
+    position:relative; z-index:1; flex-shrink:0;
+    width:56px; height:56px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; border:2px solid rgba(20,23,40,0.1);
+  }
+  .rung .body h3{font-size:17px; font-weight:700; margin-bottom:4px;}
+  .rung .body p{color:var(--muted); font-size:14px;}
+  .rung[data-lvl="1"] .node{box-shadow:0 0 22px rgba(34,197,94,.5); background:rgba(34,197,94,.12);}
+  .rung[data-lvl="2"] .node{box-shadow:0 0 22px rgba(234,179,8,.5); background:rgba(234,179,8,.12);}
+  .rung[data-lvl="3"] .node{box-shadow:0 0 22px rgba(249,115,22,.5); background:rgba(249,115,22,.12);}
+  .rung[data-lvl="4"] .node{box-shadow:0 0 22px rgba(239,68,68,.5); background:rgba(239,68,68,.12);}
+  .rung[data-lvl="5"] .node{box-shadow:0 0 22px rgba(107,114,128,.5); background:rgba(107,114,128,.16);}
+  .rung[data-lvl="6"] .node{box-shadow:0 0 26px rgba(124,18,48,.65); background:rgba(124,18,48,.22);}
+
+  /* rules */
+  .rules-card{padding:30px;}
+  .rules-card ol{list-style:none; counter-reset:rule;}
+  .rules-card li{
+    counter-increment:rule; position:relative; padding-inline-start:44px; padding-block:12px;
+    border-bottom:1px solid rgba(255,255,255,0.06); font-size:15px;
+  }
+  .rules-card li:last-child{border-bottom:none;}
+  .rules-card li::before{
+    content:counter(rule); position:absolute; inset-inline-start:0; top:10px;
+    width:28px; height:28px; border-radius:8px; background:rgba(91,140,255,.15); color:var(--accent);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; font-family:'Rubik',sans-serif;
+  }
+  .rules-note{margin-top:18px; padding:14px 16px; border-radius:12px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); font-size:13.5px; color:#b91c1c;}
+
+  /* effective date strip */
+  .date-strip{
+    display:flex; align-items:center; gap:14px; padding:16px 22px; margin-bottom:28px;
+    border-inline-start:3px solid var(--accent2);
+  }
+  .date-strip .big{font-family:'Rubik'; font-weight:800; font-size:18px;}
+  .date-strip .small{color:var(--muted); font-size:13.5px;}
+
+  /* subscriptions */
+  .plans{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px;}
+  .plan{padding:26px 22px; display:flex; flex-direction:column; gap:10px; position:relative; overflow:hidden;}
+  .plan.highlight{border-color:rgba(139,92,246,0.4);}
+  .plan.highlight::before{content:'הכי פופולרי'; position:absolute; top:14px; left:-32px; transform:rotate(-40deg); background:var(--accent2); color:#fff; font-size:11px; font-weight:700; padding:3px 40px;}
+  .plan .name{font-size:14px; color:var(--muted); font-weight:600;}
+  .plan .price{font-family:'Rubik'; font-size:32px; font-weight:900;}
+  .plan .price span{font-size:14px; color:var(--muted); font-weight:500;}
+  .plan ul{margin-top:8px; display:flex; flex-direction:column; gap:8px;}
+  .plan li{font-size:13.5px; color:#c7cbe0; display:flex; gap:8px; align-items:flex-start;}
+  .plan li::before{content:'✓'; color:var(--c-green); font-weight:800; flex-shrink:0;}
+
+  .plan ul.plusminus li::before{content:none;}
+  .plan ul.plusminus li.yes{color:#15803d; font-weight:700;}
+  .plan ul.plusminus li.no{color:#b91c1c;}
+
+  /* shop */
+  .shop-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px;}
+  .shop-item{padding:22px 20px; display:flex; flex-direction:column; gap:6px;}
+  .shop-item .name{font-weight:700; font-size:15px;}
+  .shop-item .price{font-family:'Rubik'; font-weight:900; font-size:24px; color:var(--accent);}
+  .shop-item .price.free{color:#15803d;}
+  .shop-item .note{font-size:12px; color:var(--muted);}
+  .shop-item .note.warn{color:#b91c1c;}
+  .buy-btn{
+    margin-top:8px; padding:9px; border-radius:10px; border:none; cursor:pointer;
+    font-family:'Assistant'; font-weight:700; font-size:13px; color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+  }
+  .plan .tag{font-size:11.5px; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.06); width:fit-content; color:var(--muted);}
+
+  .cap-list{display:flex; flex-direction:column; gap:7px; margin-top:6px;}
+  .cap{display:flex; align-items:center; gap:9px; font-size:13.5px;}
+  .cap .mark{width:19px; height:19px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0;}
+  .cap.yes{color:var(--text);}
+  .cap.yes .mark{background:rgba(34,197,94,.15); color:#15803d;}
+  .cap.no{color:var(--muted); text-decoration:line-through;}
+  .cap.no .mark{background:rgba(239,68,68,.12); color:#b91c1c;}
+
+  .price-tiers{margin-top:14px; display:flex; flex-direction:column; gap:0; border-top:1px solid var(--glass-border);}
+  .price-tiers .tier{display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid var(--glass-border);}
+  .price-tiers .tier span:first-child{color:var(--muted);}
+  .price-tiers .tier span:last-child{font-weight:700; font-family:'Rubik';}
+  .price-tiers button.tier{all:unset; display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid var(--glass-border); width:100%; cursor:pointer; box-sizing:border-box; font-family:'Assistant';}
+  .price-tiers button.tier:hover{background:rgba(91,140,255,.08); border-radius:8px; padding-inline:6px;}
+
+  /* removed vs new */
+  .diff-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:640px){.diff-grid{grid-template-columns:1fr;}}
+  .diff-card{padding:22px;}
+  .diff-card h3{font-size:14px; margin-bottom:12px; display:flex; align-items:center; gap:8px;}
+  .diff-card.removed h3{color:#b91c1c;}
+  .diff-card.added h3{color:#15803d;}
+  .diff-card p{font-size:13.5px; color:var(--muted);}
+
+  /* age / geo notice */
+  .notice-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:640px){.notice-grid{grid-template-columns:1fr;}}
+  .notice{padding:22px;}
+  .notice .k{font-family:'Rubik'; font-weight:800; font-size:22px; margin-bottom:4px;}
+  .notice .v{color:var(--muted); font-size:13.5px;}
+
+  /* status check widget */
+  .checker{padding:28px; text-align:center;}
+  .checker select{
+    background:var(--bg2); color:var(--text); border:1px solid var(--glass-border);
+    padding:12px 16px; border-radius:12px; font-size:15px; font-family:'Assistant'; width:100%; max-width:280px; margin:16px auto 0; display:block;
+  }
+  .result{margin-top:18px; padding:14px; border-radius:12px; font-weight:700; display:none;}
+
+  /* footer / contact */
+  footer{padding:60px 0 50px; text-align:center;}
+  .contact-card{padding:36px 24px;}
+  .contact-card h2{font-size:22px; margin-bottom:8px;}
+  .contact-card p{color:var(--muted); font-size:14px; margin-bottom:24px;}
+
+  .fine{color:var(--muted); font-size:12.5px; margin-top:30px; text-align:center; padding-bottom:20px;}
+
+  /* profile avatar — top corner */
+  .profile-avatar{
+    position:fixed; top:18px; left:18px; z-index:10;
+    width:52px; height:52px; border-radius:50%;
+    overflow:hidden; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 20px rgba(20,23,40,0.12);
+  }
+  .profile-avatar img{width:100%; height:100%; object-fit:cover; display:none;}
+  .profile-avatar .placeholder{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    color:var(--muted);
+  }
+  .profile-avatar .placeholder svg{width:26px; height:26px;}
+  .profile-avatar.logged-in .placeholder{display:none;}
+  .profile-avatar.logged-in img{display:block;}
+
+  @media(max-width:600px){
+    .rung{padding-inline-end:20px;}
+    .profile-avatar{width:42px; height:42px; top:12px; left:12px;}
+  }
+
+  /* AI assistant widget */
+  .ai-fab{
+    position:fixed; bottom:22px; left:22px; z-index:20;
+    width:56px; height:56px; border-radius:50%; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff; font-size:24px;
+    box-shadow:0 10px 28px rgba(91,140,255,0.35);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .18s ease;
+  }
+  .ai-fab:hover{transform:scale(1.06);}
+  .ai-panel{
+    position:fixed; bottom:88px; left:22px; z-index:20;
+    width:min(340px, calc(100vw - 44px)); max-height:min(480px, 70vh);
+    display:none; flex-direction:column; overflow:hidden;
+    background:var(--bg2); border:1px solid var(--glass-border); border-radius:20px;
+    box-shadow:0 20px 60px rgba(20,23,40,0.25);
+  }
+  .ai-panel.open{display:flex;}
+  .ai-panel-header{
+    padding:14px 16px; border-bottom:1px solid var(--glass-border);
+    display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14px;
+  }
+  .ai-panel-header button{background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;}
+  .ai-messages{flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:10px; font-size:13.5px;}
+  .ai-msg{padding:9px 13px; border-radius:12px; max-width:88%; line-height:1.5;}
+  .ai-msg.user{align-self:flex-end; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;}
+  .ai-msg.bot{align-self:flex-start; background:rgba(120,120,140,0.1); color:var(--text);}
+  .ai-msg.bot.loading{color:var(--muted); font-style:italic;}
+  .ai-input-row{display:flex; gap:8px; padding:12px; border-top:1px solid var(--glass-border);}
+  .ai-input-row input{
+    flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--glass-border);
+    background:var(--bg); color:var(--text); font-family:'Assistant'; font-size:13.5px;
+  }
+  .ai-input-row button{
+    padding:10px 16px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size:13.5px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;
+  }
+
+  /* consent modal — this is the SITE asking before sending the user to TikTok's own screen */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,12,18,0.45);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    position:relative;
+    max-width:360px; width:100%; padding:28px 24px; text-align:center;
+    background:var(--bg2); border:1px solid var(--glass-border); border-radius:20px;
+    box-shadow:0 20px 60px rgba(20,23,40,0.25);
+  }
+  .modal-card .modal-icon{
+    width:52px; height:52px; border-radius:14px; margin:0 auto 16px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex; align-items:center; justify-content:center; color:#fff;
+  }
+  .modal-card h3{font-size:17px; margin-bottom:10px;}
+  .modal-card p{font-size:14px; color:var(--muted); margin-bottom:22px;}
+  .modal-actions{display:flex; gap:10px;}
+  .modal-actions .btn{flex:1; justify-content:center; padding:12px;}
+</style>
+</head>
+<body>
+
+<div class="profile-avatar glass" id="profileAvatar" title="התחברות עם TikTok" style="cursor:pointer;">
+  <img id="profileAvatarImg" src="" alt="תמונת פרופיל TikTok">
+  <span class="placeholder">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+  </span>
+</div>
+
+<div class="modal-overlay" id="consentModal">
+  <div class="modal-card">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
+    </div>
+    <h3>האתר מבקש גישה</h3>
+    <p>לתמונת הפרופיל והשם שלך ב-TikTok, ולבדוק אם אתה חבר רגיל, מנהל או בעלים בקבוצה.</p>
+    <div class="modal-actions">
+      <button type="button" id="consentYes" class="btn btn-primary">כן</button>
+      <button type="button" id="consentNo" class="btn btn-ghost glass">לא</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="paypalModal">
+  <div class="modal-card" style="text-align:right;">
+    <button type="button" id="paypalModalClose" style="position:absolute; top:14px; left:14px; background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;">✕</button>
+    <div style="text-align:center;">
+      <h3 id="paypalItemName" style="margin-bottom:2px;"></h3>
+      <p id="paypalItemPrice" style="font-family:'Rubik'; font-weight:800; font-size:22px; color:var(--accent); margin-bottom:18px;"></p>
+    </div>
+    <div id="paypalButtonContainer"></div>
+    <p style="font-size:11.5px; color:var(--muted); margin-top:14px; text-align:center;">התשלום מאובטח דרך PayPal.</p>
+  </div>
+</div>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<div class="wrap">
+
+  <header>
+    <div class="badge glass"><span class="dot"></span> קהילת רצף · TikTok</div>
+    <p style="margin-top:8px; font-size:13px; color:var(--muted);">👑 בעלים: <b style="color:var(--text);">הבאן המקורי</b></p>
+    <h1>רצף</h1>
+    <p>בית התמיכה הרשמי של הקבוצה — חוקים, סטטוסים, מנויים והתחברות, במקום אחד.</p>
+    <div class="badge glass" style="margin-top:16px; font-weight:700;">🔥 רצף: <span id="streakDays">335</span> ימים</div>
+    <div class="cta-row">
+      <button type="button" id="tiktokLoginBtn" class="btn btn-tiktok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
+        התחברות עם TikTok
+      </button>
+      <a href="#" data-target="contact" class="btn btn-ghost glass tab-jump">עמוד TikTok של רצף</a>
+      <a href="#" data-target="status" class="btn btn-ghost glass tab-jump">בדיקת סטטוס</a>
+    </div>
+    <p id="tiktokAuthStatus" style="margin-top:14px; font-size:13.5px; color:var(--muted); display:none;"></p>
+    <p style="margin-top:10px; font-size:12.5px; color:var(--muted); max-width:420px; margin-inline:auto;">
+      ההתחברות מבקשת רק את השם הציבורי שלכם ב-TikTok, כדי להציג "מחובר בתור @שם".
+      אין לה גישה לפרסום, הודעות, עוקבים או כל פעולה בחשבון שלכם.
+    </p>
+  </header>
+
+  <nav class="tabs-nav glass">
+    <button class="tab-btn active" data-target="status">סטטוס</button>
+    <button class="tab-btn" data-target="rules">חוקים</button>
+    <button class="tab-btn" data-target="subs">מנויים</button>
+    <button class="tab-btn" data-target="team">בעלים ומנהלים</button>
+    <button class="tab-btn" data-target="scope">גיל ותנאים</button>
+    <button class="tab-btn" data-target="shop">חנות</button>
+    <button class="tab-btn" data-target="contact">יצירת קשר</button>
+  </nav>
+
+  <!-- STATUS LADDER -->
+  <section id="status" class="tab-panel active">
+    <span class="eyebrow">מערכת סטטוס</span>
+    <h2 class="sec-title">איפה אתה עומד בקבוצה</h2>
+    <p class="sec-sub">כל חבר מתחיל ירוק. חריגה מהחוקים מעלה אותך בסולם — הסולם לא מתאפס לבד, מנהל מטפל בכל שלב.</p>
+
+    <div class="ladder">
+      <div class="rung glass" data-lvl="1">
+        <div class="node">🟢</div>
+        <div class="body"><h3>הכול טוב</h3><p>אין בעיה. אתה בסדר גמור בקבוצה.</p></div>
+      </div>
+      <div class="rung glass" data-lvl="2">
+        <div class="node">🟡</div>
+        <div class="body"><h3>סבבה — אזהרה ראשונה ⚠️</h3><p>חריגה קלה. זו הפעמון הראשון — שימו לב לחוקים.</p></div>
+      </div>
+      <div class="rung glass" data-lvl="3">
+        <div class="node">🟠</div>
+        <div class="body"><h3>בסיכון — אזהרה שנייה</h3><p>חריגה חוזרת. הסטטוס הבא הוא כבר סכנה של ממש.</p></div>
+      </div>
+      <div class="rung glass" data-lvl="4">
+        <div class="node">🔴</div>
+        <div class="body"><h3>בסכנה — אזהרה חמורה</h3><p>אתה קרוב מאוד לבאן. כל חריגה נוספת עלולה להוציא אותך.</p></div>
+      </div>
+      <div class="rung glass" data-lvl="5">
+        <div class="node">⚫</div>
+        <div class="body"><h3>באן</h3><p>חסימה מהקבוצה.</p></div>
+      </div>
+      <div class="rung glass" data-lvl="6">
+        <div class="node">☠️</div>
+        <div class="body"><h3>חסימה לצמיתות</h3><p>הרמה החמורה ביותר — אין חזרה.</p></div>
+      </div>
+    </div>
+
+    <button type="button" id="bannedToggleBtn" class="btn btn-ghost glass" style="margin-top:24px;">
+      📋 מי בבאן
+    </button>
+
+    <div id="bannedList" class="glass" style="display:none; margin-top:16px; padding:20px 22px;">
+      <h3 style="font-size:15px; margin-bottom:12px; color:#b91c1c;">רשימת חסומים נוכחית</h3>
+      <ul id="bannedNames" style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:14px;"></ul>
+      <p id="bannedEmpty" style="color:var(--muted); font-size:13.5px; display:none;">אין כרגע אף אחד ברשימה.</p>
+    </div>
+  </section>
+
+  <!-- RULES -->
+  <section id="rules" class="tab-panel">
+    <span class="eyebrow">חוקי הקבוצה</span>
+    <h2 class="sec-title">חוקים</h2>
+    <p class="sec-sub">שלושה חוקי בסיס שחלים על כולם, כל הזמן.</p>
+
+
+    <div class="rules-card glass">
+      <ol>
+        <li>לא לספים.</li>
+        <li>לא לקלל את היוצר, המנהלים, או כל חבר אחר בקבוצה.</li>
+        <li>אסור לשנות את השם או את התמונה של הקבוצה.</li>
+      </ol>
+      <div class="rules-note">
+        קללה כלפי מנהל יכולה להוריד ישר לסטטוס סיכון, סכנה או באן — תלוי אם יש חרטה. אם מישהו מקלל בפרטי אבל הוא בקבוצה, המנהל שנפגע צריך להעביר הוכחות; אם זה מאומת, המקלל מקבל באן.
+      </div>
+      <div class="rules-note">
+        אסור לשלוח או להזכיר תוכן שקשור לעזה, פלסטין, לבנון, איראן או עיראק. זה לא כולל רוסיה, סין או צפון קוריאה.
+      </div>
+    </div>
+  </section>
+
+  <div class="tab-panel" id="subs">
+  <!-- SUBSCRIPTION CHANGE -->
+  <section id="subs-change">
+    <span class="eyebrow">עדכון מנויים</span>
+    <h2 class="sec-title">מה משתנה</h2>
+
+    <div class="date-strip glass">
+      <div class="big">1 בספטמבר 2026</div>
+      <div class="small">מהתאריך הזה, שליחת סרטונים דורשת מנוי. מחיר המנוי הבסיסי עולה ל-16₪ בשנת 2027.</div>
+    </div>
+
+    <div class="diff-grid">
+      <div class="diff-card glass removed">
+        <h3>❌ מה נמחק</h3>
+        <p>שליחת סרטונים חופשית במנוי הפלוס הרגיל — כולל לייבים וסרטונים אישיים — לא תהיה זמינה יותר בחינם.</p>
+      </div>
+      <div class="diff-card glass added">
+        <h3>✅ מה חדש</h3>
+        <p>שליחת סרטונים ולייבים עוברת למנויים בתשלום. יש שני מנויים חדשים בתשלום ומנוי מנהלים חינמי.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO POSTING SUBSCRIPTIONS -->
+  <section id="video-subs">
+    <span class="eyebrow">הרשאת פרסום סרטונים</span>
+    <h2 class="sec-title">מנוי סרטון</h2>
+    <p class="sec-sub">בנפרד ממנויי רצף פלוס — זה המנוי שקובע מה מותר לשלוח בכלל.</p>
+
+    <div class="plans">
+      <div class="plan glass">
+        <span class="tag">בסיסי</span>
+        <div class="name">מנוי סרטון רגיל</div>
+        <div class="price">5₪<span>/חודש</span></div>
+        <ul class="plusminus">
+          <li class="no">− אפשר לשלוח לייבים</li>
+          <li class="no">− אפשר לשלוח סרטונים של כולם</li>
+          <li class="yes">+ אפשר לשלוח סרטונים שלנו</li>
+        </ul>
+        <button type="button" class="buy-btn" data-item="מנוי סרטון רגיל (חודש)" data-price="5" style="margin-top:14px;">🛒 קנה</button>
+      </div>
+      <div class="plan glass highlight">
+        <span class="tag">מורחב</span>
+        <div class="name">מנוי סרטון פלוס</div>
+        <div class="price">—<span>/חודש · מחיר יעודכן</span></div>
+        <ul>
+          <li>אפשר לשלוח לייבים</li>
+          <li>אפשר לשלוח סרטונים שלנו</li>
+          <li>אפשר לשלוח סרטונים של כולם</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px; margin-top:28px; margin-bottom:12px;">📅 לוח הנחות</h3>
+    <div class="glass" style="padding:18px 20px; display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
+      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--glass-border); padding-bottom:8px;">
+        <span>20–25 בינואר</span><span style="font-weight:700; color:#15803d;">חינם</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--glass-border); padding-bottom:8px;">
+        <span>1 באפריל</span><span style="font-weight:700;">המחיר עולה בשקל נוסף</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--glass-border); padding-bottom:8px;">
+        <span>1–5 בספטמבר</span><span style="font-weight:700; color:#15803d;">הנחה 50%</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--glass-border); padding-bottom:8px;">
+        <span>25 בספטמבר</span><span style="font-weight:700; color:#15803d;">הנחה 25%</span>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>1–10 בנובמבר</span><span style="font-weight:700; color:#15803d;">הנחה 11%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANS -->
+  <section id="plans">
+    <span class="eyebrow">הטבות קהילה</span>
+    <h2 class="sec-title">מנויי רצף פלוס</h2>
+    <p class="sec-sub">מנהלים מקבלים 2₪ הנחה על כל מנוי בתשלום. חברי צוות נבחרים (למשל shirel) מקבלים מנוי בחינם.</p>
+
+    <div class="plans">
+      <div class="plan glass">
+        <span class="tag">בסיסי</span>
+        <div class="name">רצף פלוס 🔥</div>
+        <ul>
+          <li>מקום נוסף אחד לספאם</li>
+          <li>אפשרות לפרסום</li>
+          <li>ניתן לשנות שם</li>
+          <li>שימוש בתג פלוס</li>
+          <li>תמיכה פלוס</li>
+          <li>אפשר לשלוח רק סרטונים שלנו</li>
+        </ul>
+        <div class="price-tiers">
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (חודש)" data-price="12.45"><span>חודש</span><span>₪12.45</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (שנה)" data-price="18"><span>שנה</span><span>₪18</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (שבוע)" data-price="4.95"><span>שבוע</span><span>₪4.95</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (3 ימים)" data-price="2.95"><span>3 ימים</span><span>₪2.95</span></button>
+          <div class="tier"><span>יום</span><span>חינם (באישור בלבד)</span></div>
+        </div>
+      </div>
+
+      <div class="plan glass highlight">
+        <span class="tag">פרימיום</span>
+        <div class="name">רצף פלוס פרימיום 🔥</div>
+        <ul>
+          <li>שני מקומות לספאם</li>
+          <li>פרסום בסרטון</li>
+          <li>ניתן לשנות שם ותמונת קבוצה</li>
+          <li>שימוש בתג פלוס פרימיום</li>
+          <li>תמיכה עם מנהל</li>
+          <li>אפשר לשלוח כל סרטון</li>
+        </ul>
+        <div class="price-tiers">
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (חודש)" data-price="18"><span>חודש</span><span>₪18</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (שנה)" data-price="20"><span>שנה</span><span>₪20</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (שבוע)" data-price="9.95"><span>שבוע</span><span>₪9.95</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (3 ימים)" data-price="5.95"><span>3 ימים</span><span>₪5.95</span></button>
+          <div class="tier"><span>10 שעות</span><span>חינם (באישור בלבד)</span></div>
+        </div>
+      </div>
+
+      <div class="plan glass">
+        <span class="tag">מנהלים בלבד</span>
+        <div class="name">מנוי מנהל</div>
+        <div class="price">חינם</div>
+        <ul>
+          <li>שמור לצוות הניהול של רצף</li>
+          <li>כל ההרשאות של רצף פלוס פרימיום</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- OWNERS & ADMINS -->
+  <section id="team" class="tab-panel">
+    <span class="eyebrow">מי מנהל את רצף</span>
+    <h2 class="sec-title">בעלים ומנהלים</h2>
+    <p class="sec-sub">הרשימה מתעדכנת ידנית — פנו לבעלים כדי להוסיף מנהל.</p>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="glass" style="padding:18px 20px; display:flex; align-items:center; gap:14px;">
+        <span style="font-size:26px;">👑</span>
+        <div>
+          <div style="font-weight:700; font-size:15px;">הבאן המקורי</div>
+          <div style="color:var(--muted); font-size:13px;">בעלים</div>
+        </div>
+      </div>
+      <div class="glass" style="padding:18px 20px; display:flex; align-items:center; gap:14px;">
+        <span style="font-size:26px;">🛡️</span>
+        <div>
+          <div style="font-weight:700; font-size:15px;">shirel</div>
+          <div style="color:var(--muted); font-size:13px;">מנהלת · הנחת מנהלים / מנוי חינם</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGE / SCOPE -->
+  <section id="scope" class="tab-panel">
+    <span class="eyebrow">מי יכול להצטרף</span>
+    <h2 class="sec-title">גיל ותנאים</h2>
+    <div class="notice-grid">
+      <div class="notice glass">
+        <div class="k">15-</div>
+        <div class="v">גיל הכניסה הנוכחי לקבוצה</div>
+      </div>
+      <div class="notice glass">
+        <div class="k">16- בשנת 2027</div>
+        <div class="v">הגיל עולה כל שנה</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOP -->
+  <section id="shop" class="tab-panel">
+    <span class="eyebrow">חנות רצף</span>
+    <h2 class="sec-title">מה אפשר לקנות</h2>
+    <p class="sec-sub">רכישות דרך הבעלים/מנהלים. חלק מהפריטים מסוכנים או מוגבלים — שימו לב להערות.</p>
+
+    <div class="shop-grid">
+      <div class="shop-item glass">
+        <span class="name">🏷️ תג תורם</span>
+        <span class="price">₪1</span>
+        <button type="button" class="buy-btn" data-item="תג תורם" data-price="1">🛒 קנה</button>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">💎 תג עשיר</span>
+        <span class="price">₪10</span>
+        <button type="button" class="buy-btn" data-item="תג עשיר" data-price="10">🛒 קנה</button>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">📢 לקבל ערעור</span>
+        <span class="price">₪5</span>
+        <button type="button" class="buy-btn" data-item="לקבל ערעור" data-price="5">🛒 קנה</button>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">🛡️ תג מנהל</span>
+        <span class="price free">חינם</span>
+        <span class="note">מנהל בלבד</span>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">✏️ שינוי שם/תמונת קבוצה</span>
+        <span class="price">₪10</span>
+        <span class="note">חד פעמי</span>
+        <button type="button" class="buy-btn" data-item="שינוי שם/תמונת קבוצה" data-price="10">🛒 קנה</button>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">🗑️ מחיקת הקבוצה</span>
+        <span class="price">₪1,000</span>
+        <button type="button" class="buy-btn" data-item="מחיקת הקבוצה" data-price="1000">🛒 קנה</button>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">👢 הקיק אנשים</span>
+        <span class="price">₪500</span>
+        <button type="button" class="buy-btn" data-item="הקיק אנשים" data-price="500">🛒 קנה</button>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">👑 להיות בעלים חדש</span>
+        <span class="price">₪700</span>
+        <button type="button" class="buy-btn" data-item="להיות בעלים חדש" data-price="700">🛒 קנה</button>
+      </div>
+      <div class="shop-item glass">
+        <span class="name">🎲 להיות מנהל בלי ניסיון</span>
+        <span class="price">₪50</span>
+        <span class="note warn">⚠️ יכול לגרום לחסימה</span>
+        <button type="button" class="buy-btn" data-item="להיות מנהל בלי ניסיון" data-price="50">🛒 קנה</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <footer id="contact" class="tab-panel">
+    <div class="contact-card glass">
+      <h2>צריך עזרה?</h2>
+      <p>לשאלות על סטטוס, מנויים או חוקים — פנו ישירות.</p>
+      <div class="cta-row">
+        <a href="https://wa.me/972546020998" target="_blank" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2z"/></svg>
+          וואטסאפ
+        </a>
+        <a href="mailto:helpme9284772@gmail.com" class="btn btn-ghost glass">אימייל</a>
+        <a href="#" id="tiktokGroupLink" class="btn btn-ghost glass">עמוד הקבוצה ב-TikTok</a>
+      </div>
+    </div>
+    <p class="fine">רצף · בית תמיכה — עדכן קישורים, מחיר מנוי הפלוס ופרטי יצירת קשר לפני פרסום.</p>
+  </footer>
+
+</div>
+
+<button type="button" class="ai-fab" id="aiFab" title="עוזר AI">🤖</button>
+
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-panel-header">
+    <span>עוזר AI · רצף</span>
+    <button type="button" id="aiClose">✕</button>
+  </div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, מערכת הסטטוס או המנויים.</div>
+  </div>
+  <div class="ai-input-row">
+    <input type="text" id="aiInput" placeholder="שאלה...">
+    <button type="button" id="aiSend">שלח</button>
+  </div>
+</div>
+
+<!-- PayPal SDK — עדכנו client-id לפני פרסום. currency=ILS; אם PayPal לא תומך ב-₪ בחשבון שלכם, שנו ל-USD -->
+<script src="https://www.paypal.com/sdk/js?client-id=BAAhbIg6bwV1ltfGRK26UeZW5IHSeBRKIWTN8er9d3O_H-3tObj85yKCJ5enaa7C0C3fIBcXktCLaDSzdoEArael_DCSBbxIV90U0IvIorU9fYNu&currency=ILS"></script>
+
+<script>
+  // === TikTok config — fill in from your TikTok for Developers app before publishing ===
+  const TIKTOK_CLIENT_KEY = "awt4ywx6dk6j3wem"; // client_key is public, safe to ship in the page
+  const TIKTOK_GROUP_URL = "https://tiktok.me/group/ZSfhTkvp4/";
+  // Must exactly match the redirect URI registered in your TikTok app.
+  // Set to the domain where you deploy tiktok-login-backend (see the
+  // setup instructions in the HTML comment at the bottom of this file).
+  const TIKTOK_REDIRECT_URI = "https://chi-liart-74.vercel.app/api/callback";
+
+  document.getElementById('tiktokGroupLink').href = TIKTOK_GROUP_URL;
+
+  // Real login: sends the user to TikTok's official consent screen. TikTok itself
+  // shows the "רצף מבקש גישה לחשבון שלך" permission prompt — this page never
+  // simulates that screen. The scope requested below, user.info.basic, only
+  // returns public profile fields (username/display name, avatar, open_id) —
+  // it does NOT grant posting, messaging, follower access, or any write
+  // permission on the person's TikTok account. After the user approves,
+  // TikTok redirects to TIKTOK_REDIRECT_URI (your server), which exchanges
+  // the code for a token and sends the user back here with their username.
+  document.getElementById('tiktokLoginBtn').addEventListener('click', openConsentModal);
+  document.getElementById('profileAvatar').addEventListener('click', openConsentModal);
+
+  const consentModal = document.getElementById('consentModal');
+  function openConsentModal(){ consentModal.classList.add('open'); }
+  function closeConsentModal(){ consentModal.classList.remove('open'); }
+
+  document.getElementById('consentYes').addEventListener('click', function(){
+    closeConsentModal();
+    requestTikTokLogin();
+  });
+  document.getElementById('consentNo').addEventListener('click', closeConsentModal);
+  consentModal.addEventListener('click', function(e){ if (e.target === consentModal) closeConsentModal(); });
+
+  function requestTikTokLogin(){
+    const statusEl = document.getElementById('tiktokAuthStatus');
+    if (TIKTOK_CLIENT_KEY === "YOUR_TIKTOK_CLIENT_KEY") {
+      statusEl.innerHTML = 'ההתחברות עדיין לא מוגדרת: צריך client key מ-TikTok for Developers ושרת שמשלים את החיבור (הקוד וההוראות מופיעים כהערה בתחתית קובץ ה-HTML). עד אז הכפתור לא באמת יתחבר.';
+      statusEl.style.color = '#b91c1c';
+      statusEl.style.display = 'block';
+      return;
+    }
+    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef`;
+    window.location.href = authUrl;
+  }
+
+  // After the backend redirects back here, reflect the login state and clean the URL.
+  (function showLoginResult(){
+    const params = new URLSearchParams(window.location.search);
+    const statusEl = document.getElementById('tiktokAuthStatus');
+    const avatarWrap = document.getElementById('profileAvatar');
+    const avatarImg = document.getElementById('profileAvatarImg');
+    if (params.get('tiktok_ok') === '1') {
+      const username = params.get('username') || '';
+      const avatarUrl = params.get('avatar') || '';
+      const role = params.get('role') || 'member';
+      const roleLabel = role === 'owner' ? 'בעלים' : role === 'admin' ? 'מנהל' : 'חבר';
+      statusEl.textContent = username ? `מחובר בתור @${username} · ${roleLabel} ✅` : 'התחברות בוצעה בהצלחה ✅';
+      statusEl.style.display = 'block';
+      if (avatarUrl) {
+        avatarImg.src = avatarUrl;
+        avatarWrap.classList.add('logged-in');
+        avatarWrap.title = username ? `@${username} · ${roleLabel}` : 'מחובר';
+      }
+    } else if (params.get('tiktok_error')) {
+      statusEl.textContent = 'ההתחברות נכשלה, נסו שוב.';
+      statusEl.style.display = 'block';
+    }
+    if (params.has('tiktok_ok') || params.has('tiktok_error') || params.has('username') || params.has('avatar') || params.has('role')) {
+      params.delete('tiktok_ok'); params.delete('tiktok_error'); params.delete('username'); params.delete('avatar'); params.delete('role');
+      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+      window.history.replaceState({}, '', clean);
+    }
+  })();
+
+  // === day streak — anchored so it always increases by 1 per calendar day ===
+  // Anchor date is set so that on 2026-08-26 the count reads 335. No manual
+  // updates needed — this recalculates from today's date every time the page loads.
+  (function updateStreak(){
+    const START_DATE = new Date(2025, 8, 25); // 25 בספטמבר 2025 (חודשים ב-JS מתחילים מ-0, אז 8 = ספטמבר)
+    const today = new Date();
+    const startMidnight = new Date(START_DATE.getFullYear(), START_DATE.getMonth(), START_DATE.getDate());
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const dayCount = Math.round((todayMidnight - startMidnight) / 86400000);
+    const el = document.getElementById('streakDays');
+    if (el) el.textContent = dayCount;
+  })();
+
+  // === AI assistant widget ===
+  const aiFab = document.getElementById('aiFab');
+  const aiPanel = document.getElementById('aiPanel');
+  const aiMessages = document.getElementById('aiMessages');
+  const aiInput = document.getElementById('aiInput');
+  const aiSend = document.getElementById('aiSend');
+  let aiHistory = [];
+
+  aiFab.addEventListener('click', () => aiPanel.classList.toggle('open'));
+  document.getElementById('aiClose').addEventListener('click', () => aiPanel.classList.remove('open'));
+
+  const AI_CONTEXT = `אתה עוזר AI באתר הרשמי של קבוצת TikTok בשם "רצף". יש לקבוצה אתר תמיכה משלה (האתר הזה שבו אתה נמצא), עם טאבים לסטטוס, חוקים, מנויים, בעלים ומנהלים, חנות, גיל ותנאים, ויצירת קשר — אפשר להפנות לשם כשרלוונטי. הבעלים של הקבוצה נקרא "הבאן המקורי", ו-shirel היא מנהלת. בראש העמוד מוצג מונה "רצף: X ימים" שעולה אוטומטית באחד כל יום.
+בטאב "חנות" אפשר לקנות (ולשלם ישירות דרך PayPal באתר): תג תורם (₪1), תג עשיר (₪10), לקבל ערעור (₪5), תג מנהל (חינם, מנהל בלבד), שינוי שם/תמונת קבוצה (₪10, חד פעמי), מחיקת הקבוצה (₪1,000), הקיק אנשים (₪500), להיות בעלים חדש (₪700), להיות מנהל בלי ניסיון (₪50, יכול לגרום לחסימה). גם מנויי הסרטון ומנויי רצף פלוס/פרימיום ניתנים לתשלום ישיר דרך PayPal בעמוד.
+אם מישהו מספר שקיבל אזהרה/סטטוס/באן ומסביר על מה — אל תסתפק בלהפנות אותו לבעלים ולא תגיד לו "אל תסמוך על ה-AI". תעזור לו בפועל: קודם תבדוק מול שלושת החוקים הרשמיים (ספאם, קללות כלפי היוצר/מנהלים/חברים, שינוי שם/תמונת הקבוצה, ואיסור הזכרת עזה/פלסטין/לבנון/איראן/עיראק) האם הסיבה שהוא מתאר בכלל תואמת חוק קיים. אם היא לא תואמת אף חוק רשמי — תגיד לו את זה בבירור וישירות (למשל: "זו לא סיבה שמופיעה בחוקי הקבוצה"), ועדיין תעזור לו לנסח ערעור קצר וברור שמסביר את זה, לשליחה ל"הבאן המקורי": מה קרה, מי נתן את הסטטוס, מתי, ולמה זה לא תואם אף חוק רשמי. אם הסיבה כן תואמת חוק אמיתי — תסביר את זה בכנות ותעזור לו לנסח ערעור שמביע הבנה/התנצלות ובקשה לבדיקה מחדש, בהתאם למה שהוא בוחר.
+אם מישהו מזכיר עצה או תשובה שקיבל מ-AI אחר (כמו Gemini/ChatGPT) לגבי סטטוס בקבוצה — תתייחס לתוכן שהוא מביא לגופו (תבדוק מול החוקים כמו למעלה), ולא תפטור אותו בביטול גורף על "אל תסמוך על AI".
+ענה בעברית, קצר וברור.
+מידע על הקבוצה:
+- מערכת סטטוס: 🟢 הכול טוב, 🟡 אזהרה ראשונה, 🟠 אזהרה שנייה (בסיכון), 🔴 אזהרה חמורה (בסכנה), ⚫ באן, ☠️ חסימה לצמיתות.
+- חוקים: 1) לא לספים. 2) לא לקלל את היוצר/מנהלים/חברים. 3) אסור לשנות שם או תמונה של הקבוצה. אסור להזכיר עזה/פלסטין/לבנון/איראן/עיראק.
+- החל מ-1.9.2026 שליחת סרטונים דורשת מנוי. יש שתי מערכות מנויים נפרדות:
+  (א) "מנוי סרטון" — קובע מה מותר לשלוח בכלל: מנוי סרטון רגיל (5₪/חודש, אפשר לשלוח סרטונים שלנו) או מנוי סרטון פלוס (מחיר טרם נקבע, אפשר לשלוח לייבים, סרטונים שלנו, וסרטונים של כולם). יש גם לוח הנחות תקופתי למנוי סרטון: 20–25 בינואר חינם, 1 באפריל המחיר עולה בשקל, 1–5 בספטמבר הנחה 50%, 25 בספטמבר הנחה 25%, 1–10 בנובמבר הנחה 11%.
+  (ב) מנויי "רצף פלוס" — הטבות קהילה נוספות (לא קשור ישירות להרשאת שליחת סרטונים):
+- מנוי "רצף פלוס 🔥": מקום נוסף לספאם, אפשרות לפרסום, ניתן לשנות שם, תג פלוס, תמיכה פלוס, שליחת סרטוני הקבוצה בלבד. מחירים: חודש ₪12.45, שנה ₪18, שבוע ₪4.95, 3 ימים ₪2.95, יום חינם (באישור בלבד).
+- מנוי "רצף פלוס פרימיום 🔥": שני מקומות לספאם, פרסום בסרטון, שינוי שם ותמונת קבוצה, תג פלוס פרימיום, תמיכה עם מנהל, שליחת כל סרטון (כולל לייבים וסרטונים אישיים). מחירים: חודש ₪18, שנה ₪20, שבוע ₪9.95, 3 ימים ₪5.95, 10 שעות חינם (באישור בלבד).
+- "מנוי מנהל": חינם, שמור למנהלים בלבד, כולל את כל הרשאות רצף פלוס פרימיום.
+- מנהלים מקבלים 2₪ הנחה על כל מנוי בתשלום. חברי צוות נבחרים (כמו shirel) מקבלים מנוי בחינם.
+- גיל כניסה: 15- כרגע, יעלה ל-16- ב-2027. חשוב: כתבו תמיד "15-" ו-"16-" בדיוק כך (מינוס אחרי המספר) — זה הסימון הרשמי של הקבוצה, גם אם זה נראה לא שגרתי. לעולם אל תכתבו "15+" או "16+".
+- קללה כלפי מנהל יכולה להוריד ישר לסיכון/סכנה/באן. אם מישהו מקלל בפרטי אבל הוא בקבוצה, המנהל שנפגע צריך להעביר הוכחות; אם מאומת, המקלל מקבל באן.
+אם שואלים משהו שלא קשור לקבוצה, ענה בקצרה ובאדיבות שאתה כאן בעיקר לעזור עם שאלות על רצף.`;
+
+  function addMessage(text, cls){
+    const div = document.createElement('div');
+    div.className = `ai-msg ${cls}`;
+    div.textContent = text;
+    aiMessages.appendChild(div);
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+    return div;
+  }
+
+  async function sendAiMessage(){
+    const text = aiInput.value.trim();
+    if (!text) return;
+    aiInput.value = '';
+    addMessage(text, 'user');
+    aiHistory.push({ role: 'user', content: text });
+    const loadingEl = addMessage('חושב...', 'bot loading');
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 500,
+          system: AI_CONTEXT,
+          messages: aiHistory,
+        }),
+      });
+      const data = await response.json();
+      const reply = (data.content || [])
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('\n') || 'לא הצלחתי לענות כרגע, נסו שוב.';
+      loadingEl.textContent = reply;
+      loadingEl.classList.remove('loading');
+      aiHistory.push({ role: 'assistant', content: reply });
+    } catch (err) {
+      loadingEl.textContent = 'שגיאה בחיבור לעוזר. נסו שוב מאוחר יותר.';
+      loadingEl.classList.remove('loading');
+    }
+  }
+
+  aiSend.addEventListener('click', sendAiMessage);
+  aiInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendAiMessage(); });
+
+  // === banned users — עדכנו את הרשימה הזו ידנית לפי הצורך ===
+  const BANNED_USERS = [
+    // "username1",
+    // "username2",
+  ];
+
+  (function renderBannedList(){
+    const listEl = document.getElementById('bannedNames');
+    const emptyEl = document.getElementById('bannedEmpty');
+    if (BANNED_USERS.length === 0) {
+      emptyEl.style.display = 'block';
+      return;
+    }
+    BANNED_USERS.forEach(name => {
+      const li = document.createElement('li');
+      li.textContent = `@${name}`;
+      li.style.padding = '8px 12px';
+      li.style.borderRadius = '10px';
+      li.style.background = 'rgba(239,68,68,.08)';
+      li.style.color = '#b91c1c';
+      li.style.fontWeight = '600';
+      listEl.appendChild(li);
+    });
+  })();
+
+  document.getElementById('bannedToggleBtn').addEventListener('click', function(){
+    const panel = document.getElementById('bannedList');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // === tab switching ===
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+  function activateTab(target){
+    panels.forEach(p => p.classList.toggle('active', p.id === target));
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.target === target));
+    window.scrollTo({top: 0, behavior:'smooth'});
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.target)));
+  document.querySelectorAll('.tab-jump').forEach(el => {
+    el.addEventListener('click', (e) => { e.preventDefault(); activateTab(el.dataset.target); });
+  });
+
+
+  // reveal ladder rungs on scroll
+  const rungs = document.querySelectorAll('.rung');
+  rungs.forEach(r => r.style.opacity = 0);
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        en.target.style.transition = 'opacity .5s ease, transform .5s ease';
+        en.target.style.opacity = 1;
+        en.target.style.transform = 'translateX(0)';
+        io.unobserve(en.target);
+      }
+    });
+  }, {threshold:0.2});
+  rungs.forEach(r => { r.style.transform = 'translateX(20px)'; io.observe(r); });
+
+  // === PayPal checkout ===
+  // השרת (create-order.js / capture-order.js) רץ על אותו פרויקט Vercel כמו ה-TikTok
+  // callback — ראו את התיעוד המלא בהערת ה-HTML בתחתית הקובץ.
+  const PAYPAL_API_BASE_URL = "https://chi-liart-74.vercel.app";
+
+  const paypalModal = document.getElementById('paypalModal');
+  const paypalItemName = document.getElementById('paypalItemName');
+  const paypalItemPrice = document.getElementById('paypalItemPrice');
+  const paypalButtonContainer = document.getElementById('paypalButtonContainer');
+
+  function openPaypalModal(itemName, price){
+    paypalItemName.textContent = itemName;
+    paypalItemPrice.textContent = `₪${price}`;
+    paypalButtonContainer.innerHTML = '';
+    paypalModal.classList.add('open');
+
+    if (typeof paypal === 'undefined') {
+      paypalButtonContainer.innerHTML =
+        '<p style="color:#b91c1c; font-size:13.5px;">PayPal עדיין לא מוגדר — צריך client-id אמיתי בתג ה-script בראש הקובץ, ושרת עם client secret (ראו הערת ה-HTML בתחתית הקובץ).</p>';
+      return;
+    }
+
+    paypal.Buttons({
+      style: { layout: 'vertical', shape: 'rect', label: 'pay' },
+      createOrder: async function () {
+        const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ item: itemName, price: price }),
+        });
+        const data = await res.json();
+        if (!data.id) throw new Error('create-order failed');
+        return data.id;
+      },
+      onApprove: async function (data) {
+        const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/capture-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderID: data.orderID }),
+        });
+        const details = await res.json();
+        if (details.status === 'COMPLETED') {
+          paypalButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ התשלום התקבל! תודה על "${itemName}".</p>`;
+        } else {
+          paypalButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">התשלום לא הושלם. נסו שוב.</p>';
+        }
+      },
+      onError: function (err) {
+        console.error('PayPal error:', err);
+        paypalButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">שגיאה בתשלום. נסו שוב מאוחר יותר.</p>';
+      },
+      onCancel: function () {
+        paypalButtonContainer.innerHTML = '<p style="color:var(--muted); text-align:center;">התשלום בוטל.</p>';
+      },
+    }).render(paypalButtonContainer);
+  }
+
+  document.querySelectorAll('.buy-btn, .buy-tier').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openPaypalModal(btn.dataset.item, btn.dataset.price);
+    });
+  });
+
+  document.getElementById('paypalModalClose').addEventListener('click', () => {
+    paypalModal.classList.remove('open');
+  });
+  paypalModal.addEventListener('click', (e) => { if (e.target === paypalModal) paypalModal.classList.remove('open'); });
+
+</script>
+
+<!--
+  ============================================================================
+  שרת ההתחברות (TikTok OAuth) — קובץ נפרד שצריך להעלות בנפרד לשרת (לא לכאן!)
+  ============================================================================
+  זה לא רץ בדף הזה. TikTok לא מאפשרת לדף HTML סטטי להשלים login אמיתי,
+  כי זה דורש client secret שאסור לחשוף בדפדפן. הקוד הזה חייב לרוץ בצד שרת.
+
+  שמרו את הקטע הבא כקובץ בשם api/callback.js בפרויקט Vercel נפרד (או בתיקיית
+  api/ של הפרויקט הזה אם תעלו אותו כמו שהוא ל-Vercel — Vercel מזהה כל דבר
+  תחת /api בתור פונקציית שרת אוטומטית).
+
+  --- api/callback.js ---
+
+  // Roles are NOT something TikTok's API knows about — TikTok only returns
+  // public profile info. To answer "is this person a regular member, admin,
+  // or owner in OUR group", you maintain that mapping yourselves, here, by
+  // TikTok username. Update this object whenever your admin list changes.
+  const ROLES = {
+    // 'tiktok_username': 'owner' | 'admin'
+    'your_tiktok_username_here': 'owner', // הבאן המקורי — עדכן כאן ל-@ המדויק שלך ב-TikTok (לא שם התצוגה), באותיות קטנות
+    // 'shirel_username': 'admin',
+  };
+  function resolveRole(username) {
+    if (!username) return 'member';
+    return ROLES[username.toLowerCase()] || 'member';
+  }
+
+  module.exports = async (req, res) => {
+    const { code, error: tiktokError } = req.query;
+    if (tiktokError) return res.redirect(302, `/?tiktok_error=${encodeURIComponent(tiktokError)}`);
+    if (!code) return res.redirect(302, '/?tiktok_error=missing_code');
+
+    const CLIENT_KEY = process.env.TIKTOK_CLIENT_KEY;
+    const CLIENT_SECRET = process.env.TIKTOK_CLIENT_SECRET;
+    const REDIRECT_URI = process.env.TIKTOK_REDIRECT_URI;
+    if (!CLIENT_KEY || !CLIENT_SECRET || !REDIRECT_URI) {
+      return res.redirect(302, '/?tiktok_error=server_not_configured');
+    }
+
+    try {
+      const tokenRes = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_key: CLIENT_KEY,
+          client_secret: CLIENT_SECRET,
+          code,
+          grant_type: 'authorization_code',
+          redirect_uri: REDIRECT_URI,
+        }),
+      });
+      const tokenData = await tokenRes.json();
+      if (!tokenData.access_token) return res.redirect(302, '/?tiktok_error=token_exchange_failed');
+
+      // scope requested is user.info.basic only — public profile fields, no
+      // posting / messaging / follower access / write permissions of any kind
+      const userRes = await fetch(
+        'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,username',
+        { headers: { Authorization: `Bearer ${tokenData.access_token}` } }
+      );
+      const userData = await userRes.json();
+      const user = userData && userData.data && userData.data.user;
+      const username = (user && (user.username || user.display_name)) || '';
+
+      const params = new URLSearchParams({
+        tiktok_ok: '1',
+        username,
+        avatar: (user && user.avatar_url) || '',
+        role: resolveRole(username),
+      });
+      return res.redirect(302, `/?${params.toString()}`);
+    } catch (err) {
+      console.error('TikTok callback error:', err);
+      return res.redirect(302, '/?tiktok_error=server_error');
+    }
+  };
+
+  --- סוף api/callback.js ---
+
+  הגדרה (כ-10 דקות):
+  1. TikTok for Developers → Create app → הוסיפו Login Kit, scope: user.info.basic.
+     קבלו משם Client Key ו-Client Secret.
+  2. שמרו את הקוד למעלה כ-api/callback.js, פרסמו לתיקיית פרויקט ריקה ב-Vercel:
+       npm i -g vercel   (פעם אחת)
+       vercel            (בתוך תיקיית הפרויקט)
+     תקבלו כתובת כמו https://chi-liart-74.vercel.app
+  3. אצל TikTok, ב-Redirect URI, הוסיפו בדיוק:
+       https://chi-liart-74.vercel.app/api/callback
+  4. ב-Vercel → Settings → Environment Variables, הוסיפו:
+       TIKTOK_CLIENT_KEY=...
+       TIKTOK_CLIENT_SECRET=...
+       TIKTOK_REDIRECT_URI=https://chi-liart-74.vercel.app/api/callback
+     ואז Redeploy.
+  4.5. בתוך api/callback.js, מלאו את אובייקט ROLES עם שמות המשתמש (ב-TikTok,
+     באותיות קטנות) של הבעלים והמנהלים שלכם. כל שם שלא ברשימה ייחשב "member".
+     כל עדכון ברשימה דורש פריסה מחדש (vercel).
+  5. בקובץ הזה (בתוך ה-<script> למעלה), עדכנו:
+       const TIKTOK_CLIENT_KEY = "המפתח מ-TikTok";
+     ואם האתר והשרת לא על אותו דומיין, עדכנו גם:
+       const TIKTOK_REDIRECT_URI = "https://chi-liart-74.vercel.app/api/callback";
+
+  חשוב: אל תדביקו TIKTOK_CLIENT_SECRET בשום מקום בקובץ הזה או בכל דף שהדפדפן
+  טוען — הוא שייך רק למשתני הסביבה של השרת.
+  ============================================================================
+-->
+
+<!--
+  ============================================================================
+  שרת PayPal — שני קבצים נפרדים שצריך להעלות לאותו פרויקט Vercel כמו ה-TikTok
+  (https://chi-liart-74.vercel.app) — פשוט שני קבצי api/ נוספים באותו repo.
+  ============================================================================
+
+  קובץ 1: api/paypal/create-order.js
+  -----------------------------------
+  const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
+
+  async function getAccessToken() {
+    const auth = Buffer.from(
+      `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+    ).toString('base64');
+    const res = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=client_credentials',
+    });
+    const data = await res.json();
+    if (!data.access_token) throw new Error('Failed to get PayPal access token');
+    return data.access_token;
+  }
+
+  module.exports = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    try {
+      const { item, price } = req.body || {};
+      const amount = Number(price);
+      if (!item || !amount || amount <= 0) return res.status(400).json({ error: 'Missing or invalid item/price' });
+      const accessToken = await getAccessToken();
+      const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          intent: 'CAPTURE',
+          purchase_units: [{ description: `רצף — ${item}`, amount: { currency_code: 'ILS', value: amount.toFixed(2) } }],
+        }),
+      });
+      const orderData = await orderRes.json();
+      if (!orderData.id) return res.status(502).json({ error: 'PayPal order creation failed' });
+      return res.status(200).json({ id: orderData.id });
+    } catch (err) {
+      console.error('create-order error:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  };
+
+  קובץ 2: api/paypal/capture-order.js
+  -------------------------------------
+  const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
+
+  async function getAccessToken() {
+    const auth = Buffer.from(
+      `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+    ).toString('base64');
+    const res = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=client_credentials',
+    });
+    const data = await res.json();
+    if (!data.access_token) throw new Error('Failed to get PayPal access token');
+    return data.access_token;
+  }
+
+  module.exports = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    try {
+      const { orderID } = req.body || {};
+      if (!orderID) return res.status(400).json({ error: 'Missing orderID' });
+      const accessToken = await getAccessToken();
+      const captureRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderID}/capture`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      });
+      const captureData = await captureRes.json();
+      return res.status(200).json({ status: captureData.status, id: captureData.id });
+    } catch (err) {
+      console.error('capture-order error:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  };
+
+  הגדרה (כ-10 דקות, באותו תהליך כמו ה-TikTok):
+  1. ב-PayPal: היכנסו ל-developer.paypal.com → Apps & Credentials → Create App.
+     קבלו משם Client ID ו-Secret. להתחלה, השתמשו במצב Sandbox (כסף פיקטיבי לבדיקות).
+  2. ב-GitHub (אותו repo כמו ה-TikTok): "Add file" → "Create new file" פעמיים,
+     בנתיבים המדויקים: api/paypal/create-order.js, api/paypal/capture-order.js.
+     הדביקו את הקוד המתאים מלמעלה בכל אחד, ו-Commit.
+  3. ב-Vercel, הפרויקט אמור להתפרס מחדש אוטומטית עם הקבצים החדשים.
+  4. ב-Vercel → Settings → Environment Variables, הוסיפו:
+       PAYPAL_CLIENT_ID=BAAhbIg6bwV1ltfGRK26UeZW5IHSeBRKIWTN8er9d3O_H-3tObj85yKCJ5enaa7C0C3fIBcXktCLaDSzdoEArael_DCSBbxIV90U0IvIorU9fYNu
+       PAYPAL_CLIENT_SECRET=EArael_DCSBbxIV90U0IvIorU9fYNuEhmsVRV2stQfol5MDjvbOGSpakDT0eYtvqKT0Rw0VEWEnkWsJU
+       PAYPAL_API_BASE=https://api-m.sandbox.paypal.com   (או .../api-m.paypal.com לתשלומים אמיתיים)
+     ואז Redeploy.
+  5. ה-Client ID כבר מולא בקובץ הזה (בתג ה-script של PayPal SDK, למעלה).
+     אין צורך לגעת בו שוב — רק ה-Secret שייך אך ורק למשתני הסביבה בשרת (שלב 4).
+
+  חשוב:
+  - PAYPAL_CLIENT_SECRET לעולם לא נכנס לשום מקום בקובץ הזה או בדפדפן — רק
+    למשתני הסביבה בשרת.
+  - במצב Sandbox אין כסף אמיתי עובר — לתשלומים אמיתיים, עברו לחשבון Live
+    ב-PayPal ועדכנו PAYPAL_API_BASE כמו שכתוב למעלה.
+  - ה-currency בתג ה-SDK (currency=ILS) חייב להתאים למטבע שמוגדר בחשבון
+    PayPal שלכם. אם ₪ לא נתמך, שנו גם שם וגם בקוד ל-USD.
+  ============================================================================
+-->
+
+</body>
+</html>

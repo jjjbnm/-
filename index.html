@@ -456,6 +456,7 @@
     <button class="tab-btn" data-target="scope" data-i18n="nav_scope">גיל ותנאים</button>
     <button class="tab-btn" data-target="shop" data-i18n="nav_shop">חנות</button>
     <button class="tab-btn" data-target="settings" data-i18n="nav_settings">הגדרות</button>
+    <button class="tab-btn" data-target="about" data-i18n="nav_about">אודות וגרסה</button>
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">יצירת קשר</button>
   </nav>
 
@@ -841,6 +842,44 @@
     <button type="button" id="resetSettingsBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center;">↺ איפוס לברירת מחדל</button>
   </section>
 
+  <!-- ABOUT & VERSION -->
+  <section id="about" class="tab-panel">
+    <span class="eyebrow" data-i18n="about_eyebrow">מידע כללי</span>
+    <h2 class="sec-title" data-i18n="about_title">אודות וגרסה</h2>
+    <p class="sec-sub" data-i18n="about_sub">כל מה שקשור לאתר עצמו — לא לקבוצה.</p>
+
+    <div class="settings-card glass">
+      <h3>ℹ️ על האתר</h3>
+      <p style="font-size:13.5px; color:var(--muted); line-height:1.7;">
+        בית התמיכה הרשמי של קבוצת רצף — חוקים, סטטוס, מנויים, חנות ותשלומים, במקום אחד.
+        האתר בנוי כקובץ HTML אחד, ורץ דרך Vercel.
+      </p>
+    </div>
+
+    <div class="settings-card glass">
+      <h3>🧩 גרסה ורכיבים</h3>
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">גרסת אתר</span><span style="font-weight:700;">גישה מקודמת</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">שפות</span><span style="font-weight:700;">HTML · CSS · JS · TypeScript</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">אחסון</span><span style="font-weight:700;">Vercel + GitHub</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">תשלומים</span><span style="font-weight:700;">PayPal · Apple Pay</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">התחברות</span><span style="font-weight:700;">TikTok Login Kit</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">עוזר</span><span style="font-weight:700;">מקומי, חינמי</span></div>
+      </div>
+    </div>
+
+    <div class="settings-card glass">
+      <h3>📝 יומן שינויים</h3>
+      <ul style="font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:6px; padding-inline-start:18px;">
+        <li>הוספת עוזר רצף (מקומי, חינמי)</li>
+        <li>הוספת PWA — התקנה למסך הבית</li>
+        <li>הוספת חנות ומחשבון מחיר ב-TypeScript</li>
+        <li>הוספת התחברות TikTok + תשלומי PayPal</li>
+        <li>הוספת טאבים, הגדרות עיצוב, ותמיכה דו-לשונית</li>
+      </ul>
+    </div>
+  </section>
+
   <!-- CONTACT -->
   <footer id="contact" class="tab-panel">
     <div class="contact-card glass">
@@ -866,11 +905,11 @@
 
 <div class="ai-panel" id="aiPanel">
   <div class="ai-panel-header">
-    <span>עוזר AI · רצף</span>
+    <span>עוזר רצף</span>
     <button type="button" id="aiClose">✕</button>
   </div>
   <div class="ai-messages" id="aiMessages">
-    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, מערכת הסטטוס או המנויים.</div>
+    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, סטטוס, מנויים, חנות או ערעורים — עוזר מקומי חינמי (בלי חיבור ל-AI חיצוני).</div>
   </div>
   <div class="ai-input-row">
     <input type="text" id="aiInput" placeholder="שאלה...">
@@ -879,7 +918,10 @@
 </div>
 
 <!-- PayPal SDK — עדכנו client-id לפני פרסום. currency=ILS; אם PayPal לא תומך ב-₪ בחשבון שלכם, שנו ל-USD -->
-<script src="https://www.paypal.com/sdk/js?client-id=BAAhbIg6bwV1ltfGRK26UeZW5IHSeBRKIWTN8er9d3O_H-3tObj85yKCJ5enaa7C0C3fIBcXktCLaDSzdoEArael_DCSBbxIV90U0IvIorU9fYNu&currency=ILS"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=BAAhbIg6bwV1ltfGRK26UeZW5IHSeBRKIWTN8er9d3O_H-3tObj85yKCJ5enaa7C0C3fIBcXktCLaDSzdoEArael_DCSBbxIV90U0IvIorU9fYNu&currency=ILS"
+  onload="window.__paypalSdkLoaded = true;"
+  onerror="window.__paypalSdkFailed = true; console.error('PayPal SDK failed to load — check network connection or an ad/privacy blocker.');">
+</script>
 
 <script>
   // === TikTok config — fill in from your TikTok for Developers app before publishing ===
@@ -974,7 +1016,6 @@
   const aiMessages = document.getElementById('aiMessages');
   const aiInput = document.getElementById('aiInput');
   const aiSend = document.getElementById('aiSend');
-  let aiHistory = [];
 
   aiFab.addEventListener('click', () => aiPanel.classList.toggle('open'));
   document.getElementById('aiClose').addEventListener('click', () => aiPanel.classList.remove('open'));
@@ -998,6 +1039,48 @@
 - קללה כלפי מנהל יכולה להוריד ישר לסיכון/סכנה/באן. אם מישהו מקלל בפרטי אבל הוא בקבוצה, המנהל שנפגע צריך להעביר הוכחות; אם מאומת, המקלל מקבל באן.
 אם שואלים משהו שלא קשור לקבוצה, ענה בקצרה ובאדיבות שאתה כאן בעיקר לעזור עם שאלות על רצף.`;
 
+  function localAnswer(question){
+    const t = question.toLowerCase();
+
+    if (/ערעור/.test(t)) {
+      return 'בשביל ערעור על סטטוס/אזהרה/באן: תכתוב הודעה ל"הבאן המקורי" (הבעלים) שכוללת — מה קרה, מי נתן את הסטטוס, מתי, ולמה לדעתך זו טעות או שאתה מצטער. בדוק קודם מול טאב "חוקים" אם הסיבה בכלל תואמת אחד משלושת החוקים הרשמיים (ספאם, קללות, שינוי שם/תמונה, הזכרת מדינות אסורות) — אם לא, זה שווה לציין בערעור.';
+    }
+    if (/באן|חסימה|⚫|☠️/.test(t)) {
+      return 'סולם הסטטוס: 🟢 הכול טוב → 🟡 אזהרה ראשונה → 🟠 בסיכון → 🔴 בסכנה → ⚫ באן → ☠️ חסימה לצמיתות. פרטים מלאים בטאב "סטטוס", כולל רשימת מי בבאן כרגע.';
+    }
+    if (/סטטוס|אזהר/.test(t)) {
+      return 'הסטטוס עולה לפי חומרת החריגה מהחוקים ולא מתאפס לבד — מנהל מטפל בכל שלב. הרשימה המלאה (🟢🟡🟠🔴⚫☠️) נמצאת בטאב "סטטוס".';
+    }
+    if (/חוק/.test(t)) {
+      return 'שלושת החוקים: 1) לא לספים. 2) לא לקלל את היוצר/מנהלים/חברים. 3) אסור לשנות שם/תמונת הקבוצה. בנוסף אסור להזכיר עזה/פלסטין/לבנון/איראן/עיראק. פירוט מלא בטאב "חוקים".';
+    }
+    if (/גיל/.test(t)) {
+      return 'גיל הכניסה כרגע: 15-. יעלה ל-16- ב-2027.';
+    }
+    if (/לייב|כולם|סרטונים שלנו|מנוי סרטון/.test(t)) {
+      return 'מנוי סרטון רגיל (5₪/חודש): רק "אפשר לשלוח סרטונים שלנו". מנוי סרטון פלוס: גם לייבים, גם סרטונים שלנו, גם סרטונים של כולם. יש גם לוח הנחות עונתי — בטאב "מנויים".';
+    }
+    if (/רצף פלוס|פרימיום|ספאם|תג פלוס/.test(t)) {
+      return 'רצף פלוס 🔥: מקום נוסף לספאם, פרסום, שינוי שם, תג פלוס, תמיכה פלוס (חודש ₪12.45). רצף פלוס פרימיום 🔥: שני מקומות לספאם, שינוי שם+תמונה, תג פרימיום, תמיכה עם מנהל, כל הסרטונים (חודש ₪18). פירוט מלא בטאב "מנויים".';
+    }
+    if (/מנוי|מחיר|תשלום|לשלם/.test(t)) {
+      return 'יש כמה סוגי מנוי: מנוי סרטון (רגיל/פלוס), רצף פלוס ופרימיום, ומנוי מנהל (חינם, למנהלים בלבד). כל הפרטים והמחירים בטאב "מנויים".';
+    }
+    if (/חנות|לקנות|תג תורם|תג עשיר|קיק|למחוק/.test(t)) {
+      return 'בטאב "חנות" אפשר לקנות: תג תורם (₪1), תג עשיר (₪10), ערעור (₪5), תג מנהל (חינם, מנהל בלבד), שינוי שם/תמונה (₪10), מחיקת קבוצה (₪1,000), הקיק (₪500), בעלים חדש (₪700), מנהל בלי ניסיון (₪50 ⚠️ מסוכן).';
+    }
+    if (/מנהל|בעלים|shirel|שירל/.test(t)) {
+      return 'הבעלים: "הבאן המקורי" 👑. shirel היא מנהלת 🛡️. רשימה מעודכנת בטאב "בעלים ומנהלים".';
+    }
+    if (/רצף\b.*ימים|כמה ימים|סטריק/.test(t)) {
+      return 'המונה "🔥 רצף: X ימים" בראש העמוד עולה אוטומטית באחד כל יום.';
+    }
+    if (/הגדרות|צבע|כהה|בהיר|שפה|english/.test(t)) {
+      return 'בטאב "הגדרות" אפשר לשנות מצב כהה/בהיר, צבע ראשי של האתר, עוצמת אפקט הזכוכית, ואפילו את שפת הניווט (עברית/English).';
+    }
+    return 'אני עוזר מקומי ופשוט (בלי חיבור ל-AI חיצוני) — אני יכול לענות על שאלות לגבי חוקים, סטטוס, מנויים, חנות, בעלים/מנהלים, גיל וערעורים. נסה לשאול על אחד מהנושאים האלה, או עברו לטאב הרלוונטי למעלה.';
+  }
+
   function addMessage(text, cls){
     const div = document.createElement('div');
     div.className = `ai-msg ${cls}`;
@@ -1007,37 +1090,16 @@
     return div;
   }
 
-  async function sendAiMessage(){
+  function sendAiMessage(){
     const text = aiInput.value.trim();
     if (!text) return;
     aiInput.value = '';
     addMessage(text, 'user');
-    aiHistory.push({ role: 'user', content: text });
-    const loadingEl = addMessage('חושב...', 'bot loading');
 
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 500,
-          system: AI_CONTEXT,
-          messages: aiHistory,
-        }),
-      });
-      const data = await response.json();
-      const reply = (data.content || [])
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('\n') || 'לא הצלחתי לענות כרגע, נסו שוב.';
-      loadingEl.textContent = reply;
-      loadingEl.classList.remove('loading');
-      aiHistory.push({ role: 'assistant', content: reply });
-    } catch (err) {
-      loadingEl.textContent = 'שגיאה בחיבור לעוזר. נסו שוב מאוחר יותר.';
-      loadingEl.classList.remove('loading');
-    }
+    setTimeout(function(){
+      const reply = localAnswer(text);
+      addMessage(reply, 'bot');
+    }, 300);
   }
 
   aiSend.addEventListener('click', sendAiMessage);
@@ -1076,7 +1138,7 @@
   // === language toggle (EN/HE) — headings & nav translated, detailed body text stays Hebrew ===
   const I18N = {
     nav_status: 'Status', nav_rules: 'Rules', nav_subs: 'Subscriptions', nav_team: 'Owners & Admins',
-    nav_scope: 'Age & Terms', nav_shop: 'Shop', nav_settings: 'Settings', nav_contact: 'Contact',
+    nav_scope: 'Age & Terms', nav_shop: 'Shop', nav_settings: 'Settings', nav_about: 'About', nav_contact: 'Contact',
     hero_badge: 'Retzef Community · TikTok', hero_owner_label: 'Owner',
     hero_subtitle: "The group's official support hub — rules, status, subscriptions and login, in one place.",
     hero_streak_label: 'Streak', hero_days_label: 'days',
@@ -1090,6 +1152,7 @@
     scope_eyebrow: 'Who can join', scope_title: 'Age & Terms',
     shop_eyebrow: 'Retzef Shop', shop_title: 'What you can buy', shop_sub: 'Purchases go through the owner/admins. Some items are risky or limited — check the notes.',
     settings_eyebrow: 'Personalization', settings_title: 'Settings',
+    about_eyebrow: 'General Info', about_title: 'About & Version', about_sub: 'Everything about the site itself — not the group.',
     contact_title: 'Need help?', contact_sub: 'Questions about status, subscriptions, or rules — reach out directly.',
   };
   const I18N_HE = {}; // captured on first switch to English, so we can restore Hebrew exactly
@@ -1235,8 +1298,14 @@
     paypalModal.classList.add('open');
 
     if (typeof paypal === 'undefined') {
-      paypalButtonContainer.innerHTML =
-        '<p style="color:#b91c1c; font-size:13.5px;">PayPal עדיין לא מוגדר — צריך client-id אמיתי בתג ה-script בראש הקובץ, ושרת עם client secret (ראו הערת ה-HTML בתחתית הקובץ).</p>';
+      if (window.__paypalSdkFailed) {
+        paypalButtonContainer.innerHTML =
+          '<p style="color:#b91c1c; font-size:13.5px;">כפתורי PayPal לא נטענו — לרוב זה חוסם פרסומות/פרטיות בדפדפן שחוסם סקריפטים מ-paypal.com. נסו דפדפן אחר או כבו את החוסם לאתר הזה.</p>';
+      } else {
+        paypalButtonContainer.innerHTML =
+          '<p style="color:#b91c1c; font-size:13.5px;">PayPal עדיין לא מוגדר — צריך client-id אמיתי בתג ה-script בראש הקובץ, ושרת עם client secret (ראו הערת ה-HTML בתחתית הקובץ).</p>';
+      }
+      console.warn('PayPal Buttons not available. window.paypal is undefined at click time. SDK failed to load:', !!window.__paypalSdkFailed);
       return;
     }
 

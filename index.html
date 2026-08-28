@@ -8,6 +8,7 @@
 <!-- Web App Manifest (JSON) — turns this into an installable app on the phone's home screen -->
 <link rel="manifest" href='data:application/manifest+json,{"name":"רצף - בית תמיכה","short_name":"רצף","start_url":".","display":"standalone","background_color":"%23f3f4f9","theme_color":"%233b63e0","lang":"he","dir":"rtl","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%233b63e0%27/%3E%3Ctext x=%2750%27 y=%2766%27 font-size=%2748%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3E%D7%A8%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
 <meta name="theme-color" content="#3b63e0">
+<meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="רצף">
@@ -28,6 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
+    color-scheme: light;
     --bg:#f3f4f9;
     --bg2:#ffffff;
     --glass:rgba(255,255,255,0.55);
@@ -46,6 +48,7 @@
     --c-skull:#7c1230;
   }
   html[data-theme="dark"]{
+    color-scheme: dark;
     --bg:#0a0c12;
     --bg2:#11141d;
     --glass:rgba(255,255,255,0.045);

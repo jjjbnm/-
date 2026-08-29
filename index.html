@@ -1273,56 +1273,97 @@
     paypalButtonContainer.innerHTML = '';
     paypalModal.classList.add('open');
 
-    if (typeof paypal === 'undefined') {
-      if (window.__paypalSdkFailed) {
-        paypalButtonContainer.innerHTML =
-          '<p style="color:#b91c1c; font-size:13.5px;">כפתורי PayPal לא נטענו — לרוב זה חוסם פרסומות/פרטיות בדפדפן שחוסם סקריפטים מ-paypal.com. נסו דפדפן אחר או כבו את החוסם לאתר הזה.</p>';
-      } else {
-        paypalButtonContainer.innerHTML =
-          '<p style="color:#b91c1c; font-size:13.5px;">PayPal עדיין לא מוגדר — צריך client-id אמיתי בתג ה-script בראש הקובץ, ושרת עם client secret (ראו הערת ה-HTML בתחתית הקובץ).</p>';
-      }
-      paypalButtonContainer.innerHTML +=
+    function showManualFallback(reasonHtml){
+      paypalButtonContainer.innerHTML =
+        reasonHtml +
         '<button type="button" id="paypalDiagnoseBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center; margin-top:12px; font-size:13px; padding:10px;">🔍 הרץ אבחון</button>' +
         '<div id="paypalDiagnoseResult" style="margin-top:10px; font-size:12.5px; color:var(--muted); text-align:right; white-space:pre-line;"></div>';
       document.getElementById('paypalDiagnoseBtn').addEventListener('click', runPaypalDiagnosis);
-      console.warn('PayPal Buttons not available. window.paypal is undefined at click time. SDK failed to load:', !!window.__paypalSdkFailed);
+    }
+
+    // client-id sanity check — catches an obviously-empty/placeholder id before even
+    // trying to render. A truly expired/revoked id can only be confirmed by PayPal's
+    // own response when rendering (handled in the catch block below), since validating
+    // it for real requires the secret, which never belongs in the browser.
+    const clientIdMatch = document.querySelector('script[src*="paypal.com/sdk/js"]');
+    const clientIdInUrl = clientIdMatch ? new URL(clientIdMatch.src).searchParams.get('client-id') : null;
+    if (!clientIdInUrl || clientIdInUrl === 'YOUR_PAYPAL_CLIENT_ID' || clientIdInUrl.length < 10) {
+      console.error('PayPal: client-id looks missing/placeholder in the SDK script tag:', clientIdInUrl);
+      showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">ה-client-id של PayPal לא מוגדר כראוי בתג ה-script.</p>');
       return;
     }
 
-    paypal.Buttons({
-      style: { layout: 'vertical', shape: 'rect', label: 'pay' },
-      createOrder: async function () {
-        const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ item: itemName, price: price }),
-        });
-        const data = await res.json();
-        if (!data.id) throw new Error('create-order failed');
-        return data.id;
-      },
-      onApprove: async function (data) {
-        const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/capture-order`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderID: data.orderID }),
-        });
-        const details = await res.json();
-        if (details.status === 'COMPLETED') {
-          paypalButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ התשלום התקבל! תודה על "${itemName}".</p>`;
-        } else {
-          paypalButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">התשלום לא הושלם. נסו שוב.</p>';
-        }
-      },
-      onError: function (err) {
-        console.error('PayPal error:', err);
-        paypalButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">שגיאה בתשלום. נסו שוב מאוחר יותר.</p>';
-      },
-      onCancel: function () {
-        paypalButtonContainer.innerHTML = '<p style="color:var(--muted); text-align:center;">התשלום בוטל.</p>';
-      },
-    }).render(paypalButtonContainer);
+    if (typeof paypal === 'undefined') {
+      if (window.__paypalSdkFailed) {
+        console.error('PayPal SDK script failed to load entirely (network/blocker). client-id used:', clientIdInUrl);
+        showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">כפתורי PayPal לא נטענו — לרוב זה חוסם פרסומות/פרטיות בדפדפן שחוסם סקריפטים מ-paypal.com, או בעיית רשת. נסו דפדפן אחר או כבו את החוסם לאתר הזה.</p>');
+      } else {
+        console.warn('PayPal SDK not yet loaded when button was clicked (window.paypal undefined, no error/load event fired yet). client-id used:', clientIdInUrl);
+        showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">PayPal עדיין לא נטען. נסו לרענן את הדף ולנסות שוב בעוד כמה שניות.</p>');
+      }
+      return;
+    }
+
+    try {
+      paypal.Buttons({
+        style: { layout: 'vertical', shape: 'rect', label: 'pay' },
+        createOrder: async function () {
+          const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item: itemName, price: price }),
+          });
+          const data = await res.json();
+          if (!data.id) {
+            console.error('PayPal create-order failed. Server response:', data, 'HTTP status:', res.status);
+            throw new Error('create-order failed');
+          }
+          return data.id;
+        },
+        onApprove: async function (data) {
+          const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/capture-order`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderID: data.orderID }),
+          });
+          const details = await res.json();
+          if (details.status === 'COMPLETED') {
+            paypalButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ התשלום התקבל! תודה על "${itemName}".</p>`;
+          } else {
+            console.error('PayPal capture did not complete. Server response:', details, 'HTTP status:', res.status);
+            paypalButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">התשלום לא הושלם. נסו שוב.</p>';
+          }
+        },
+        onError: function (err) {
+          console.error('PayPal Buttons onError — this usually means an invalid/expired/sandbox-mismatched client-id, or the server endpoint failed:', err);
+          showManualFallback('<p style="color:#b91c1c; text-align:center;">שגיאה בתשלום — ייתכן שה-client-id פג תוקף, במצב Sandbox בטעות, או שהשרת לא זמין.</p>');
+        },
+        onCancel: function () {
+          paypalButtonContainer.innerHTML = '<p style="color:var(--muted); text-align:center;">התשלום בוטל.</p>';
+        },
+      }).render(paypalButtonContainer).catch(function(err){
+        console.error('PayPal Buttons failed to render at all (often an invalid client-id):', err);
+        showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">כפתורי PayPal לא הצליחו להיטען — כנראה בעיה עם ה-client-id (פג תוקף / Sandbox / לא תקין).</p>');
+      });
+    } catch (err) {
+      console.error('Unexpected error initializing PayPal Buttons:', err);
+      showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">שגיאה בלתי צפויה בטעינת PayPal.</p>');
+    }
   }
+
+  // Disable buy buttons gracefully (instead of a broken-looking click) if the SDK
+  // never loads within a few seconds of page load.
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      if (typeof paypal === 'undefined') {
+        document.querySelectorAll('.buy-btn, .buy-tier').forEach(btn => {
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+          btn.title = 'PayPal לא זמין כרגע';
+        });
+      }
+    }, 4000);
+  });
 
   document.querySelectorAll('.buy-btn, .buy-tier').forEach(btn => {
     btn.addEventListener('click', () => {

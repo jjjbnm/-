@@ -1233,40 +1233,6 @@
   const paypalItemPrice = document.getElementById('paypalItemPrice');
   const paypalButtonContainer = document.getElementById('paypalButtonContainer');
 
-  async function runPaypalDiagnosis(){
-    const resultEl = document.getElementById('paypalDiagnoseResult');
-    resultEl.textContent = 'בודק...';
-    const lines = [];
-
-    lines.push('מחובר לאינטרנט: ' + (navigator.onLine ? '✅ כן' : '❌ לא'));
-    lines.push('סקריפט PayPal נטען בהצלחה: ' + (window.__paypalSdkLoaded ? '✅ כן' : (window.__paypalSdkFailed ? '❌ נכשל' : '⏳ עדיין לא ידוע')));
-
-    try {
-      await fetch('https://www.paypal.com/sdk/js?client-id=test', { mode: 'no-cors', cache: 'no-store' });
-      lines.push('חיבור רשת ל-paypal.com: ✅ עבר (השרת של PayPal בר-השגה)');
-    } catch (err) {
-      lines.push('חיבור רשת ל-paypal.com: ❌ נכשל (חסימת רשת/DNS/פיירוול, לא קשור לקוד האתר)');
-    }
-
-    try {
-      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item: 'בדיקת אבחון', price: 1 }),
-      });
-      lines.push('השרת שלנו (Vercel) מגיב: ' + (res.status ? `✅ כן (סטטוס ${res.status})` : '❌ לא'));
-    } catch (err) {
-      lines.push('השרת שלנו (Vercel) מגיב: ❌ לא ניתן להגיע אליו');
-    }
-
-    lines.push('');
-    lines.push(window.__paypalSdkFailed || !navigator.onLine
-      ? '👉 מסקנה: זה כנראה חסימה ברמת הדפדפן/רשת, לא בעיה בקוד.'
-      : '👉 מסקנה: הרשת תקינה — נסו לרענן את הדף, או לבדוק בדפדפן אחר.');
-
-    resultEl.textContent = lines.join('\n');
-  }
-
   function openPaypalModal(itemName, price){
     paypalItemName.textContent = itemName;
     paypalItemPrice.textContent = `₪${price}`;
@@ -1274,11 +1240,7 @@
     paypalModal.classList.add('open');
 
     function showManualFallback(reasonHtml){
-      paypalButtonContainer.innerHTML =
-        reasonHtml +
-        '<button type="button" id="paypalDiagnoseBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center; margin-top:12px; font-size:13px; padding:10px;">🔍 הרץ אבחון</button>' +
-        '<div id="paypalDiagnoseResult" style="margin-top:10px; font-size:12.5px; color:var(--muted); text-align:right; white-space:pre-line;"></div>';
-      document.getElementById('paypalDiagnoseBtn').addEventListener('click', runPaypalDiagnosis);
+      paypalButtonContainer.innerHTML = reasonHtml;
     }
 
     // client-id sanity check — catches an obviously-empty/placeholder id before even
@@ -1664,4 +1626,4 @@ initPriceCalculator();
 </script>
 
 </body>
-          </html>
+</html>

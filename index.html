@@ -927,78 +927,17 @@
 </script>
 
 <script>
-  // === TikTok config — fill in from your TikTok for Developers app before publishing ===
-  const TIKTOK_CLIENT_KEY = "awt4ywx6dk6j3wem"; // client_key is public, safe to ship in the page
+  // === TikTok — simple link, no server, no OAuth ===
+  const TIKTOK_USERNAME = "your_username"; // בלי @ — שם המשתמש שלכם ב-TikTok
   const TIKTOK_GROUP_URL = "https://tiktok.me/group/ZSfhTkvp4/";
-  // Must exactly match the redirect URI registered in your TikTok app.
-  // Set to the domain where you deploy tiktok-login-backend (see the
-  // setup instructions in the HTML comment at the bottom of this file).
-  const TIKTOK_REDIRECT_URI = "https://chi-liart-74.vercel.app/api/callback";
 
   document.getElementById('tiktokGroupLink').href = TIKTOK_GROUP_URL;
-
-  // Real login: sends the user to TikTok's official consent screen. TikTok itself
-  // shows the "רצף מבקש גישה לחשבון שלך" permission prompt — this page never
-  // simulates that screen. The scope requested below, user.info.basic, only
-  // returns public profile fields (username/display name, avatar, open_id) —
-  // it does NOT grant posting, messaging, follower access, or any write
-  // permission on the person's TikTok account. After the user approves,
-  // TikTok redirects to TIKTOK_REDIRECT_URI (your server), which exchanges
-  // the code for a token and sends the user back here with their username.
-  document.getElementById('tiktokLoginBtn').addEventListener('click', openConsentModal);
-  document.getElementById('profileAvatar').addEventListener('click', openConsentModal);
-
-  const consentModal = document.getElementById('consentModal');
-  function openConsentModal(){ consentModal.classList.add('open'); }
-  function closeConsentModal(){ consentModal.classList.remove('open'); }
-
-  document.getElementById('consentYes').addEventListener('click', function(){
-    closeConsentModal();
-    requestTikTokLogin();
+  document.getElementById('tiktokLoginBtn').addEventListener('click', function(){
+    window.open(`https://www.tiktok.com/@${TIKTOK_USERNAME}`, '_blank');
   });
-  document.getElementById('consentNo').addEventListener('click', closeConsentModal);
-  consentModal.addEventListener('click', function(e){ if (e.target === consentModal) closeConsentModal(); });
-
-  function requestTikTokLogin(){
-    const statusEl = document.getElementById('tiktokAuthStatus');
-    if (TIKTOK_CLIENT_KEY === "YOUR_TIKTOK_CLIENT_KEY") {
-      statusEl.innerHTML = 'ההתחברות עדיין לא מוגדרת: צריך client key מ-TikTok for Developers ושרת שמשלים את החיבור (הקוד וההוראות מופיעים כהערה בתחתית קובץ ה-HTML). עד אז הכפתור לא באמת יתחבר.';
-      statusEl.style.color = '#b91c1c';
-      statusEl.style.display = 'block';
-      return;
-    }
-    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef`;
-    window.location.href = authUrl;
-  }
-
-  // After the backend redirects back here, reflect the login state and clean the URL.
-  (function showLoginResult(){
-    const params = new URLSearchParams(window.location.search);
-    const statusEl = document.getElementById('tiktokAuthStatus');
-    const avatarWrap = document.getElementById('profileAvatar');
-    const avatarImg = document.getElementById('profileAvatarImg');
-    if (params.get('tiktok_ok') === '1') {
-      const username = params.get('username') || '';
-      const avatarUrl = params.get('avatar') || '';
-      const role = params.get('role') || 'member';
-      const roleLabel = role === 'owner' ? 'בעלים' : role === 'admin' ? 'מנהל' : 'חבר';
-      statusEl.textContent = username ? `מחובר בתור @${username} · ${roleLabel} ✅` : 'התחברות בוצעה בהצלחה ✅';
-      statusEl.style.display = 'block';
-      if (avatarUrl) {
-        avatarImg.src = avatarUrl;
-        avatarWrap.classList.add('logged-in');
-        avatarWrap.title = username ? `@${username} · ${roleLabel}` : 'מחובר';
-      }
-    } else if (params.get('tiktok_error')) {
-      statusEl.textContent = 'ההתחברות נכשלה, נסו שוב.';
-      statusEl.style.display = 'block';
-    }
-    if (params.has('tiktok_ok') || params.has('tiktok_error') || params.has('username') || params.has('avatar') || params.has('role')) {
-      params.delete('tiktok_ok'); params.delete('tiktok_error'); params.delete('username'); params.delete('avatar'); params.delete('role');
-      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-      window.history.replaceState({}, '', clean);
-    }
-  })();
+  document.getElementById('profileAvatar').addEventListener('click', function(){
+    window.open(`https://www.tiktok.com/@${TIKTOK_USERNAME}`, '_blank');
+  });
 
   // === day streak — anchored so it always increases by 1 per calendar day ===
   // Anchor date is set so that on 2026-08-26 the count reads 335. No manual
@@ -1294,6 +1233,40 @@
   const paypalItemPrice = document.getElementById('paypalItemPrice');
   const paypalButtonContainer = document.getElementById('paypalButtonContainer');
 
+  async function runPaypalDiagnosis(){
+    const resultEl = document.getElementById('paypalDiagnoseResult');
+    resultEl.textContent = 'בודק...';
+    const lines = [];
+
+    lines.push('מחובר לאינטרנט: ' + (navigator.onLine ? '✅ כן' : '❌ לא'));
+    lines.push('סקריפט PayPal נטען בהצלחה: ' + (window.__paypalSdkLoaded ? '✅ כן' : (window.__paypalSdkFailed ? '❌ נכשל' : '⏳ עדיין לא ידוע')));
+
+    try {
+      await fetch('https://www.paypal.com/sdk/js?client-id=test', { mode: 'no-cors', cache: 'no-store' });
+      lines.push('חיבור רשת ל-paypal.com: ✅ עבר (השרת של PayPal בר-השגה)');
+    } catch (err) {
+      lines.push('חיבור רשת ל-paypal.com: ❌ נכשל (חסימת רשת/DNS/פיירוול, לא קשור לקוד האתר)');
+    }
+
+    try {
+      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item: 'בדיקת אבחון', price: 1 }),
+      });
+      lines.push('השרת שלנו (Vercel) מגיב: ' + (res.status ? `✅ כן (סטטוס ${res.status})` : '❌ לא'));
+    } catch (err) {
+      lines.push('השרת שלנו (Vercel) מגיב: ❌ לא ניתן להגיע אליו');
+    }
+
+    lines.push('');
+    lines.push(window.__paypalSdkFailed || !navigator.onLine
+      ? '👉 מסקנה: זה כנראה חסימה ברמת הדפדפן/רשת, לא בעיה בקוד.'
+      : '👉 מסקנה: הרשת תקינה — נסו לרענן את הדף, או לבדוק בדפדפן אחר.');
+
+    resultEl.textContent = lines.join('\n');
+  }
+
   function openPaypalModal(itemName, price){
     paypalItemName.textContent = itemName;
     paypalItemPrice.textContent = `₪${price}`;
@@ -1308,6 +1281,10 @@
         paypalButtonContainer.innerHTML =
           '<p style="color:#b91c1c; font-size:13.5px;">PayPal עדיין לא מוגדר — צריך client-id אמיתי בתג ה-script בראש הקובץ, ושרת עם client secret (ראו הערת ה-HTML בתחתית הקובץ).</p>';
       }
+      paypalButtonContainer.innerHTML +=
+        '<button type="button" id="paypalDiagnoseBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center; margin-top:12px; font-size:13px; padding:10px;">🔍 הרץ אבחון</button>' +
+        '<div id="paypalDiagnoseResult" style="margin-top:10px; font-size:12.5px; color:var(--muted); text-align:right; white-space:pre-line;"></div>';
+      document.getElementById('paypalDiagnoseBtn').addEventListener('click', runPaypalDiagnosis);
       console.warn('PayPal Buttons not available. window.paypal is undefined at click time. SDK failed to load:', !!window.__paypalSdkFailed);
       return;
     }

@@ -10,7 +10,11 @@ async function getAccessToken() {
     body: 'grant_type=client_credentials',
   });
   const data = await res.json();
-  if (!data.access_token) throw new Error('Failed to get PayPal access token');
+  if (!data.access_token) {
+    // מדפיס בלוגים בדיוק מה PayPal החזיר — לא רק "נכשל"
+    console.error('PayPal token endpoint response:', JSON.stringify(data), 'HTTP status:', res.status, 'API base used:', PAYPAL_API_BASE);
+    throw new Error('Failed to get PayPal access token: ' + JSON.stringify(data));
+  }
   return data.access_token;
 }
 
@@ -34,10 +38,10 @@ module.exports = async (req, res) => {
       }),
     });
     const orderData = await orderRes.json();
-    if (!orderData.id) return res.status(502).json({ error: 'PayPal order creation failed' });
+    if (!orderData.id) return res.status(502).json({ error: 'PayPal order creation failed', details: orderData });
     return res.status(200).json({ id: orderData.id });
   } catch (err) {
-    console.error('create-order error:', err);
-    return res.status(500).json({ error: 'Server error' });
+    console.error('create-order error:', err.message);
+    return res.status(500).json({ error: 'Server error', details: err.message });
   }
 };

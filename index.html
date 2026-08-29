@@ -921,8 +921,7 @@
 </div>
 
 <!-- PayPal SDK — עדכנו client-id לפני פרסום. currency=ILS; אם PayPal לא תומך ב-₪ בחשבון שלכם, שנו ל-USD -->
-<!-- זמנית לבדיקה: client-id=test הוא ה-client-id הרשמי של PayPal לדמו/בדיקות ציבוריות -->
-<script src="https://www.paypal.com/sdk/js?client-id=test&currency=ILS"
+<script src="https://www.paypal.com/sdk/js?client-id=AVXjZhqGVNC8WS5GU0Y6_O_BmkGLP6LV6HcYKZHW5XFAvTOOBe9Pfoywe92-arGXOY9t-ng5X2943zfY&currency=ILS"
   onload="window.__paypalSdkLoaded = true;"
   onerror="window.__paypalSdkFailed = true; console.error('PayPal SDK failed to load — check network connection or an ad/privacy blocker.');">
 </script>
@@ -1585,8 +1584,8 @@
      הדביקו את הקוד המתאים מלמעלה בכל אחד, ו-Commit.
   3. ב-Vercel, הפרויקט אמור להתפרס מחדש אוטומטית עם הקבצים החדשים.
   4. ב-Vercel → Settings → Environment Variables, הוסיפו:
-       PAYPAL_CLIENT_ID=BAAhbIg6bwV1ltfGRK26UeZW5IHSeBRKIWTN8er9d3O_H-3tObj85yKCJ5enaa7C0C3fIBcXktCLaDSzdoEArael_DCSBbxIV90U0IvIorU9fYNu
-       PAYPAL_CLIENT_SECRET=EArael_DCSBbxIV90U0IvIorU9fYNuEhmsVRV2stQfol5MDjvbOGSpakDT0eYtvqKT0Rw0VEWEnkWsJU
+       PAYPAL_CLIENT_ID=AVXjZhqGVNC8WS5GU0Y6_O_BmkGLP6LV6HcYKZHW5XFAvTOOBe9Pfoywe92-arGXOY9t-ng5X2943zfY
+       PAYPAL_CLIENT_SECRET=... (העתיקו מאותו עמוד אפליקציה ב-developer.paypal.com, ליד ה-Client ID)
        PAYPAL_API_BASE=https://api-m.sandbox.paypal.com   (או .../api-m.paypal.com לתשלומים אמיתיים)
      ואז Redeploy.
   5. ה-Client ID כבר מולא בקובץ הזה (בתג ה-script של PayPal SDK, למעלה).

@@ -1,5 +1,5 @@
 // TikTok OAuth callback — runs on the server, never in the browser.
-// Path in GitHub must be: api/callback.js
+// Path in GitHub must be exactly: api/callback.js
 // Deploy the repo to Vercel; Vercel auto-detects files under /api
 // as serverless functions, so this becomes: https://your-domain.com/api/callback
 //
@@ -14,6 +14,7 @@
 // list changes, then redeploy.
 const ROLES = {
   // 'tiktok_username': 'owner' | 'admin'
+  'your_tiktok_username_here': 'owner', // הבאן המקורי — עדכן ל-@ המדויק שלך ב-TikTok (לא שם התצוגה), אותיות קטנות
   // 'shirel_username': 'admin',
 };
 function resolveRole(username) {
@@ -41,7 +42,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // 1) exchange the authorization code for an access token
     const tokenRes = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -60,7 +60,6 @@ module.exports = async (req, res) => {
       return res.redirect(302, '/?tiktok_error=token_exchange_failed');
     }
 
-    // 2) use the access token to fetch basic profile info
     const userRes = await fetch(
       'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,username',
       { headers: { Authorization: `Bearer ${tokenData.access_token}` } }
@@ -69,11 +68,6 @@ module.exports = async (req, res) => {
     const user = userData && userData.data && userData.data.user;
     const username = (user && (user.username || user.display_name)) || '';
 
-    // NOTE: this demo doesn't persist anything server-side (no DB, no session).
-    // It just bounces the username/avatar/role back to the page via query
-    // params so the front end can show "מחובר בתור @username · תפקיד".
-    // For a real app, create a signed session/cookie here instead of
-    // trusting a query param.
     const params = new URLSearchParams({
       tiktok_ok: '1',
       username,

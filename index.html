@@ -618,12 +618,14 @@
       <div class="plan glass highlight">
         <span class="tag">מורחב</span>
         <div class="name">מנוי סרטון פלוס</div>
-        <div class="price">—<span>/חודש · מחיר יעודכן</span></div>
-        <ul>
-          <li>אפשר לשלוח לייבים</li>
-          <li>אפשר לשלוח סרטונים שלנו</li>
-          <li>אפשר לשלוח סרטונים של כולם</li>
+        <div class="price">10₪<span>/חודש</span></div>
+        <ul class="plusminus">
+          <li class="yes">+ אפשר לשלוח לייבים</li>
+          <li class="yes">+ אפשר לשלוח סרטונים שלנו</li>
+          <li class="yes">+ אפשר לשלוח סרטונים של כולם</li>
         </ul>
+        <button type="button" class="buy-btn" data-item="מנוי סרטון פלוס (חודש)" data-price="10" style="margin-top:14px;">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="מנוי סרטון פלוס (חודש)" data-price="10" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
     </div>
 
@@ -672,6 +674,8 @@
           <button type="button" class="tier buy-tier" data-item="רצף פלוס (3 ימים)" data-price="2.95"><span>3 ימים</span><span>₪2.95</span></button>
           <div class="tier"><span>יום</span><span>חינם (באישור בלבד)</span></div>
         </div>
+        <button type="button" class="buy-btn" data-item="רצף פלוס (חודש)" data-price="12.45" style="margin-top:14px;">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="רצף פלוס (חודש)" data-price="12.45" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
 
       <div class="plan glass highlight">
@@ -692,6 +696,8 @@
           <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (3 ימים)" data-price="5.95"><span>3 ימים</span><span>₪5.95</span></button>
           <div class="tier"><span>10 שעות</span><span>חינם (באישור בלבד)</span></div>
         </div>
+        <button type="button" class="buy-btn" data-item="רצף פלוס פרימיום (חודש)" data-price="18" style="margin-top:14px;">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="רצף פלוס פרימיום (חודש)" data-price="18" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
 
       <div class="plan glass">
@@ -838,6 +844,13 @@
     <span class="eyebrow" data-i18n="settings_eyebrow">התאמה אישית</span>
     <h2 class="sec-title" data-i18n="settings_title">הגדרות</h2>
     <p class="sec-sub">שנה את המראה של האתר — הצבעים, מצב כהה/בהיר, ועוצמת אפקט הזכוכית.</p>
+
+    <div class="settings-card glass">
+      <h3>🔍 אבחון מערכת</h3>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">בודק חיבור, PayPal והשרת — שימושי אם משהו לא עובד.</p>
+      <button type="button" id="systemDiagnoseBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center;">🔍 הרץ אבחון</button>
+      <div id="systemDiagnoseResult" style="margin-top:10px; font-size:12.5px; color:var(--muted); text-align:right; white-space:pre-line;"></div>
+    </div>
 
     <div class="settings-card glass">
       <h3>🌗 מצב תצוגה</h3>
@@ -1043,7 +1056,7 @@
 - מערכת סטטוס: 🟢 הכול טוב, 🟡 אזהרה ראשונה, 🟠 אזהרה שנייה (בסיכון), 🔴 אזהרה חמורה (בסכנה), ⚫ באן, ☠️ חסימה לצמיתות.
 - חוקים: 1) לא לספים. 2) לא לקלל את היוצר/מנהלים/חברים. 3) אסור לשנות שם או תמונה של הקבוצה. אסור להזכיר עזה/פלסטין/לבנון/איראן/עיראק.
 - החל מ-1.9.2026 שליחת סרטונים דורשת מנוי. יש שתי מערכות מנויים נפרדות:
-  (א) "מנוי סרטון" — קובע מה מותר לשלוח בכלל: מנוי סרטון רגיל (5₪/חודש, אפשר לשלוח סרטונים שלנו) או מנוי סרטון פלוס (מחיר טרם נקבע, אפשר לשלוח לייבים, סרטונים שלנו, וסרטונים של כולם). יש גם לוח הנחות תקופתי למנוי סרטון: 20–25 בינואר חינם, 1 באפריל המחיר עולה בשקל, 1–5 בספטמבר הנחה 50%, 25 בספטמבר הנחה 25%, 1–10 בנובמבר הנחה 11%.
+  (א) "מנוי סרטון" — קובע מה מותר לשלוח בכלל: מנוי סרטון רגיל (5₪/חודש, אפשר לשלוח סרטונים שלנו) או מנוי סרטון פלוס (10₪/חודש, אפשר לשלוח לייבים, סרטונים שלנו, וסרטונים של כולם). יש גם לוח הנחות תקופתי למנוי סרטון: 20–25 בינואר חינם, 1 באפריל המחיר עולה בשקל, 1–5 בספטמבר הנחה 50%, 25 בספטמבר הנחה 25%, 1–10 בנובמבר הנחה 11%.
   (ב) מנויי "רצף פלוס" — הטבות קהילה נוספות (לא קשור ישירות להרשאת שליחת סרטונים):
 - מנוי "רצף פלוס 🔥": מקום נוסף לספאם, אפשרות לפרסום, ניתן לשנות שם, תג פלוס, תמיכה פלוס, שליחת סרטוני הקבוצה בלבד. מחירים: חודש ₪12.45, שנה ₪18, שבוע ₪4.95, 3 ימים ₪2.95, יום חינם (באישור בלבד).
 - מנוי "רצף פלוס פרימיום 🔥": שני מקומות לספאם, פרסום בסרטון, שינוי שם ותמונת קבוצה, תג פלוס פרימיום, תמיכה עם מנהל, שליחת כל סרטון (כולל לייבים וסרטונים אישיים). מחירים: חודש ₪18, שנה ₪20, שבוע ₪9.95, 3 ימים ₪5.95, 10 שעות חינם (באישור בלבד).
@@ -1072,7 +1085,7 @@
       return 'גיל הכניסה כרגע: 15-. יעלה ל-16- ב-2027.';
     }
     if (/לייב|כולם|סרטונים שלנו|מנוי סרטון/.test(t)) {
-      return 'מנוי סרטון רגיל (5₪/חודש): רק "אפשר לשלוח סרטונים שלנו". מנוי סרטון פלוס: גם לייבים, גם סרטונים שלנו, גם סרטונים של כולם. יש גם לוח הנחות עונתי — בטאב "מנויים".';
+      return 'מנוי סרטון רגיל (5₪/חודש): רק "אפשר לשלוח סרטונים שלנו". מנוי סרטון פלוס (10₪/חודש): גם לייבים, גם סרטונים שלנו, גם סרטונים של כולם. יש גם לוח הנחות עונתי — בטאב "מנויים".';
     }
     if (/רצף פלוס|פרימיום|ספאם|תג פלוס/.test(t)) {
       return 'רצף פלוס 🔥: מקום נוסף לספאם, פרסום, שינוי שם, תג פלוס, תמיכה פלוס (חודש ₪12.45). רצף פלוס פרימיום 🔥: שני מקומות לספאם, שינוי שם+תמונה, תג פרימיום, תמיכה עם מנהל, כל הסרטונים (חודש ₪18). פירוט מלא בטאב "מנויים".';
@@ -1198,6 +1211,43 @@
   document.getElementById('langEn').addEventListener('click', () => setLanguage('en'));
 
   // === settings tab ===
+  document.getElementById('systemDiagnoseBtn').addEventListener('click', async function(){
+    const resultEl = document.getElementById('systemDiagnoseResult');
+    resultEl.textContent = 'בודק...';
+    const lines = [];
+
+    lines.push('מחובר לאינטרנט: ' + (navigator.onLine ? '✅ כן' : '❌ לא'));
+    lines.push('סקריפט PayPal נטען: ' + (window.__paypalSdkLoaded ? '✅ כן' : (window.__paypalSdkFailed ? '❌ נכשל' : '⏳ עדיין לא ידוע')));
+
+    try {
+      await fetch('https://www.paypal.com/sdk/js?client-id=test', { mode: 'no-cors', cache: 'no-store' });
+      lines.push('חיבור רשת ל-paypal.com: ✅ עבר');
+    } catch (err) {
+      lines.push('חיבור רשת ל-paypal.com: ❌ נכשל');
+    }
+
+    try {
+      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item: 'בדיקת אבחון', price: 1 }),
+      });
+      lines.push('שרת PayPal שלנו (Vercel) מגיב: ' + (res.status ? `✅ כן (סטטוס ${res.status})` : '❌ לא'));
+    } catch (err) {
+      lines.push('שרת PayPal שלנו (Vercel) מגיב: ❌ לא ניתן להגיע אליו');
+    }
+
+    try {
+      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/callback`, { method: 'GET' });
+      lines.push('שרת TikTok שלנו (Vercel) מגיב: ' + (res.status ? `✅ כן (סטטוס ${res.status})` : '❌ לא'));
+    } catch (err) {
+      lines.push('שרת TikTok שלנו (Vercel) מגיב: ❌ לא ניתן להגיע אליו');
+    }
+
+    resultEl.textContent = lines.join('\n');
+  });
+
+
   const darkToggle = document.getElementById('darkModeToggle');
   darkToggle.addEventListener('click', function(){
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';

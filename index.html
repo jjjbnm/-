@@ -336,6 +336,50 @@
     transition:transform .18s ease;
   }
   .ai-fab:hover{transform:scale(1.06);}
+
+  /* shopping cart */
+  .cart-fab{
+    position:fixed; bottom:22px; right:22px; z-index:20;
+    width:56px; height:56px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--bg2); border:1px solid var(--glass-border);
+    color:var(--text); font-size:22px;
+    box-shadow:0 10px 28px rgba(20,23,40,0.18);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .18s ease;
+  }
+  .cart-fab:hover{transform:scale(1.06);}
+  .cart-badge{
+    position:absolute; top:-4px; left:-4px; min-width:20px; height:20px; border-radius:999px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;
+    font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    padding:0 4px; display:none;
+  }
+  .cart-badge.show{display:flex;}
+  .cart-panel{
+    position:fixed; bottom:88px; right:22px; z-index:20;
+    width:min(340px, calc(100vw - 44px)); max-height:min(480px, 70vh);
+    display:none; flex-direction:column; overflow:hidden;
+    background:var(--bg2); border:1px solid var(--glass-border); border-radius:20px;
+    box-shadow:0 20px 60px rgba(20,23,40,0.25);
+  }
+  .cart-panel.open{display:flex;}
+  .cart-panel-header{
+    padding:14px 16px; border-bottom:1px solid var(--glass-border);
+    display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14px;
+  }
+  .cart-panel-header button{background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;}
+  .cart-items{flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:8px;}
+  .cart-item{display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; padding:8px 0; border-bottom:1px solid var(--glass-border);}
+  .cart-item .remove-item{background:none; border:none; color:#b91c1c; cursor:pointer; font-size:16px; flex-shrink:0;}
+  .cart-empty{padding:24px; text-align:center; color:var(--muted); font-size:13px;}
+  .cart-footer{padding:14px 16px; border-top:1px solid var(--glass-border); display:flex; flex-direction:column; gap:10px;}
+  .cart-total{display:flex; justify-content:space-between; font-weight:800; font-family:'Rubik'; font-size:16px;}
+  .add-to-cart-btn{
+    display:flex; align-items:center; gap:6px;
+    border-radius:10px; border:1px solid var(--glass-border); background:var(--glass);
+    color:var(--text); cursor:pointer; font-family:'Assistant'; font-weight:600;
+  }
+
   .ai-panel{
     position:fixed; bottom:88px; left:22px; z-index:20;
     width:min(340px, calc(100vw - 44px)); max-height:min(480px, 70vh);
@@ -569,6 +613,7 @@
           <li class="yes">+ אפשר לשלוח סרטונים שלנו</li>
         </ul>
         <button type="button" class="buy-btn" data-item="מנוי סרטון רגיל (חודש)" data-price="5" style="margin-top:14px;">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="מנוי סרטון רגיל (חודש)" data-price="5" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="plan glass highlight">
         <span class="tag">מורחב</span>
@@ -713,16 +758,19 @@
         <span class="name">🏷️ תג תורם</span>
         <span class="price">₪1</span>
         <button type="button" class="buy-btn" data-item="תג תורם" data-price="1">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="תג תורם" data-price="1" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="shop-item glass">
         <span class="name">💎 תג עשיר</span>
         <span class="price">₪10</span>
         <button type="button" class="buy-btn" data-item="תג עשיר" data-price="10">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="תג עשיר" data-price="10" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="shop-item glass">
         <span class="name">📢 לקבל ערעור</span>
         <span class="price">₪5</span>
         <button type="button" class="buy-btn" data-item="לקבל ערעור" data-price="5">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="לקבל ערעור" data-price="5" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="shop-item glass">
         <span class="name">🛡️ תג מנהל</span>
@@ -734,27 +782,32 @@
         <span class="price">₪10</span>
         <span class="note">חד פעמי</span>
         <button type="button" class="buy-btn" data-item="שינוי שם/תמונת קבוצה" data-price="10">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="שינוי שם/תמונת קבוצה" data-price="10" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="shop-item glass">
         <span class="name">🗑️ מחיקת הקבוצה</span>
         <span class="price">₪1,000</span>
         <button type="button" class="buy-btn" data-item="מחיקת הקבוצה" data-price="1000">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="מחיקת הקבוצה" data-price="1000" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="shop-item glass">
         <span class="name">👢 הקיק אנשים</span>
         <span class="price">₪500</span>
         <button type="button" class="buy-btn" data-item="הקיק אנשים" data-price="500">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="הקיק אנשים" data-price="500" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="shop-item glass">
         <span class="name">👑 להיות בעלים חדש</span>
         <span class="price">₪700</span>
         <button type="button" class="buy-btn" data-item="להיות בעלים חדש" data-price="700">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="להיות בעלים חדש" data-price="700" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="shop-item glass">
         <span class="name">🎲 להיות מנהל בלי ניסיון</span>
         <span class="price">₪50</span>
         <span class="note warn">⚠️ יכול לגרום לחסימה</span>
         <button type="button" class="buy-btn" data-item="להיות מנהל בלי ניסיון" data-price="50">🛒 קנה</button>
+        <button type="button" class="add-to-cart-btn" data-item="להיות מנהל בלי ניסיון" data-price="50" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
     </div>
 
@@ -917,6 +970,25 @@
   <div class="ai-input-row">
     <input type="text" id="aiInput" placeholder="שאלה...">
     <button type="button" id="aiSend">שלח</button>
+  </div>
+</div>
+
+<button type="button" class="cart-fab" id="cartFab" title="עגלת קניות">
+  🛒
+  <span class="cart-badge" id="cartBadge">0</span>
+</button>
+
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-header">
+    <span>עגלת קניות</span>
+    <button type="button" id="cartClose">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty" id="cartEmptyMsg">העגלה ריקה — לחצו "➕ הוסף לעגלה" על פריטים.</div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none;">
+    <div class="cart-total"><span>סה"כ</span><span id="cartTotal">₪0</span></div>
+    <button type="button" class="btn btn-primary" id="cartCheckoutBtn" style="width:100%; justify-content:center;">💳 לתשלום</button>
   </div>
 </div>
 
@@ -1331,6 +1403,65 @@
     btn.addEventListener('click', () => {
       openPaypalModal(btn.dataset.item, btn.dataset.price);
     });
+  });
+
+  // === shopping cart ===
+  let cart = []; // { name, price }
+
+  const cartFab = document.getElementById('cartFab');
+  const cartPanel = document.getElementById('cartPanel');
+  const cartItemsEl = document.getElementById('cartItems');
+  const cartEmptyMsg = document.getElementById('cartEmptyMsg');
+  const cartFooter = document.getElementById('cartFooter');
+  const cartTotalEl = document.getElementById('cartTotal');
+  const cartBadge = document.getElementById('cartBadge');
+
+  function renderCart(){
+    cartItemsEl.innerHTML = '';
+    if (cart.length === 0) {
+      cartItemsEl.appendChild(cartEmptyMsg);
+      cartFooter.style.display = 'none';
+      cartBadge.classList.remove('show');
+      return;
+    }
+    let total = 0;
+    cart.forEach((item, idx) => {
+      total += Number(item.price);
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+      row.innerHTML = `<span>${item.name}</span><span style="display:flex; align-items:center; gap:8px;"><b>₪${item.price}</b><button type="button" class="remove-item" data-idx="${idx}">✕</button></span>`;
+      cartItemsEl.appendChild(row);
+    });
+    cartFooter.style.display = 'flex';
+    cartTotalEl.textContent = `₪${total.toLocaleString('he-IL')}`;
+    cartBadge.textContent = cart.length;
+    cartBadge.classList.add('show');
+
+    cartItemsEl.querySelectorAll('.remove-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        cart.splice(Number(btn.dataset.idx), 1);
+        renderCart();
+      });
+    });
+  }
+
+  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cart.push({ name: btn.dataset.item, price: btn.dataset.price });
+      renderCart();
+      cartPanel.classList.add('open');
+    });
+  });
+
+  cartFab.addEventListener('click', () => cartPanel.classList.toggle('open'));
+  document.getElementById('cartClose').addEventListener('click', () => cartPanel.classList.remove('open'));
+
+  document.getElementById('cartCheckoutBtn').addEventListener('click', () => {
+    if (cart.length === 0) return;
+    const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+    const summary = cart.length === 1 ? cart[0].name : `עגלת קניות (${cart.length} פריטים: ${cart.map(i => i.name).join(', ')})`;
+    cartPanel.classList.remove('open');
+    openPaypalModal(summary, total);
   });
 
   document.getElementById('paypalModalClose').addEventListener('click', () => {

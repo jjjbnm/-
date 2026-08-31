@@ -464,6 +464,8 @@
       <p id="paypalItemPrice" style="font-family:'Rubik'; font-weight:800; font-size:22px; color:var(--accent); margin-bottom:18px;"></p>
     </div>
     <div id="paypalButtonContainer"></div>
+    <div id="applePayButtonContainer" style="margin-top:10px;"></div>
+    <div id="googlePayButtonContainer" style="margin-top:10px;"></div>
     <p style="font-size:11.5px; color:var(--muted); margin-top:14px; text-align:center;">התשלום מאובטח דרך PayPal.</p>
   </div>
 </div>
@@ -931,7 +933,7 @@
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">גרסת אתר</span><span style="font-weight:700;">גישה מקודמת</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">שפות</span><span style="font-weight:700;">HTML · CSS · JS · TypeScript</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">אחסון</span><span style="font-weight:700;">Vercel + GitHub</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">תשלומים</span><span style="font-weight:700;">PayPal · Apple Pay</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">תשלומים</span><span style="font-weight:700;">PayPal · Apple Pay · Google Pay</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">התחברות</span><span style="font-weight:700;">TikTok Login Kit</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">עוזר</span><span style="font-weight:700;">מקומי, חינמי</span></div>
       </div>
@@ -1012,17 +1014,57 @@
 </script>
 
 <script>
-  // === TikTok — simple link, no server, no OAuth ===
-  const TIKTOK_USERNAME = "your_username"; // בלי @ — שם המשתמש שלכם ב-TikTok
+  // === TikTok config — real OAuth, server confirmed working ===
+  const TIKTOK_CLIENT_KEY = "awt4ywx6dk6j3wem";
   const TIKTOK_GROUP_URL = "https://tiktok.me/group/ZSfhTkvp4/";
+  const TIKTOK_REDIRECT_URI = "https://chi-liart-74.vercel.app/api/callback";
 
   document.getElementById('tiktokGroupLink').href = TIKTOK_GROUP_URL;
-  document.getElementById('tiktokLoginBtn').addEventListener('click', function(){
-    window.open(`https://www.tiktok.com/@${TIKTOK_USERNAME}`, '_blank');
+
+  document.getElementById('tiktokLoginBtn').addEventListener('click', openConsentModal);
+  document.getElementById('profileAvatar').addEventListener('click', openConsentModal);
+
+  const consentModal = document.getElementById('consentModal');
+  function openConsentModal(){ consentModal.classList.add('open'); }
+  function closeConsentModal(){ consentModal.classList.remove('open'); }
+
+  document.getElementById('consentYes').addEventListener('click', function(){
+    closeConsentModal();
+    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef`;
+    window.location.href = authUrl;
   });
-  document.getElementById('profileAvatar').addEventListener('click', function(){
-    window.open(`https://www.tiktok.com/@${TIKTOK_USERNAME}`, '_blank');
-  });
+  document.getElementById('consentNo').addEventListener('click', closeConsentModal);
+  consentModal.addEventListener('click', function(e){ if (e.target === consentModal) closeConsentModal(); });
+
+  // After the server redirects back here, reflect the login state and clean the URL.
+  (function showLoginResult(){
+    const params = new URLSearchParams(window.location.search);
+    const statusEl = document.getElementById('tiktokAuthStatus');
+    const avatarWrap = document.getElementById('profileAvatar');
+    const avatarImg = document.getElementById('profileAvatarImg');
+    if (params.get('tiktok_ok') === '1') {
+      const username = params.get('username') || '';
+      const avatarUrl = params.get('avatar') || '';
+      const role = params.get('role') || 'member';
+      const roleLabel = role === 'owner' ? 'בעלים' : role === 'admin' ? 'מנהל' : 'חבר';
+      statusEl.textContent = username ? `מחובר בתור @${username} · ${roleLabel} ✅` : 'התחברות בוצעה בהצלחה ✅';
+      statusEl.style.display = 'block';
+      if (avatarUrl) {
+        avatarImg.src = avatarUrl;
+        avatarWrap.classList.add('logged-in');
+        avatarWrap.title = username ? `@${username} · ${roleLabel}` : 'מחובר';
+      }
+    } else if (params.get('tiktok_error')) {
+      const statusEl2 = document.getElementById('tiktokAuthStatus');
+      statusEl2.textContent = 'ההתחברות נכשלה (' + params.get('tiktok_error') + '), נסו שוב.';
+      statusEl2.style.display = 'block';
+    }
+    if (params.has('tiktok_ok') || params.has('tiktok_error') || params.has('username') || params.has('avatar') || params.has('role')) {
+      params.delete('tiktok_ok'); params.delete('tiktok_error'); params.delete('username'); params.delete('avatar'); params.delete('role');
+      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+      window.history.replaceState({}, '', clean);
+    }
+  })();
 
   // === day streak — anchored so it always increases by 1 per calendar day ===
   // Anchor date is set so that on 2026-08-26 the count reads 335. No manual
@@ -1354,6 +1396,8 @@
   const paypalItemName = document.getElementById('paypalItemName');
   const paypalItemPrice = document.getElementById('paypalItemPrice');
   const paypalButtonContainer = document.getElementById('paypalButtonContainer');
+  const applePayButtonContainer = document.getElementById('applePayButtonContainer');
+  const googlePayButtonContainer = document.getElementById('googlePayButtonContainer');
 
   function openPaypalModal(itemName, price){
     paypalItemName.textContent = itemName;
@@ -1429,6 +1473,98 @@
         console.error('PayPal Buttons failed to render at all (often an invalid client-id):', err);
         showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">כפתורי PayPal לא הצליחו להיטען — כנראה בעיה עם ה-client-id (פג תוקף / Sandbox / לא תקין).</p>');
       });
+
+      // Apple Pay — separate funding source. Only renders on devices/browsers
+      // that support Apple Pay AND when it's enabled on the PayPal merchant
+      // account (Sandbox/Live) with a verified domain (see setup notes at the
+      // bottom of this file). If not eligible, this silently shows nothing —
+      // the regular PayPal buttons above still work as the fallback.
+      applePayButtonContainer.innerHTML = '';
+      if (paypal.isFundingEligible && paypal.isFundingEligible(paypal.FUNDING.APPLEPAY)) {
+        paypal.Buttons({
+          fundingSource: paypal.FUNDING.APPLEPAY,
+          style: { layout: 'vertical', shape: 'rect' },
+          createOrder: async function () {
+            const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ item: itemName, price: price }),
+            });
+            const data = await res.json();
+            if (!data.id) {
+              console.error('Apple Pay create-order failed. Server response:', data, 'HTTP status:', res.status);
+              throw new Error('create-order failed');
+            }
+            return data.id;
+          },
+          onApprove: async function (data) {
+            const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/capture-order`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderID: data.orderID }),
+            });
+            const details = await res.json();
+            if (details.status === 'COMPLETED') {
+              paypalButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ התשלום התקבל! תודה על "${itemName}".</p>`;
+              applePayButtonContainer.innerHTML = '';
+            } else {
+              console.error('Apple Pay capture did not complete. Server response:', details, 'HTTP status:', res.status);
+              paypalButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">התשלום לא הושלם. נסו שוב.</p>';
+            }
+          },
+          onError: function (err) {
+            console.error('Apple Pay button error:', err);
+          },
+        }).render(applePayButtonContainer).catch(function(err){
+          console.warn('Apple Pay button failed to render (device/account not eligible):', err);
+        });
+      }
+
+      // Google Pay — same pattern as Apple Pay: separate funding source,
+      // only renders when the browser/device supports Google Pay AND it's
+      // enabled on the PayPal merchant account. Silently shows nothing if
+      // not eligible — regular PayPal buttons remain the fallback.
+      googlePayButtonContainer.innerHTML = '';
+      if (paypal.isFundingEligible && paypal.isFundingEligible(paypal.FUNDING.GOOGLEPAY)) {
+        paypal.Buttons({
+          fundingSource: paypal.FUNDING.GOOGLEPAY,
+          style: { layout: 'vertical', shape: 'rect' },
+          createOrder: async function () {
+            const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/create-order`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ item: itemName, price: price }),
+            });
+            const data = await res.json();
+            if (!data.id) {
+              console.error('Google Pay create-order failed. Server response:', data, 'HTTP status:', res.status);
+              throw new Error('create-order failed');
+            }
+            return data.id;
+          },
+          onApprove: async function (data) {
+            const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/capture-order`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderID: data.orderID }),
+            });
+            const details = await res.json();
+            if (details.status === 'COMPLETED') {
+              paypalButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ התשלום התקבל! תודה על "${itemName}".</p>`;
+              applePayButtonContainer.innerHTML = '';
+              googlePayButtonContainer.innerHTML = '';
+            } else {
+              console.error('Google Pay capture did not complete. Server response:', details, 'HTTP status:', res.status);
+              paypalButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">התשלום לא הושלם. נסו שוב.</p>';
+            }
+          },
+          onError: function (err) {
+            console.error('Google Pay button error:', err);
+          },
+        }).render(googlePayButtonContainer).catch(function(err){
+          console.warn('Google Pay button failed to render (device/account not eligible):', err);
+        });
+      }
     } catch (err) {
       console.error('Unexpected error initializing PayPal Buttons:', err);
       showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">שגיאה בלתי צפויה בטעינת PayPal.</p>');
@@ -1758,53 +1894,4 @@ interface ShopItem {
 }
 
 function applyAdminDiscount(price: number, isAdmin: boolean): number {
-  const discount: number = isAdmin ? 2 : 0;
-  const result: number = price - discount;
-  return result > 0 ? result : 0;
-}
-
-function formatILS(amount: number): string {
-  return '₪' + amount.toLocaleString('he-IL');
-}
-
-function calculatePrice(item: ShopItem, isAdmin: boolean): string {
-  const finalPrice: number = applyAdminDiscount(item.price, isAdmin);
-  return formatILS(finalPrice);
-}
-
-function initPriceCalculator(): void {
-  const select = document.getElementById('tsCalcItem') as HTMLSelectElement | null;
-  const adminCheckbox = document.getElementById('tsCalcAdmin') as HTMLInputElement | null;
-  const resultEl = document.getElementById('tsCalcResult') as HTMLElement | null;
-  if (!select || !adminCheckbox || !resultEl) return;
-
-  function update(): void {
-    const price: number = Number(select!.value);
-    const isAdmin: boolean = adminCheckbox!.checked;
-    const item: ShopItem = { price };
-    resultEl!.textContent = calculatePrice(item, isAdmin);
-  }
-
-  select.addEventListener('change', update);
-  adminCheckbox.addEventListener('change', update);
-  update();
-}
-
-initPriceCalculator();
-</script>
-
-<script>
-  // בוטסטראפ: מקמפל את קוד ה-TypeScript שלמעלה ל-JS ומריץ אותו
-  (function runTypeScript(){
-    const src = document.getElementById('tsSource').textContent;
-    const compiled = window.ts.transpileModule(src, {
-      compilerOptions: { module: window.ts.ModuleKind.None, target: window.ts.ScriptTarget.ES2017 }
-    }).outputText;
-    const scriptEl = document.createElement('script');
-    scriptEl.textContent = compiled;
-    document.body.appendChild(scriptEl);
-  })();
-</script>
-
-</body>
-</html>
+  const discount: number = isAdmin ? 2 :

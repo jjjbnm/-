@@ -544,7 +544,8 @@
   </header>
 
   <nav class="tabs-nav glass">
-    <button class="tab-btn active" data-target="status" data-i18n="nav_status">סטטוס</button>
+    <button class="tab-btn active" data-target="home" data-i18n="nav_home">בית</button>
+    <button class="tab-btn" data-target="status" data-i18n="nav_status">סטטוס</button>
     <button class="tab-btn" data-target="rules" data-i18n="nav_rules">חוקים</button>
     <button class="tab-btn" data-target="subs" data-i18n="nav_subs">מנויים</button>
     <button class="tab-btn" data-target="team" data-i18n="nav_team">בעלים ומנהלים</button>
@@ -555,8 +556,40 @@
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">יצירת קשר</button>
   </nav>
 
+  <!-- HOME -->
+  <section id="home" class="tab-panel active">
+    <span class="eyebrow" data-i18n="home_eyebrow">ברוכים הבאים</span>
+    <h2 class="sec-title" data-i18n="home_title">בית</h2>
+    <p class="sec-sub" data-i18n="home_sub">כל מה שצריך לדעת על רצף, במקום אחד.</p>
+
+    <div class="shop-grid" style="margin-bottom:20px;">
+      <div class="shop-item glass tab-jump" data-target="status" style="cursor:pointer;">
+        <span class="name">🟢 סטטוס</span>
+        <span class="note">בדקו איפה אתם עומדים בקבוצה</span>
+      </div>
+      <div class="shop-item glass tab-jump" data-target="rules" style="cursor:pointer;">
+        <span class="name">📜 חוקים</span>
+        <span class="note">כל חוקי הקבוצה</span>
+      </div>
+      <div class="shop-item glass tab-jump" data-target="subs" style="cursor:pointer;">
+        <span class="name">💳 מנויים</span>
+        <span class="note">רצף פלוס, מנוי סרטון ועוד</span>
+      </div>
+      <div class="shop-item glass tab-jump" data-target="shop" style="cursor:pointer;">
+        <span class="name">🛍️ חנות</span>
+        <span class="note">תגים, שינויים ועוד</span>
+      </div>
+    </div>
+
+    <div class="settings-card glass">
+      <h3>🆘 מצאתם בעיה?</h3>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">אם משהו לא עובד באתר או בקבוצה, אפשר לפנות ישירות.</p>
+      <a href="https://www.tiktok.com/@user613987579196?_r=1&_t=ZS-99MugNRg5zk" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">✉️ עלי לפנות לתמיכה</a>
+    </div>
+  </section>
+
   <!-- STATUS LADDER -->
-  <section id="status" class="tab-panel active">
+  <section id="status" class="tab-panel">
     <span class="eyebrow" data-i18n="status_eyebrow">מערכת סטטוס</span>
     <h2 class="sec-title" data-i18n="status_title">איפה אתה עומד בקבוצה</h2>
     <p class="sec-sub" data-i18n="status_sub">כל חבר מתחיל ירוק. חריגה מהחוקים מעלה אותך בסולם — הסולם לא מתאפס לבד, מנהל מטפל בכל שלב.</p>
@@ -1293,13 +1326,14 @@
 
   // === language toggle (EN/HE) — headings & nav translated, detailed body text stays Hebrew ===
   const I18N = {
-    nav_status: 'Status', nav_rules: 'Rules', nav_subs: 'Subscriptions', nav_team: 'Owners & Admins',
+    nav_home: 'Home', nav_status: 'Status', nav_rules: 'Rules', nav_subs: 'Subscriptions', nav_team: 'Owners & Admins',
     nav_scope: 'Age & Terms', nav_shop: 'Shop', nav_settings: 'Settings', nav_about: 'About', nav_contact: 'Contact',
     hero_badge: 'Retzef Community · TikTok', hero_owner_label: 'Owner',
     hero_subtitle: "The group's official support hub — rules, status, subscriptions and login, in one place.",
     hero_streak_label: 'Streak', hero_days_label: 'days',
     hero_login_btn: 'Login with TikTok', hero_tiktok_page_btn: "Retzef's TikTok page", hero_check_status_btn: 'Check status',
     status_eyebrow: 'Status System', status_title: 'Where you stand in the group', status_sub: 'Everyone starts green. Breaking the rules moves you up the ladder — it never resets on its own, an admin handles every step.',
+    home_eyebrow: 'Welcome', home_title: 'Home', home_sub: 'Everything you need to know about Retzef, in one place.',
     rules_eyebrow: 'Group Rules', rules_title: 'Rules', rules_sub: 'Three base rules that apply to everyone, at all times.',
     subschange_eyebrow: 'Subscription Update', subschange_title: "What's changing",
     videosubs_eyebrow: 'Video Posting Permission', videosubs_title: 'Video Subscription', videosubs_sub: "Separate from Retzef Plus — this is the subscription that determines what's allowed to be sent at all.",
@@ -1790,47 +1824,4 @@
       if (data.status === 'SUSPENDED' || data.status === 'CANCELLED' || data.status === 'EXPIRED') {
         statusEl.style.color = '#b91c1c';
       } else {
-        statusEl.style.color = '';
-      }
-    } catch (err) {
-      statusEl.textContent = 'שגיאה בבדיקת סטטוס. נסו שוב.';
-    }
-  }
-  document.getElementById('checkSubStatusBtn').addEventListener('click', updateMySubStatus);
-  if (localStorage.getItem('retzef_subscription_id')) updateMySubStatus();
-
-  // === shopping cart ===
-  let cart = []; // { name, price }
-
-  const cartFab = document.getElementById('cartFab');
-  const cartPanel = document.getElementById('cartPanel');
-  const cartItemsEl = document.getElementById('cartItems');
-  const cartEmptyMsg = document.getElementById('cartEmptyMsg');
-  const cartFooter = document.getElementById('cartFooter');
-  const cartTotalEl = document.getElementById('cartTotal');
-  const cartBadge = document.getElementById('cartBadge');
-
-  function renderCart(){
-    cartItemsEl.innerHTML = '';
-    if (cart.length === 0) {
-      cartItemsEl.appendChild(cartEmptyMsg);
-      cartFooter.style.display = 'none';
-      cartBadge.classList.remove('show');
-      return;
-    }
-    let total = 0;
-    cart.forEach((item, idx) => {
-      total += Number(item.price);
-      const row = document.createElement('div');
-      row.className = 'cart-item';
-      row.innerHTML = `<span>${item.name}</span><span style="display:flex; align-items:center; gap:8px;"><b>₪${item.price}</b><button type="button" class="remove-item" data-idx="${idx}">✕</button></span>`;
-      cartItemsEl.appendChild(row);
-    });
-    cartFooter.style.display = 'flex';
-    cartTotalEl.textContent = `₪${total.toLocaleString('he-IL')}`;
-    cartBadge.textContent = cart.length;
-    cartBadge.classList.add('show');
-
-    cartItemsEl.querySelectorAll('.remove-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        cart.splice(Number(btn.dataset.i
+     

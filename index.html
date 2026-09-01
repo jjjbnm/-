@@ -58,6 +58,109 @@
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  // 1) Tab system: prefer explicit data-target="#id", otherwise match by index
+  (function initTabs() {
+    const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+    const panels = Array.from(document.querySelectorAll('.tab-panel'));
+    if (!tabs.length || !panels.length) return;
+
+    function activateTab(index) {
+      tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+      panels.forEach((p, i) => p.classList.toggle('active', i === index));
+      // focus the activated tab for keyboard users
+      tabs[index] && tabs[index].focus();
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const target = tab.getAttribute('data-target');
+        if (target) {
+          const panel = document.querySelector(target);
+          if (panel) {
+            tabs.forEach(t => t.classList.remove('active'));
+            panels.forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            panel.classList.add('active');
+            return;
+          }
+        }
+        activateTab(i);
+      });
+    });
+
+    // If no tab is active, activate the first
+    if (!tabs.some(t => t.classList.contains('active'))) activateTab(0);
+  })();
+
+  // 2) Generic button handler: support data-href navigation and data-action hooks
+  (function initButtons() {
+    // delegate clicks for performance and to cover dynamically inserted buttons
+    document.body.addEventListener('click', function (ev) {
+      const btn = ev.target.closest('.btn, [data-action], [data-href]');
+      if (!btn) return;
+
+      // If it's an <a> and has a proper href, let it behave normally
+      if (btn.tagName === 'A' && btn.getAttribute('href')) return;
+
+      ev.preventDefault();
+
+      // data-href -> navigate
+      const href = btn.getAttribute('data-href') || btn.dataset.href;
+      if (href) {
+        window.location.href = href;
+        return;
+      }
+
+      // data-action -> built-in behaviors (extend as needed)
+      const action = btn.getAttribute('data-action') || btn.dataset.action;
+      if (action === 'open-tiktok-oauth') {
+        // Example: redirect to /api/tiktok/start or to a full OAuth URL
+        const url = btn.getAttribute('data-oauth-url') || '/api/tiktok/start';
+        window.location.href = url;
+        return;
+      }
+      if (action === 'open-paypal-create') {
+        // Example: open a create-order flow — adapt to your front-end code
+        // This is a no-op placeholder so button responds; replace with your logic.
+        console.log('PayPal create-order button clicked. Add your create-order logic here.');
+        return;
+      }
+
+      // If the button references a panel by id (aria-controls / data-controls)
+      const controls = btn.getAttribute('aria-controls') || btn.dataset.controls;
+      if (controls) {
+        const el = document.getElementById(controls);
+        if (el) el.classList.toggle('active');
+        return;
+      }
+
+      // fallback: add a small visual feedback so user sees the click
+      btn.classList.add('clicked');
+      setTimeout(() => btn.classList.remove('clicked'), 200);
+      console.log('Button clicked (no handler):', btn);
+    }, false);
+  })();
+
+  // 3) Accessibility / misc fixes
+  (function a11yFixes() {
+    // Make sure keyboard "Enter"/"Space" activate .btn elements (if not native buttons)
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      const el = document.activeElement;
+      if (!el) return;
+      if (el.classList && el.classList.contains('btn')) {
+        ev.preventDefault();
+        el.click();
+      }
+    });
+  })();
+
+  console.log('UI helper script initialized: tabs and generic button handlers are active.');
+});
+</script>
   body{
     background:var(--bg);
     color:var(--text);

@@ -440,6 +440,22 @@
 </head>
 <body>
 
+<script>
+  // מציג כל שגיאת JS ישירות על המסך — כדי לאתר תקלות מהטלפון, בלי מחשב/devtools
+  window.addEventListener('error', function(e){
+    var box = document.createElement('div');
+    box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999999;background:#b91c1c;color:#fff;padding:14px;font-size:13px;direction:ltr;text-align:left;white-space:pre-wrap;font-family:monospace;';
+    box.textContent = 'JS ERROR: ' + e.message + '\n@ ' + e.filename + ':' + e.lineno + ':' + e.colno;
+    document.body.insertBefore(box, document.body.firstChild);
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    var box = document.createElement('div');
+    box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999999;background:#b91c1c;color:#fff;padding:14px;font-size:13px;direction:ltr;text-align:left;white-space:pre-wrap;font-family:monospace;';
+    box.textContent = 'PROMISE ERROR: ' + (e.reason && e.reason.message ? e.reason.message : e.reason);
+    document.body.insertBefore(box, document.body.firstChild);
+  });
+</script>
+
 <div class="profile-avatar glass" id="profileAvatar" title="התחברות עם TikTok" style="cursor:pointer;">
   <img id="profileAvatarImg" src="" alt="תמונת פרופיל TikTok">
   <span class="placeholder">
@@ -1817,32 +1833,4 @@
 
     cartItemsEl.querySelectorAll('.remove-item').forEach(btn => {
       btn.addEventListener('click', () => {
-        cart.splice(Number(btn.dataset.idx), 1);
-        renderCart();
-      });
-    });
-  }
-
-  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      cart.push({ name: btn.dataset.item, price: btn.dataset.price });
-      renderCart();
-      cartPanel.classList.add('open');
-    });
-  });
-
-  cartFab.addEventListener('click', () => cartPanel.classList.toggle('open'));
-  document.getElementById('cartClose').addEventListener('click', () => cartPanel.classList.remove('open'));
-
-  document.getElementById('cartCheckoutBtn').addEventListener('click', () => {
-    if (cart.length === 0) return;
-    const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-    const summary = cart.length === 1 ? cart[0].name : `עגלת קניות (${cart.length} פריטים: ${cart.map(i => i.name).join(', ')})`;
-    cartPanel.classList.remove('open');
-    openPaypalModal(summary, total);
-  });
-
-  document.getElementById('paypalModalClose').addEventListener('click', () => {
-    paypalModal.classList.remove('open');
-  });
-  paypalModal.addEventListener('click', 
+        cart.splice(Number(btn.dataset.i

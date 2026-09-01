@@ -379,6 +379,11 @@
     border-radius:10px; border:1px solid var(--glass-border); background:var(--glass);
     color:var(--text); cursor:pointer; font-family:'Assistant'; font-weight:600;
   }
+  .subscribe-btn{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    border-radius:10px; border:1px solid var(--accent); background:transparent;
+    color:var(--accent); cursor:pointer; font-family:'Assistant'; font-weight:700;
+  }
 
   .ai-panel{
     position:fixed; bottom:88px; left:22px; z-index:20;
@@ -456,6 +461,18 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="usernameModal" style="z-index:60;">
+  <div class="modal-card">
+    <div class="modal-icon">👤</div>
+    <h3>ברוכים הבאים לרצף</h3>
+    <p>איך קוראים לכם? זה יישמר במכשיר הזה בלבד.</p>
+    <input type="text" id="usernameInput" placeholder="שם משתמש" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--glass-border); background:var(--bg); color:var(--text); font-family:'Assistant'; font-size:15px; margin-bottom:14px; text-align:center;">
+    <div class="modal-actions">
+      <button type="button" id="usernameSubmit" class="btn btn-primary" style="flex:1; justify-content:center;">כניסה</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="paypalModal">
   <div class="modal-card" style="text-align:right;">
     <button type="button" id="paypalModalClose" style="position:absolute; top:14px; left:14px; background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;">✕</button>
@@ -470,6 +487,18 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="subModal">
+  <div class="modal-card" style="text-align:right;">
+    <button type="button" id="subModalClose" style="position:absolute; top:14px; left:14px; background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;">✕</button>
+    <div style="text-align:center;">
+      <h3 id="subItemName" style="margin-bottom:2px;"></h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:18px;">מנוי מתחדש — חיוב אוטומטי כל תקופה, עד ביטול</p>
+    </div>
+    <div id="subButtonContainer"></div>
+    <p style="font-size:11.5px; color:var(--muted); margin-top:14px; text-align:center;">התשלום מאובטח דרך PayPal. אפשר לבטל בכל עת דרך PayPal.</p>
+  </div>
+</div>
+
 <div class="blob blob1"></div>
 <div class="blob blob2"></div>
 <div class="blob blob3"></div>
@@ -479,6 +508,7 @@
   <header>
     <div class="badge glass"><span class="dot"></span> <span data-i18n="hero_badge">קהילת רצף · TikTok</span></div>
     <p style="margin-top:8px; font-size:13px; color:var(--muted);">👑 <span data-i18n="hero_owner_label">בעלים</span>: <b style="color:var(--text);">הבאן המקורי</b></p>
+    <p id="userGreeting" style="margin-top:4px; font-size:13px; color:var(--muted); display:none;"></p>
     <h1>רצף</h1>
     <p data-i18n="hero_subtitle">בית התמיכה הרשמי של הקבוצה — חוקים, סטטוסים, מנויים והתחברות, במקום אחד.</p>
     <div class="badge glass" style="margin-top:16px; font-weight:700;">🔥 <span data-i18n="hero_streak_label">רצף</span>: <span id="streakDays">335</span> <span data-i18n="hero_days_label">ימים</span></div>
@@ -582,8 +612,8 @@
     <h2 class="sec-title" data-i18n="subschange_title">מה משתנה</h2>
 
     <div class="date-strip glass">
-      <div class="big">1 בספטמבר 2026</div>
-      <div class="small">מהתאריך הזה, שליחת סרטונים דורשת מנוי. מחיר המנוי הבסיסי עולה ל-8₪ בשנת 2027.</div>
+      <div class="big">עדכון מדיניות סרטונים</div>
+      <div class="small">שליחת סרטונים דורשת מנוי. מחיר המנוי הבסיסי עולה בשנת 2027.</div>
     </div>
 
     <div class="diff-grid">
@@ -597,6 +627,12 @@
       </div>
     </div>
   </section>
+
+  <div class="settings-card glass" style="margin:20px 0;">
+    <h3>🔁 המנוי שלי</h3>
+    <p id="mySubStatus" style="font-size:13px; color:var(--muted); margin-bottom:10px;">לא נמצא מנוי פעיל במכשיר הזה.</p>
+    <button type="button" id="checkSubStatusBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center; font-size:13px;">🔄 בדוק סטטוס מנוי</button>
+  </div>
 
   <!-- VIDEO POSTING SUBSCRIPTIONS -->
   <section id="video-subs">
@@ -615,6 +651,7 @@
           <li class="yes">+ אפשר לשלוח סרטונים שלנו</li>
         </ul>
         <button type="button" class="buy-btn" data-item="מנוי סרטון רגיל (חודש)" data-price="2.5" style="margin-top:14px;">🛒 קנה</button>
+        <button type="button" class="subscribe-btn" data-item="מנוי סרטון רגיל (חודשי, מתחדש)" data-plan="video_regular_month" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">🔁 הרשמה כמנוי מתחדש</button>
         <button type="button" class="add-to-cart-btn" data-item="מנוי סרטון רגיל (חודש)" data-price="2.5" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
       <div class="plan glass highlight">
@@ -627,6 +664,7 @@
           <li class="yes">+ אפשר לשלוח סרטונים של כולם</li>
         </ul>
         <button type="button" class="buy-btn" data-item="מנוי סרטון פלוס (חודש)" data-price="5" style="margin-top:14px;">🛒 קנה</button>
+        <button type="button" class="subscribe-btn" data-item="מנוי סרטון פלוס (חודשי, מתחדש)" data-plan="video_plus_month" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">🔁 הרשמה כמנוי מתחדש</button>
         <button type="button" class="add-to-cart-btn" data-item="מנוי סרטון פלוס (חודש)" data-price="5" style="margin-top:6px; width:100%; justify-content:center; font-size:12.5px; padding:8px;">➕ הוסף לעגלה</button>
       </div>
     </div>
@@ -670,10 +708,10 @@
           <li>אפשר לשלוח רק סרטונים שלנו</li>
         </ul>
         <div class="price-tiers">
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס (חודש)" data-price="6.22"><span>חודש</span><span>₪6.22</span></button>
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס (שנה)" data-price="9"><span>שנה</span><span>₪9</span></button>
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס (שבוע)" data-price="2.48"><span>שבוע</span><span>₪2.48</span></button>
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס (3 ימים)" data-price="1.48"><span>3 ימים</span><span>₪1.48</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (חודש)" data-price="6.22"><span>חודש</span><span>₪6.22</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס (חודש) (מתחדש)" data-plan="retzef_plus_month" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (שנה)" data-price="9"><span>שנה</span><span>₪9</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס (שנה) (מתחדש)" data-plan="retzef_plus_year" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (שבוע)" data-price="2.48"><span>שבוע</span><span>₪2.48</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס (שבוע) (מתחדש)" data-plan="retzef_plus_week" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס (3 ימים)" data-price="1.48"><span>3 ימים</span><span>₪1.48</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס (3 ימים) (מתחדש)" data-plan="retzef_plus_day" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
           <div class="tier"><span>יום</span><span>חינם (באישור בלבד)</span></div>
         </div>
         <button type="button" class="buy-btn" data-item="רצף פלוס (חודש)" data-price="6.22" style="margin-top:14px;">🛒 קנה</button>
@@ -692,10 +730,10 @@
           <li>אפשר לשלוח כל סרטון</li>
         </ul>
         <div class="price-tiers">
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (חודש)" data-price="9"><span>חודש</span><span>₪9</span></button>
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (שנה)" data-price="10"><span>שנה</span><span>₪10</span></button>
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (שבוע)" data-price="4.97"><span>שבוע</span><span>₪4.97</span></button>
-          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (3 ימים)" data-price="2.98"><span>3 ימים</span><span>₪2.98</span></button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (חודש)" data-price="9"><span>חודש</span><span>₪9</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס פרימיום (חודש) (מתחדש)" data-plan="retzef_premium_month" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (שנה)" data-price="10"><span>שנה</span><span>₪10</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס פרימיום (שנה) (מתחדש)" data-plan="retzef_premium_year" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (שבוע)" data-price="4.97"><span>שבוע</span><span>₪4.97</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס פרימיום (שבוע) (מתחדש)" data-plan="retzef_premium_week" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
+          <button type="button" class="tier buy-tier" data-item="רצף פלוס פרימיום (3 ימים)" data-price="2.98"><span>3 ימים</span><span>₪2.98</span></button><button type="button" class="subscribe-btn" data-item="רצף פלוס פרימיום (3 ימים) (מתחדש)" data-plan="retzef_premium_day" style="width:100%; font-size:11px; padding:6px; margin-top:4px; grid-column:1/-1;">🔁 הרשמה כמנוי</button>
           <div class="tier"><span>10 שעות</span><span>חינם (באישור בלבד)</span></div>
         </div>
         <button type="button" class="buy-btn" data-item="רצף פלוס פרימיום (חודש)" data-price="9" style="margin-top:14px;">🛒 קנה</button>
@@ -820,7 +858,7 @@
     </div>
 
     <div class="settings-card glass" style="margin-top:20px;">
-      <h3>🧮 מחשבון מחיר (כתוב ב-TypeScript)</h3>
+      <h3>🧮 מחשבון מחיר</h3>
       <div style="display:flex; flex-direction:column; gap:12px;">
         <select id="tsCalcItem" style="padding:10px; border-radius:10px; border:1px solid var(--glass-border); background:var(--bg); color:var(--text); font-family:'Assistant';">
           <option value="1">תג תורם — ₪0.5</option>
@@ -852,6 +890,7 @@
       <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">בודק חיבור, PayPal והשרת — שימושי אם משהו לא עובד.</p>
       <button type="button" id="systemDiagnoseBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center;">🔍 הרץ אבחון</button>
       <div id="systemDiagnoseResult" style="margin-top:10px; font-size:12.5px; color:var(--muted); text-align:right; white-space:pre-line;"></div>
+      <p style="font-size:12px; color:#b91c1c; margin-top:10px;">⚠️ אם יש שגיאה בטעינה או בתשלום — נסו לכבות VPN או חוסם פרסומות בהגדרות הדפדפן/מכשיר, ולנסות שוב.</p>
     </div>
 
     <div class="settings-card glass">
@@ -902,6 +941,11 @@
     </div>
 
     <div class="settings-card glass">
+      <h3>🔤 גודל טקסט</h3>
+      <input type="range" id="fontSizeSlider" class="blur-slider" min="85" max="130" value="100">
+    </div>
+
+    <div class="settings-card glass">
       <h3>🌐 שפה / Language</h3>
       <div class="lang-row">
         <button type="button" class="lang-btn active" id="langHe">עברית</button>
@@ -931,7 +975,6 @@
       <h3>🧩 גרסה ורכיבים</h3>
       <div style="display:flex; flex-direction:column; gap:10px; font-size:13.5px;">
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">גרסת אתר</span><span style="font-weight:700;">גישה מקודמת</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">שפות</span><span style="font-weight:700;">HTML · CSS · JS · TypeScript</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">אחסון</span><span style="font-weight:700;">Vercel + GitHub</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">תשלומים</span><span style="font-weight:700;">PayPal · Apple Pay · Google Pay</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">התחברות</span><span style="font-weight:700;">TikTok Login Kit</span></div>
@@ -944,7 +987,7 @@
       <ul style="font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:6px; padding-inline-start:18px;">
         <li>הוספת עוזר רצף (מקומי, חינמי)</li>
         <li>הוספת PWA — התקנה למסך הבית</li>
-        <li>הוספת חנות ומחשבון מחיר ב-TypeScript</li>
+        <li>הוספת חנות ומחשבון מחיר</li>
         <li>הוספת התחברות TikTok + תשלומי PayPal</li>
         <li>הוספת טאבים, הגדרות עיצוב, ותמיכה דו-לשונית</li>
       </ul>
@@ -968,7 +1011,6 @@
     <p class="fine">רצף · בית תמיכה — עדכן קישורים, מחיר מנוי הפלוס ופרטי יצירת קשר לפני פרסום.</p>
   </footer>
 
-  <p class="fine" style="margin-top:-10px; margin-bottom:20px;">🛠️ נוצר עם Claude · PayPal · TikTok · Vercel · GitHub — HTML · CSS · JavaScript · TypeScript</p>
 
 </div>
 
@@ -1065,6 +1107,35 @@
       window.history.replaceState({}, '', clean);
     }
   })();
+
+  // === username login gate — stored per-device in localStorage ===
+  const PREMIUM_NAMES = ['shirel', 'שירל']; // מי שהשם שלו מופיע כאן מקבל תג "פרימיום" ליד השם
+  const usernameModal = document.getElementById('usernameModal');
+  const userGreeting = document.getElementById('userGreeting');
+
+  function showGreeting(name){
+    const isPremium = PREMIUM_NAMES.some(n => n.toLowerCase() === name.toLowerCase());
+    userGreeting.innerHTML = `שלום, ${name}${isPremium ? ' <span style="color:var(--accent); font-weight:700;">✨ פרימיום</span>' : ''}`;
+    userGreeting.style.display = 'block';
+  }
+
+  const savedUsername = localStorage.getItem('retzef_username');
+  if (savedUsername) {
+    showGreeting(savedUsername);
+  } else {
+    usernameModal.classList.add('open');
+  }
+
+  document.getElementById('usernameSubmit').addEventListener('click', function(){
+    const val = document.getElementById('usernameInput').value.trim();
+    if (!val) return;
+    localStorage.setItem('retzef_username', val);
+    showGreeting(val);
+    usernameModal.classList.remove('open');
+  });
+  document.getElementById('usernameInput').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') document.getElementById('usernameSubmit').click();
+  });
 
   // === day streak — anchored so it always increases by 1 per calendar day ===
   // Anchor date is set so that on 2026-08-26 the count reads 335. No manual
@@ -1310,6 +1381,10 @@
     document.documentElement.style.setProperty('--glass-blur', e.target.value + 'px');
   });
 
+  document.getElementById('fontSizeSlider').addEventListener('input', function(e){
+    document.body.style.zoom = (e.target.value / 100);
+  });
+
   document.getElementById('bgColorPicker').addEventListener('input', function(e){
     document.documentElement.style.setProperty('--bg', e.target.value);
   });
@@ -1355,6 +1430,8 @@
     document.getElementById('glassColorPicker').value = DEFAULTS.bg2;
     document.getElementById('textColorPicker').value = DEFAULTS.text;
     document.getElementById('btnColorPicker').value = DEFAULTS.accent;
+    document.body.style.zoom = 1;
+    document.getElementById('fontSizeSlider').value = 100;
     setLanguage('he');
   });
 
@@ -1591,6 +1668,121 @@
     });
   });
 
+  // === real recurring subscriptions via PayPal Subscriptions API ===
+  // PLAN_IDS must be filled in after running the one-time setup endpoint
+  // (api/paypal/create-plans.js — visit it once in a browser, it creates
+  // everything on PayPal's side and returns these IDs to paste here).
+  // PayPal requires a Plan to exist before any subscribe button can use it —
+  // that one visit is unavoidable, it isn't something code alone can skip.
+  const PLAN_IDS = {
+    video_regular_month: "PASTE_PLAN_ID_HERE",
+    video_plus_month: "PASTE_PLAN_ID_HERE",
+    retzef_plus_day: "PASTE_PLAN_ID_HERE",
+    retzef_plus_week: "PASTE_PLAN_ID_HERE",
+    retzef_plus_month: "PASTE_PLAN_ID_HERE",
+    retzef_plus_year: "PASTE_PLAN_ID_HERE",
+    retzef_premium_day: "PASTE_PLAN_ID_HERE",
+    retzef_premium_week: "PASTE_PLAN_ID_HERE",
+    retzef_premium_month: "PASTE_PLAN_ID_HERE",
+    retzef_premium_year: "PASTE_PLAN_ID_HERE",
+  };
+
+  const subModal = document.getElementById('subModal');
+  const subItemName = document.getElementById('subItemName');
+  const subButtonContainer = document.getElementById('subButtonContainer');
+
+  function openSubscriptionModal(itemName, planKey){
+    subItemName.textContent = itemName;
+    subButtonContainer.innerHTML = '';
+    subModal.classList.add('open');
+
+    const planId = PLAN_IDS[planKey];
+    if (!planId || planId === 'PASTE_PLAN_ID_HERE') {
+      subButtonContainer.innerHTML = '<p style="color:#b91c1c; font-size:13.5px;">המנוי הזה עדיין לא מוגדר — צריך להריץ את api/paypal/create-plans.js פעם אחת ולהדביק את ה-plan_id שהוא מחזיר בתוך PLAN_IDS בקוד.</p>';
+      return;
+    }
+    if (typeof paypal === 'undefined' || !paypal.Buttons) {
+      subButtonContainer.innerHTML = '<p style="color:#b91c1c; font-size:13.5px;">PayPal לא נטען. נסו לרענן, או לכבות VPN/חוסם פרסומות.</p>';
+      return;
+    }
+
+    try {
+      paypal.Buttons({
+        style: { layout: 'vertical', shape: 'rect', label: 'subscribe' },
+        createSubscription: function (data, actions) {
+          return actions.subscription.create({ plan_id: planId });
+        },
+        onApprove: function (data) {
+          // שומר את מזהה המנוי במכשיר הזה בלבד — אין כאן בסיס נתונים,
+          // אז זה מה שמאפשר לאתר לבדוק סטטוס בהמשך (ראו checkSubStatusBtn).
+          localStorage.setItem('retzef_subscription_id', data.subscriptionID);
+          localStorage.setItem('retzef_subscription_name', itemName);
+          subButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ נרשמת בהצלחה ל-"${itemName}"! החיוב הבא יתבצע אוטומטית.</p>`;
+          updateMySubStatus();
+        },
+        onError: function (err) {
+          console.error('Subscription error:', err);
+          subButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">שגיאה בהרשמה למנוי. נסו שוב.</p>';
+        },
+        onCancel: function () {
+          subButtonContainer.innerHTML = '<p style="color:var(--muted); text-align:center;">ההרשמה בוטלה.</p>';
+        },
+      }).render(subButtonContainer).catch(function(err){
+        console.error('Subscription button failed to render:', err);
+        subButtonContainer.innerHTML = '<p style="color:#b91c1c; font-size:13.5px;">כפתור ההרשמה לא נטען. בדקו שה-plan_id תקין.</p>';
+      });
+    } catch (err) {
+      console.error('Unexpected subscription error:', err);
+    }
+  }
+
+  document.querySelectorAll('.subscribe-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openSubscriptionModal(btn.dataset.item, btn.dataset.plan);
+    });
+  });
+
+  document.getElementById('subModalClose').addEventListener('click', () => {
+    subModal.classList.remove('open');
+  });
+  subModal.addEventListener('click', function(e){ if (e.target === subModal) subModal.classList.remove('open'); });
+
+  // status checker — asks PayPal directly (via our server) what the real
+  // current status is; this is a poll, not a push, since there's no DB to
+  // hold a live webhook-driven status per visitor.
+  async function updateMySubStatus(){
+    const statusEl = document.getElementById('mySubStatus');
+    const subId = localStorage.getItem('retzef_subscription_id');
+    const subName = localStorage.getItem('retzef_subscription_name');
+    if (!subId) {
+      statusEl.textContent = 'לא נמצא מנוי פעיל במכשיר הזה.';
+      return;
+    }
+    statusEl.textContent = `בודק את "${subName}"...`;
+    try {
+      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/subscription-status?id=${encodeURIComponent(subId)}`);
+      const data = await res.json();
+      const statusLabels = {
+        ACTIVE: '✅ פעיל',
+        CANCELLED: '❌ בוטל',
+        SUSPENDED: '⏸️ מושהה (תשלום נכשל)',
+        EXPIRED: '⌛ פג תוקף',
+        APPROVAL_PENDING: '⏳ ממתין לאישור',
+      };
+      const label = statusLabels[data.status] || data.status || 'לא ידוע';
+      statusEl.textContent = `${subName}: ${label}`;
+      if (data.status === 'SUSPENDED' || data.status === 'CANCELLED' || data.status === 'EXPIRED') {
+        statusEl.style.color = '#b91c1c';
+      } else {
+        statusEl.style.color = '';
+      }
+    } catch (err) {
+      statusEl.textContent = 'שגיאה בבדיקת סטטוס. נסו שוב.';
+    }
+  }
+  document.getElementById('checkSubStatusBtn').addEventListener('click', updateMySubStatus);
+  if (localStorage.getItem('retzef_subscription_id')) updateMySubStatus();
+
   // === shopping cart ===
   let cart = []; // { name, price }
 
@@ -1653,246 +1845,4 @@
   document.getElementById('paypalModalClose').addEventListener('click', () => {
     paypalModal.classList.remove('open');
   });
-  paypalModal.addEventListener('click', (e) => { if (e.target === paypalModal) paypalModal.classList.remove('open'); });
-
-</script>
-
-<!--
-  ============================================================================
-  שרת ההתחברות (TikTok OAuth) — קובץ נפרד שצריך להעלות בנפרד לשרת (לא לכאן!)
-  ============================================================================
-  זה לא רץ בדף הזה. TikTok לא מאפשרת לדף HTML סטטי להשלים login אמיתי,
-  כי זה דורש client secret שאסור לחשוף בדפדפן. הקוד הזה חייב לרוץ בצד שרת.
-
-  שמרו את הקטע הבא כקובץ בשם api/callback.js בפרויקט Vercel נפרד (או בתיקיית
-  api/ של הפרויקט הזה אם תעלו אותו כמו שהוא ל-Vercel — Vercel מזהה כל דבר
-  תחת /api בתור פונקציית שרת אוטומטית).
-
-  --- api/callback.js ---
-
-  // Roles are NOT something TikTok's API knows about — TikTok only returns
-  // public profile info. To answer "is this person a regular member, admin,
-  // or owner in OUR group", you maintain that mapping yourselves, here, by
-  // TikTok username. Update this object whenever your admin list changes.
-  const ROLES = {
-    // 'tiktok_username': 'owner' | 'admin'
-    'your_tiktok_username_here': 'owner', // הבאן המקורי — עדכן כאן ל-@ המדויק שלך ב-TikTok (לא שם התצוגה), באותיות קטנות
-    // 'shirel_username': 'admin',
-  };
-  function resolveRole(username) {
-    if (!username) return 'member';
-    return ROLES[username.toLowerCase()] || 'member';
-  }
-
-  module.exports = async (req, res) => {
-    const { code, error: tiktokError } = req.query;
-    if (tiktokError) return res.redirect(302, `/?tiktok_error=${encodeURIComponent(tiktokError)}`);
-    if (!code) return res.redirect(302, '/?tiktok_error=missing_code');
-
-    const CLIENT_KEY = process.env.TIKTOK_CLIENT_KEY;
-    const CLIENT_SECRET = process.env.TIKTOK_CLIENT_SECRET;
-    const REDIRECT_URI = process.env.TIKTOK_REDIRECT_URI;
-    if (!CLIENT_KEY || !CLIENT_SECRET || !REDIRECT_URI) {
-      return res.redirect(302, '/?tiktok_error=server_not_configured');
-    }
-
-    try {
-      const tokenRes = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_key: CLIENT_KEY,
-          client_secret: CLIENT_SECRET,
-          code,
-          grant_type: 'authorization_code',
-          redirect_uri: REDIRECT_URI,
-        }),
-      });
-      const tokenData = await tokenRes.json();
-      if (!tokenData.access_token) return res.redirect(302, '/?tiktok_error=token_exchange_failed');
-
-      // scope requested is user.info.basic only — public profile fields, no
-      // posting / messaging / follower access / write permissions of any kind
-      const userRes = await fetch(
-        'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,username',
-        { headers: { Authorization: `Bearer ${tokenData.access_token}` } }
-      );
-      const userData = await userRes.json();
-      const user = userData && userData.data && userData.data.user;
-      const username = (user && (user.username || user.display_name)) || '';
-
-      const params = new URLSearchParams({
-        tiktok_ok: '1',
-        username,
-        avatar: (user && user.avatar_url) || '',
-        role: resolveRole(username),
-      });
-      return res.redirect(302, `/?${params.toString()}`);
-    } catch (err) {
-      console.error('TikTok callback error:', err);
-      return res.redirect(302, '/?tiktok_error=server_error');
-    }
-  };
-
-  --- סוף api/callback.js ---
-
-  הגדרה (כ-10 דקות):
-  1. TikTok for Developers → Create app → הוסיפו Login Kit, scope: user.info.basic.
-     קבלו משם Client Key ו-Client Secret.
-  2. שמרו את הקוד למעלה כ-api/callback.js, פרסמו לתיקיית פרויקט ריקה ב-Vercel:
-       npm i -g vercel   (פעם אחת)
-       vercel            (בתוך תיקיית הפרויקט)
-     תקבלו כתובת כמו https://chi-liart-74.vercel.app
-  3. אצל TikTok, ב-Redirect URI, הוסיפו בדיוק:
-       https://chi-liart-74.vercel.app/api/callback
-  4. ב-Vercel → Settings → Environment Variables, הוסיפו:
-       TIKTOK_CLIENT_KEY=...
-       TIKTOK_CLIENT_SECRET=...
-       TIKTOK_REDIRECT_URI=https://chi-liart-74.vercel.app/api/callback
-     ואז Redeploy.
-  4.5. בתוך api/callback.js, מלאו את אובייקט ROLES עם שמות המשתמש (ב-TikTok,
-     באותיות קטנות) של הבעלים והמנהלים שלכם. כל שם שלא ברשימה ייחשב "member".
-     כל עדכון ברשימה דורש פריסה מחדש (vercel).
-  5. בקובץ הזה (בתוך ה-<script> למעלה), עדכנו:
-       const TIKTOK_CLIENT_KEY = "המפתח מ-TikTok";
-     ואם האתר והשרת לא על אותו דומיין, עדכנו גם:
-       const TIKTOK_REDIRECT_URI = "https://chi-liart-74.vercel.app/api/callback";
-
-  חשוב: אל תדביקו TIKTOK_CLIENT_SECRET בשום מקום בקובץ הזה או בכל דף שהדפדפן
-  טוען — הוא שייך רק למשתני הסביבה של השרת.
-  ============================================================================
--->
-
-<!--
-  ============================================================================
-  שרת PayPal — שני קבצים נפרדים שצריך להעלות לאותו פרויקט Vercel כמו ה-TikTok
-  (https://chi-liart-74.vercel.app) — פשוט שני קבצי api/ נוספים באותו repo.
-  ============================================================================
-
-  קובץ 1: api/paypal/create-order.js
-  -----------------------------------
-  const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
-
-  async function getAccessToken() {
-    const auth = Buffer.from(
-      `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-    ).toString('base64');
-    const res = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
-      method: 'POST',
-      headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'grant_type=client_credentials',
-    });
-    const data = await res.json();
-    if (!data.access_token) throw new Error('Failed to get PayPal access token');
-    return data.access_token;
-  }
-
-  module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    try {
-      const { item, price } = req.body || {};
-      const amount = Number(price);
-      if (!item || !amount || amount <= 0) return res.status(400).json({ error: 'Missing or invalid item/price' });
-      const accessToken = await getAccessToken();
-      const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          intent: 'CAPTURE',
-          purchase_units: [{ description: `רצף — ${item}`, amount: { currency_code: 'ILS', value: amount.toFixed(2) } }],
-        }),
-      });
-      const orderData = await orderRes.json();
-      if (!orderData.id) return res.status(502).json({ error: 'PayPal order creation failed' });
-      return res.status(200).json({ id: orderData.id });
-    } catch (err) {
-      console.error('create-order error:', err);
-      return res.status(500).json({ error: 'Server error' });
-    }
-  };
-
-  קובץ 2: api/paypal/capture-order.js
-  -------------------------------------
-  const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
-
-  async function getAccessToken() {
-    const auth = Buffer.from(
-      `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-    ).toString('base64');
-    const res = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
-      method: 'POST',
-      headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'grant_type=client_credentials',
-    });
-    const data = await res.json();
-    if (!data.access_token) throw new Error('Failed to get PayPal access token');
-    return data.access_token;
-  }
-
-  module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    try {
-      const { orderID } = req.body || {};
-      if (!orderID) return res.status(400).json({ error: 'Missing orderID' });
-      const accessToken = await getAccessToken();
-      const captureRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderID}/capture`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      });
-      const captureData = await captureRes.json();
-      return res.status(200).json({ status: captureData.status, id: captureData.id });
-    } catch (err) {
-      console.error('capture-order error:', err);
-      return res.status(500).json({ error: 'Server error' });
-    }
-  };
-
-  הגדרה (כ-10 דקות, באותו תהליך כמו ה-TikTok):
-  1. ב-PayPal: היכנסו ל-developer.paypal.com → Apps & Credentials → Create App.
-     קבלו משם Client ID ו-Secret. להתחלה, השתמשו במצב Sandbox (כסף פיקטיבי לבדיקות).
-  2. ב-GitHub (אותו repo כמו ה-TikTok): "Add file" → "Create new file" פעמיים,
-     בנתיבים המדויקים: api/paypal/create-order.js, api/paypal/capture-order.js.
-     הדביקו את הקוד המתאים מלמעלה בכל אחד, ו-Commit.
-  3. ב-Vercel, הפרויקט אמור להתפרס מחדש אוטומטית עם הקבצים החדשים.
-  4. ב-Vercel → Settings → Environment Variables, הוסיפו:
-       PAYPAL_CLIENT_ID=AVXjZhqGVNC8WS5GU0Y6_O_BmkGLP6LV6HcYKZHW5XFAvTOOBe9Pfoywe92-arGXOY9t-ng5X2943zfY
-       PAYPAL_CLIENT_SECRET=... (העתיקו מאותו עמוד אפליקציה ב-developer.paypal.com, ליד ה-Client ID)
-       PAYPAL_API_BASE=https://api-m.sandbox.paypal.com   (או .../api-m.paypal.com לתשלומים אמיתיים)
-     ואז Redeploy.
-  5. ה-Client ID כבר מולא בקובץ הזה (בתג ה-script של PayPal SDK, למעלה).
-     אין צורך לגעת בו שוב — רק ה-Secret שייך אך ורק למשתני הסביבה בשרת (שלב 4).
-
-  חשוב:
-  - PAYPAL_CLIENT_SECRET לעולם לא נכנס לשום מקום בקובץ הזה או בדפדפן — רק
-    למשתני הסביבה בשרת.
-  - במצב Sandbox אין כסף אמיתי עובר — לתשלומים אמיתיים, עברו לחשבון Live
-    ב-PayPal ועדכנו PAYPAL_API_BASE כמו שכתוב למעלה.
-  - ה-currency בתג ה-SDK (currency=ILS) חייב להתאים למטבע שמוגדר בחשבון
-    PayPal שלכם. אם ₪ לא נתמך, שנו גם שם וגם בקוד ל-USD.
-  ============================================================================
--->
-
-<!--
-  זה קוד TypeScript אמיתי (עם טיפוסים) — לא JavaScript עם תוספת קוסמטית.
-  דפדפנים לא מריצים TypeScript ישירות, אז ה-<script> הבא מסומן
-  type="text/typescript" (הדפדפן מתעלם ממנו לגמרי) והבוטסטראפ שאחריו
-  לוקח את הטקסט שלו, מקמפל אותו ל-JavaScript עם ספריית ה-TypeScript
-  שנטענה למעלה מ-CDN, ואז מריץ את התוצאה. ה-JS הקיים באתר (הכפתורים,
-  הטאבים, ה-PayPal, TikTok וכו') לא נגע בכלל — זה קוד חדש ונפרד.
--->
-<script type="text/typescript" id="tsSource">
-interface ShopItem {
-  price: number;
-}
-
-function applyAdminDiscount(price: number, isAdmin: boolean): number {
-  const discount: number = isAdmin ? 2 : 0;
-  const re
+  paypalModal.addEventListener('click', 

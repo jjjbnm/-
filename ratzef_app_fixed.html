@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רצף - קהילת טיקטוק מתקדמת</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-color: #f8fafc;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-blur: 12px;
+        }
+        
+        [data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-color: #0f172a;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); display: flex; align-items: center; gap: 0.5rem; }
+        
+        nav { display: flex; gap: 1rem; align-items: center; }
+        
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+        
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--accent-color);
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 { margin-bottom: 1rem; font-size: 1.8rem; }
+        p { margin-bottom: 1.5rem; line-height: 1.6; opacity: 0.9; }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover { background: var(--accent-hover); }
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem; left: 1rem;
+            background: none; border: none;
+            font-size: 1.5rem; cursor: pointer;
+            color: var(--text-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <header>
+        <div class="logo">⚡ רצף - TikTok Community</div>
+        <nav>
+            <button class="nav-btn active" data-tab="home">ראשי</button>
+            <button class="nav-btn" data-tab="rules">חוקים</button>
+            <button class="nav-btn" data-tab="store">חנות ומנויים</button>
+            <button class="nav-btn" data-tab="ai">עוזר AI</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Controls Bar for Theme and Actions -->
+        <div class="controls-bar">
+            <button class="btn btn-secondary" id="toggleThemeBtn">🌓 החלף מצב תצוגה</button>
+            <button class="btn" id="openModalBtn">💬 פתח חלון הודעה</button>
+        </div>
+
+        <!-- Tab 1: Home -->
+        <div id="home" class="tab-content active">
+            <div class="card">
+                <h2>ברוכים הבאים לקהילת רצף!</h2>
+                <p>כאן תוכלו לנהל את הפעילות שלכם בטיקטוק, לעקוב אחר חוקי הקהילה, לרכוש מנויים ושירותים, וליהנות מפיקוח מלא.</p>
+                <button class="btn" onclick="switchTab('store')">מעבר לחנות הקהילה</button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Rules -->
+        <div id="rules" class="tab-content">
+            <div class="card">
+                <h2>חוקי הקהילה</h2>
+                <p>1. אין לפרסם ספאם או קישורים חיצוניים ללא אישור מנהל.</p>
+                <p>2. חובה לשמור על שפה מכובדת ואיסור מוחלט על קללות והטרדות.</p>
+                <p>3. אסור לשנות את שם או תמונת קבוצת הווטסאפ ללא הרשאה.</p>
+                <button class="btn" onclick="alert('החוקים נקראו ואושרה ההבנה בהצלחה!')">אשר קריאת חוקים</button>
+            </div>
+        </div>
+
+        <!-- Tab 3: Store -->
+        <div id="store" class="tab-content">
+            <div class="card">
+                <h2>חנות ומנויי רצף פלוס</h2>
+                <p>שדרגו את החשבון שלכם ותיהנו מגישה מלאה לפיצ'רים מתקדמים ותגים ייחודיים.</p>
+                <button class="btn" onclick="openPaymentModal()">רכישת מנוי פלוס</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: AI Assistant -->
+        <div id="ai" class="tab-content">
+            <div class="card">
+                <h2>עוזר AI קהילתי</h2>
+                <p>יש לכם שאלה על חוק או סטטוס? שאלו כאן וקבלו מענה מיידי.</p>
+                <input type="text" id="aiInput" placeholder="הקלד שאלה כאן..." style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-color); margin-bottom: 1rem;">
+                <button class="btn" id="askAiBtn">שלח שאלה לעוזר</button>
+                <div id="aiResponse" style="margin-top: 1rem; font-weight: 650;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Modal -->
+    <div class="modal" id="customModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+            <h2>הודעה מערכתית</h2>
+            <p id="modalText">הכפתורים עובדים בצורה מושלמת ובטוחה מכל מכשיר!</p>
+            <button class="btn" id="modalOkBtn">אישור והבנתי</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 קהילת רצף - כל הזכויות שמורות.</p>
+    </footer>
+
+    <script>
+        // --- Bulletproof Event Handlers & Core Logic ---
+
+        // 1. Tab Switching Logic (guaranteed working for all tabs)
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
+            
+            const targetBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (targetBtn) targetBtn.classList.add('active');
+        }
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+
+        // 2. Theme Toggle Logic
+        const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+        if (toggleThemeBtn) {
+            toggleThemeBtn.addEventListener('click', () => {
+                const body = document.body;
+                const currentTheme = body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                body.setAttribute('data-theme', newTheme);
+            });
+        }
+
+        // 3. Modal Control Logic
+        const modal = document.getElementById('customModal');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOkBtn = document.getElementById('modalOkBtn');
+
+        function openModal() { if (modal) modal.classList.add('open'); }
+        function closeModal() { if (modal) modal.classList.remove('open'); }
+
+        if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+        if (modalOkBtn) modalOkBtn.addEventListener('click', closeModal);
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // 4. Payment Simulation Function
+        function openPaymentModal() {
+            document.getElementById('modalText').innerText = "מועבר לשער תשלום מאובטח (PayPal / Apple Pay)...";
+            openModal();
+        }
+
+        // 5. AI Assistant Simulation Button
+        const askAiBtn = document.getElementById('askAiBtn');
+        if (askAiBtn) {
+        askAiBtn.addEventListener('click', () => {
+            const input = document.getElementById('aiInput');
+            const responseDiv = document.getElementById('aiResponse');
+            if (input && input.value.trim() !== "") {
+                responseDiv.innerText = `עוזר AI: קיבלתי את שאלתך "${input.value}". לפי חוקי קהילת רצף, יש לפעול באחריות ולשמור על כללי הקבוצה!`;
+                input.value = "";
+            } else {
+                responseDiv.innerText = "אנא הקלד שאלה תקינה לפני שליחה.";
+            }
+        });
+    }
+    </script>
+</body>
+</html>

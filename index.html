@@ -1710,7 +1710,7 @@
 
   document.querySelectorAll('.buy-btn, .buy-tier').forEach(btn => {
     btn.addEventListener('click', () => {
-      openPaypalModal(btn.dataset.item, btn.dataset.price);
+      alert('הרכישה עדיין לא זמינה באתר. לפרטים פנו לבעלים או למנהלים.');
     });
   });
 
@@ -1784,7 +1784,7 @@
 
   document.querySelectorAll('.subscribe-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      openSubscriptionModal(btn.dataset.item, btn.dataset.plan);
+      alert('ההרשמה למנוי עדיין לא זמינה באתר. לפרטים פנו לבעלים או למנהלים.');
     });
   });
 
@@ -1827,4 +1827,4 @@
     }
   }
   document.getElementById('checkSubStatusBtn').addEventListener('click', updateMySubStatus);
-  if (localStorage.getItem('retzef_subscription_id')) up
+  if (localStorage.getItem(

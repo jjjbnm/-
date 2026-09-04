@@ -435,8 +435,6 @@
   .modal-actions{display:flex; gap:10px;}
   .modal-actions .btn{flex:1; justify-content:center; padding:12px;}
 </style>
-<!-- TypeScript compiler (runs in-browser to transpile the typed code below) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/typescript/5.9.2/typescript.min.js"></script>
 </head>
 <body>
 
@@ -832,11 +830,11 @@
     <h2 class="sec-title" data-i18n="scope_title">גיל ותנאים</h2>
     <div class="notice-grid">
       <div class="notice glass">
-        <divfont-weight18+-</div>
+        <div class="k">15-</div>
         <div class="v">גיל הכניסה הנוכחי לקבוצה</div>
       </div>
       <div class="notice glass">
-        <div class="k">19+ בשנת 2027</div>
+        <div class="k">16- בשנת 2027</div>
         <div class="v">הגיל עולה כל שנה</div>
       </div>
     </div>
@@ -1710,7 +1708,7 @@
 
   document.querySelectorAll('.buy-btn, .buy-tier').forEach(btn => {
     btn.addEventListener('click', () => {
-      alert('הרכישה עדיין לא זמינה באתר. לפרטים פנו לבעלים או למנהלים.');
+      openPaypalModal(btn.dataset.item, btn.dataset.price);
     });
   });
 
@@ -1784,7 +1782,7 @@
 
   document.querySelectorAll('.subscribe-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      alert('ההרשמה למנוי עדיין לא זמינה באתר. לפרטים פנו לבעלים או למנהלים.');
+      openSubscriptionModal(btn.dataset.item, btn.dataset.plan);
     });
   });
 
@@ -1827,4 +1825,10 @@
     }
   }
   document.getElementById('checkSubStatusBtn').addEventListener('click', updateMySubStatus);
-  if (localStorage.getItem(
+  if (localStorage.getItem('retzef_subscription_id')) updateMySubStatus();
+
+  // === shopping cart ===
+  let cart = []; // { name, price }
+
+  const cartFab = document.getElementById('cartFab');
+  const cartPanel = document.getElementBy

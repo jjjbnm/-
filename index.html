@@ -542,16 +542,16 @@
   </header>
 
   <nav class="tabs-nav glass">
-    <button class="tab-btn active" data-target="home" data-i18n="nav_home">בית</button>
-    <button class="tab-btn" data-target="status" data-i18n="nav_status">סטטוס</button>
-    <button class="tab-btn" data-target="rules" data-i18n="nav_rules">חוקים</button>
-    <button class="tab-btn" data-target="subs" data-i18n="nav_subs">מנויים</button>
-    <button class="tab-btn" data-target="team" data-i18n="nav_team">בעלים ומנהלים</button>
-    <button class="tab-btn" data-target="scope" data-i18n="nav_scope">גיל ותנאים</button>
-    <button class="tab-btn" data-target="shop" data-i18n="nav_shop">חנות</button>
-    <button class="tab-btn" data-target="settings" data-i18n="nav_settings">הגדרות</button>
-    <button class="tab-btn" data-target="about" data-i18n="nav_about">אודות וגרסה</button>
-    <button class="tab-btn" data-target="contact" data-i18n="nav_contact">יצירת קשר</button>
+    <button class="tab-btn active" data-target="home" data-i18n="nav_home">🏠 בית</button>
+    <button class="tab-btn" data-target="status" data-i18n="nav_status">🟢 סטטוס</button>
+    <button class="tab-btn" data-target="rules" data-i18n="nav_rules">📜 חוקים</button>
+    <button class="tab-btn" data-target="subs" data-i18n="nav_subs">💳 מנויים</button>
+    <button class="tab-btn" data-target="team" data-i18n="nav_team">👥 בעלים ומנהלים</button>
+    <button class="tab-btn" data-target="scope" data-i18n="nav_scope">🎂 גיל ותנאים</button>
+    <button class="tab-btn" data-target="shop" data-i18n="nav_shop">🛍️ חנות</button>
+    <button class="tab-btn" data-target="settings" data-i18n="nav_settings">⚙️ הגדרות</button>
+    <button class="tab-btn" data-target="about" data-i18n="nav_about">ℹ️ אודות וגרסה</button>
+    <button class="tab-btn" data-target="contact" data-i18n="nav_contact">📩 יצירת קשר</button>
   </nav>
 
   <!-- HOME -->
@@ -1225,6 +1225,10 @@
   function localAnswer(question){
     const t = question.toLowerCase();
 
+    if (/הבאן המקורי/.test(question)) {
+      return '🥚 You found an Easter egg! כל הכבוד שמצאת את זה. וגם — סוד קטן: החל מ-1 באוקטובר אין יותר צורך במנוי בשביל לשלוח סרטונים — אפשר לשלוח סרטונים בלי מנוי בכלל.';
+    }
+
     if (/ערעור/.test(t)) {
       return 'בשביל ערעור על סטטוס/אזהרה/באן: תכתוב הודעה ל"הבאן המקורי" (הבעלים) שכוללת — מה קרה, מי נתן את הסטטוס, מתי, ולמה לדעתך זו טעות או שאתה מצטער. בדוק קודם מול טאב "חוקים" אם הסיבה בכלל תואמת אחד משלושת החוקים הרשמיים (ספאם, קללות, שינוי שם/תמונה, הזכרת מדינות אסורות) — אם לא, זה שווה לציין בערעור.';
     }
@@ -1320,8 +1324,8 @@
 
   // === language toggle (EN/HE) — headings & nav translated, detailed body text stays Hebrew ===
   const I18N = {
-    nav_home: 'Home', nav_status: 'Status', nav_rules: 'Rules', nav_subs: 'Subscriptions', nav_team: 'Owners & Admins',
-    nav_scope: 'Age & Terms', nav_shop: 'Shop', nav_settings: 'Settings', nav_about: 'About', nav_contact: 'Contact',
+    nav_home: '🏠 Home', nav_status: '🟢 Status', nav_rules: '📜 Rules', nav_subs: '💳 Subscriptions', nav_team: '👥 Owners & Admins',
+    nav_scope: '🎂 Age & Terms', nav_shop: '🛍️ Shop', nav_settings: '⚙️ Settings', nav_about: 'ℹ️ About', nav_contact: '📩 Contact',
     hero_badge: 'Retzef Community · TikTok', hero_owner_label: 'Owner',
     hero_subtitle: "The group's official support hub — rules, status, subscriptions and login, in one place.",
     hero_streak_label: 'Streak', hero_days_label: 'days',
@@ -1824,11 +1828,4 @@
       statusEl.textContent = 'שגיאה בבדיקת סטטוס. נסו שוב.';
     }
   }
-  document.getElementById('checkSubStatusBtn').addEventListener('click', updateMySubStatus);
-  if (localStorage.getItem('retzef_subscription_id')) updateMySubStatus();
-
-  // === shopping cart ===
-  let cart = []; // { name, price }
-
-  const cartFab = document.getElementById('cartFab');
-  const cartPanel = document.getElementBy
+  document.getElementById('checkSubStatusBtn'

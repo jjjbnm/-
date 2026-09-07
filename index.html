@@ -830,11 +830,11 @@
     <h2 class="sec-title" data-i18n="scope_title">גיל ותנאים</h2>
     <div class="notice-grid">
       <div class="notice glass">
-        <div class="k">15-</div>
+        <document.getEl18+</div>
         <div class="v">גיל הכניסה הנוכחי לקבוצה</div>
       </div>
       <div class="notice glass">
-        <div class="k">16- בשנת 2027</div>
+        <div class="k">19+ בשנת 2027</div>
         <div class="v">הגיל עולה כל שנה</div>
       </div>
     </div>
@@ -1065,7 +1065,7 @@
     <button type="button" id="aiClose">✕</button>
   </div>
   <div class="ai-messages" id="aiMessages">
-    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, סטטוס, מנויים, חנות או ערעורים — עוזר מקומי חינמי (בלי חיבור ל-AI חיצוני).</div>
+    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, סטטוס, מנויים, חנות, ערעורים — או ממש כל דבר אחר. אני מחובר ל-Claude AI ויכול לענות על הכל, לא רק על נושאי "רצף".</div>
   </div>
   <div class="ai-input-row">
     <input type="text" id="aiInput" placeholder="שאלה...">
@@ -1277,16 +1277,43 @@
     return div;
   }
 
-  function sendAiMessage(){
+  // היסטוריית שיחה קצרה (בזיכרון בלבד, נמחקת ברענון) — נשלחת ל-Claude כדי שהוא
+  // יזכור את תחילת השיחה. שומרים רק את ההודעות האחרונות כדי לא לשלוח יותר מדי.
+  const aiHistory = [];
+
+  async function sendAiMessage(){
     const text = aiInput.value.trim();
     if (!text) return;
     aiInput.value = '';
     addMessage(text, 'user');
 
-    setTimeout(function(){
-      const reply = localAnswer(text);
-      addMessage(reply, 'bot');
-    }, 300);
+    const loadingEl = addMessage('חושב...', 'bot loading');
+
+    try {
+      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/ai-chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          history: aiHistory.slice(-10),
+          system: AI_CONTEXT,
+        }),
+      });
+      if (!res.ok) throw new Error('ai-chat request failed: ' + res.status);
+      const data = await res.json();
+      if (!data.reply) throw new Error('ai-chat empty reply');
+
+      loadingEl.remove();
+      addMessage(data.reply, 'bot');
+      aiHistory.push({ role: 'user', content: text });
+      aiHistory.push({ role: 'assistant', content: data.reply });
+    } catch (err) {
+      // אם שרת ה-AI לא זמין (למשל עוד לא הוגדר, או שאין אינטרנט) — נופלים חזרה
+      // לעוזר המקומי הפשוט שממשיך לעבוד גם בלי שרת.
+      console.error('AI chat error, falling back to local answers:', err);
+      loadingEl.remove();
+      addMessage(localAnswer(text), 'bot');
+    }
   }
 
   aiSend.addEventListener('click', sendAiMessage);
@@ -1799,33 +1826,4 @@
   // current status is; this is a poll, not a push, since there's no DB to
   // hold a live webhook-driven status per visitor.
   async function updateMySubStatus(){
-    const statusEl = document.getElementById('mySubStatus');
-    const subId = localStorage.getItem('retzef_subscription_id');
-    const subName = localStorage.getItem('retzef_subscription_name');
-    if (!subId) {
-      statusEl.textContent = 'לא נמצא מנוי פעיל במכשיר הזה.';
-      return;
-    }
-    statusEl.textContent = `בודק את "${subName}"...`;
-    try {
-      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/paypal/subscription-status?id=${encodeURIComponent(subId)}`);
-      const data = await res.json();
-      const statusLabels = {
-        ACTIVE: '✅ פעיל',
-        CANCELLED: '❌ בוטל',
-        SUSPENDED: '⏸️ מושהה (תשלום נכשל)',
-        EXPIRED: '⌛ פג תוקף',
-        APPROVAL_PENDING: '⏳ ממתין לאישור',
-      };
-      const label = statusLabels[data.status] || data.status || 'לא ידוע';
-      statusEl.textContent = `${subName}: ${label}`;
-      if (data.status === 'SUSPENDED' || data.status === 'CANCELLED' || data.status === 'EXPIRED') {
-        statusEl.style.color = '#b91c1c';
-      } else {
-        statusEl.style.color = '';
-      }
-    } catch (err) {
-      statusEl.textContent = 'שגיאה בבדיקת סטטוס. נסו שוב.';
-    }
-  }
-  document.getElementById('checkSubStatusBtn'
+    const statusEl = document.getEleme

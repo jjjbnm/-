@@ -830,11 +830,11 @@
     <h2 class="sec-title" data-i18n="scope_title">גיל ותנאים</h2>
     <div class="notice-grid">
       <div class="notice glass">
-        <document.getEl18+</div>
+        <div class="k">15-</div>
         <div class="v">גיל הכניסה הנוכחי לקבוצה</div>
       </div>
       <div class="notice glass">
-        <div class="k">19+ בשנת 2027</div>
+        <div class="k">16- בשנת 2027</div>
         <div class="v">הגיל עולה כל שנה</div>
       </div>
     </div>
@@ -1065,7 +1065,7 @@
     <button type="button" id="aiClose">✕</button>
   </div>
   <div class="ai-messages" id="aiMessages">
-    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, סטטוס, מנויים, חנות, ערעורים — או ממש כל דבר אחר. אני מחובר ל-Claude AI ויכול לענות על הכל, לא רק על נושאי "רצף".</div>
+    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, סטטוס, מנויים, חנות או ערעורים.</div>
   </div>
   <div class="ai-input-row">
     <input type="text" id="aiInput" placeholder="שאלה...">
@@ -1263,9 +1263,24 @@
       return 'המונה "🔥 רצף: X ימים" בראש העמוד עולה אוטומטית באחד כל יום.';
     }
     if (/הגדרות|צבע|כהה|בהיר|שפה|english/.test(t)) {
-      return 'בטאב "הגדרות" אפשר לשנות מצב כהה/בהיר, צבע ראשי של האתר, עוצמת אפקט הזכוכית, ואפילו את שפת הניווט (עברית/English).';
+      return 'בטאב "הגדרות" אפשר לשנות מצב כהה/בהיר, צבע ראשי של האתר, עוצמת אפקט הזכוכית, גודל טקסט, ואפילו את שפת הניווט (עברית/English).';
     }
-    return 'אני עוזר מקומי ופשוט (בלי חיבור ל-AI חיצוני) — אני יכול לענות על שאלות לגבי חוקים, סטטוס, מנויים, חנות, בעלים/מנהלים, גיל וערעורים. נסה לשאול על אחד מהנושאים האלה, או עברו לטאב הרלוונטי למעלה.';
+    if (/paypal|תשלום|לשלם|כרטיס אשראי|apple pay|google pay/.test(t)) {
+      return 'תשלום מתבצע דרך PayPal ישירות באתר — לוחצים "🛒 קנה" על כל פריט/מנוי. Apple Pay ו-Google Pay מופיעים אוטומטית אם הם זמינים במכשיר שלכם.';
+    }
+    if (/עגלה|cart/.test(t)) {
+      return 'העיגול 🛒 בפינה התחתונה הוא עגלת קניות — לוחצים "➕ הוסף לעגלה" על כל פריט, ואז "💳 לתשלום" בעגלה כדי לשלם על הכול יחד ב-PayPal אחד.';
+    }
+    if (/tiktok|טיקטוק/.test(t)) {
+      return 'ההתחברות עם TikTok מבקשת רק את השם הציבורי והתמונה שלכם — אין לה גישה לפרסום, הודעות, עוקבים או כל פעולה בחשבון. לוחצים על העיגול/הכפתור בראש העמוד כדי להתחבר.';
+    }
+    if (/קשר|תמיכה|עזרה|בעיה/.test(t)) {
+      return 'לתמיכה או דיווח על בעיה, לחצו על "✉️ עלי לפנות לתמיכה" בעמוד הבית או בטאב "יצירת קשר" — זה פותח הודעה פרטית ל-TikTok שלנו.';
+    }
+    if (/רצף\b(?!.*ימים)|מה זה האתר|על מה האתר/.test(t)) {
+      return 'רצף הוא קבוצת TikTok, והאתר הזה הוא בית התמיכה הרשמי שלה — חוקים, סטטוס, מנויים, חנות והתחברות, במקום אחד.';
+    }
+    return 'הנה סיכום מהיר על רצף: 🟢🟡🟠🔴⚫☠️ סולם סטטוס לפי חומרת חריגה מהחוקים. 3 חוקי בסיס — לא לספים, לא לקלל, לא לשנות שם/תמונת קבוצה — ואיסור הזכרת מדינות מסוימות. גיל כניסה 15-, יעלה ל-16- ב-2027. מנוי סרטון (רגיל/פלוס) קובע מה מותר לשלוח; רצף פלוס/פרימיום נותנים הטבות קהילה נוספות. הבעלים: "הבאן המקורי", ו-shirel מנהלת. חנות עם תגים ושירותים שונים, כולם משולמים דרך PayPal. לפירוט מלא על כל נושא — פשוט תשאלו עליו ישירות, או עברו לטאב המתאים למעלה.';
   }
 
   function addMessage(text, cls){
@@ -1277,42 +1292,40 @@
     return div;
   }
 
-  // היסטוריית שיחה קצרה (בזיכרון בלבד, נמחקת ברענון) — נשלחת ל-Claude כדי שהוא
-  // יזכור את תחילת השיחה. שומרים רק את ההודעות האחרונות כדי לא לשלוח יותר מדי.
-  const aiHistory = [];
+  let aiHistory = [];
 
   async function sendAiMessage(){
     const text = aiInput.value.trim();
     if (!text) return;
     aiInput.value = '';
     addMessage(text, 'user');
-
-    const loadingEl = addMessage('חושב...', 'bot loading');
+    aiHistory.push({ role: 'user', content: text });
+    const loadingEl = addMessage('...', 'bot loading');
 
     try {
-      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/ai-chat`, {
+      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/claude-chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          history: aiHistory.slice(-10),
-          system: AI_CONTEXT,
-        }),
+        body: JSON.stringify({ system: AI_CONTEXT, messages: aiHistory }),
       });
-      if (!res.ok) throw new Error('ai-chat request failed: ' + res.status);
       const data = await res.json();
-      if (!data.reply) throw new Error('ai-chat empty reply');
-
-      loadingEl.remove();
-      addMessage(data.reply, 'bot');
-      aiHistory.push({ role: 'user', content: text });
-      aiHistory.push({ role: 'assistant', content: data.reply });
+      if (res.ok && data.reply) {
+        loadingEl.textContent = data.reply;
+        loadingEl.classList.remove('loading');
+        aiHistory.push({ role: 'assistant', content: data.reply });
+      } else {
+        console.warn('Claude API not available, using local fallback:', data.error);
+        const reply = localAnswer(text);
+        loadingEl.textContent = reply;
+        loadingEl.classList.remove('loading');
+        aiHistory.pop(); // don't keep the failed turn in history sent to the real API
+      }
     } catch (err) {
-      // אם שרת ה-AI לא זמין (למשל עוד לא הוגדר, או שאין אינטרנט) — נופלים חזרה
-      // לעוזר המקומי הפשוט שממשיך לעבוד גם בלי שרת.
-      console.error('AI chat error, falling back to local answers:', err);
-      loadingEl.remove();
-      addMessage(localAnswer(text), 'bot');
+      console.warn('Claude API request failed, using local fallback:', err);
+      const reply = localAnswer(text);
+      loadingEl.textContent = reply;
+      loadingEl.classList.remove('loading');
+      aiHistory.pop();
     }
   }
 
@@ -1800,30 +1813,4 @@
           subButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">שגיאה בהרשמה למנוי. נסו שוב.</p>';
         },
         onCancel: function () {
-          subButtonContainer.innerHTML = '<p style="color:var(--muted); text-align:center;">ההרשמה בוטלה.</p>';
-        },
-      }).render(subButtonContainer).catch(function(err){
-        console.error('Subscription button failed to render:', err);
-        subButtonContainer.innerHTML = '<p style="color:#b91c1c; font-size:13.5px;">כפתור ההרשמה לא נטען. בדקו שה-plan_id תקין.</p>';
-      });
-    } catch (err) {
-      console.error('Unexpected subscription error:', err);
-    }
-  }
-
-  document.querySelectorAll('.subscribe-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      openSubscriptionModal(btn.dataset.item, btn.dataset.plan);
-    });
-  });
-
-  document.getElementById('subModalClose').addEventListener('click', () => {
-    subModal.classList.remove('open');
-  });
-  subModal.addEventListener('click', function(e){ if (e.target === subModal) subModal.classList.remove('open'); });
-
-  // status checker — asks PayPal directly (via our server) what the real
-  // current status is; this is a poll, not a push, since there's no DB to
-  // hold a live webhook-driven status per visitor.
-  async function updateMySubStatus(){
-    const statusEl = document.getEleme
+          subButtonContainer.innerHT

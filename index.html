@@ -591,6 +591,23 @@
     <span class="eyebrow" data-i18n="status_eyebrow">מערכת סטטוס</span>
     <h2 class="sec-title" data-i18n="status_title">איפה אתה עומד בקבוצה</h2>
     <p class="sec-sub" data-i18n="status_sub">כל חבר מתחיל ירוק. חריגה מהחוקים מעלה אותך בסולם — הסולם לא מתאפס לבד, מנהל מטפל בכל שלב.</p>
+    <div id="memberStatusChecker" class="glass" style="padding:24px 26px; margin:22px 0 28px; border-inline-start:3px solid var(--accent);">
+      <span class="eyebrow" style="margin-bottom:5px;">בדיקת משתמש</span>
+      <h3 style="font-size:22px; margin-bottom:5px;">איזה סטטוס אני?</h3>
+      <p style="color:var(--muted); font-size:13.5px; margin-bottom:16px;">חפשו את שם המשתמש שלכם כדי לראות את הסטטוס והרמה.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <input id="memberStatusInput" type="text" dir="ltr" placeholder="@username למשל ban.real" autocomplete="off" style="flex:1; min-width:220px; padding:12px 14px; border-radius:12px; border:1px solid var(--glass-border); background:var(--bg2); color:var(--text); font-family:'Assistant'; font-size:14px;">
+        <button type="button" id="memberStatusSearchBtn" class="btn btn-primary" style="justify-content:center;">🔎 בדיקת סטטוס</button>
+      </div>
+      <div id="memberStatusResult" style="display:none; margin-top:16px; padding:14px 16px; border-radius:13px; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2);">
+        <strong id="memberStatusUsername" style="display:block; direction:ltr; text-align:right;"></strong>
+        <span id="memberStatusText" style="display:block; color:var(--muted); margin-top:4px;"></span>
+      </div>
+      <div id="memberStatusNotFound" style="display:none; margin-top:16px; padding:14px 16px; border-radius:13px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.22); color:#b91c1c; font-size:13.5px;">
+        ❌ המשתמש לא נמצא ברשימה. זה אומר שאתם לא ברשימה או ששיניתם שם — יש לפנות לתמיכה.
+      </div>
+      <p style="color:var(--muted); font-size:12.5px; margin-top:14px;">אם זה מראה שגיאה “לא נמצא”, זה אומר שאתם לא ברשימה או ששיניתם שם. יש לפנות לתמיכה.</p>
+    </div>
 
     <div class="ladder">
       <div class="rung glass" data-lvl="1">
@@ -1155,13 +1172,22 @@
   const PREMIUM_NAMES = ['shirel', 'שירל']; // מי שהשם שלו מופיע כאן מקבל תג "פרימיום" ליד השם
   const usernameModal = document.getElementById('usernameModal');
   const userGreeting = document.getElementById('userGreeting');
-
+  const ROLE_BADGES = {
+    'ban.real': { label: 'בעלים', emoji: '👑' },
+    'oobbn98': { displayName: 'שיראל', label: 'מנהלת', emoji: '👩‍💼' },
+    'user613987579196': { label: 'מנהל מערכת תמיכה', emoji: '🛠️' },
+    'shirel': { label: 'מנהלת', emoji: '👩‍💼' }
+  };
   function showGreeting(name){
-    const isPremium = PREMIUM_NAMES.some(n => n.toLowerCase() === name.toLowerCase());
-    userGreeting.innerHTML = `שלום, ${name}${isPremium ? ' <span style="color:var(--accent); font-weight:700;">✨ פרימיום</span>' : ''}`;
+    const cleanName = name.trim().replace(/^@/, '');
+    const role = ROLE_BADGES[cleanName.toLowerCase()];
+    const isPremium = PREMIUM_NAMES.some(n => n.toLowerCase() === cleanName.toLowerCase());
+    const roleBadge = role ? ` <span style="color:var(--accent); font-weight:700;">${role.emoji} ${role.label}</span>` : '';
+    const premiumBadge = isPremium ? ' <span style="color:var(--accent); font-weight:700;">✨ פרימיום</span>' : '';
+    const shownName = role && role.displayName ? `${role.displayName} (@${cleanName})` : cleanName;
+    userGreeting.innerHTML = `שלום, ${shownName}${roleBadge}${premiumBadge}`;
     userGreeting.style.display = 'block';
   }
-
   const savedUsername = localStorage.getItem('retzef_username');
   if (savedUsername) {
     showGreeting(savedUsername);
@@ -1813,4 +1839,159 @@
           subButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">שגיאה בהרשמה למנוי. נסו שוב.</p>';
         },
         onCancel: function () {
-          subButtonContainer.innerHT
+          subButtonContainer.innerHTML = '<p style="color:#656b80; text-align:center;">ההרשמה בוטלה.</p>';
+        }
+      }).render('#subButtonContainer');
+    } catch (err) {
+      console.error('Subscription render error:', err);
+      subButtonContainer.innerHTML = '<p style="color:#b91c1c; text-align:center;">שגיאה בטעינת PayPal. נסו שוב.</p>';
+    }
+  }
+</script>
+<script>
+  (function () {
+    const members = {
+      'ban.real': { status: 'בעלים', level: '', levelEmoji: '👑' },
+      'oobbn98': { status: 'הכול טוב', level: 'מנהלת', levelEmoji: '👩‍💼', displayName: 'שיראל' },
+      'user613987579196': { status: 'הכול טוב', level: 'מנהל מערכת תמיכה', levelEmoji: '🛠️' },
+      'shirel': { status: 'הכול טוב', level: 'מנהלת', levelEmoji: '👩‍💼' },
+      'ilai550': { status: 'הכול טוב', level: '' },
+      'albinocapybara': { status: 'הכול טוב', level: '' },
+      'talia_isrel8': { status: 'הכול טוב', level: '' },
+      'the_gg12': { status: 'הכול טוב', level: '' }
+    };
+    const input = document.getElementById('memberStatusInput');
+    const searchButton = document.getElementById('memberStatusSearchBtn');
+    const result = document.getElementById('memberStatusResult');
+    const notFound = document.getElementById('memberStatusNotFound');
+    const username = document.getElementById('memberStatusUsername');
+    const status = document.getElementById('memberStatusText');
+
+    function checkMemberStatus() {
+      const key = (input.value || '').trim().replace(/^@/, '').toLowerCase();
+      result.style.display = 'none';
+      notFound.style.display = 'none';
+      if (!key) {
+        notFound.textContent = '❌ כתבו שם משתמש כדי לבדוק סטטוס.';
+        notFound.style.display = 'block';
+        return;
+      }
+      const member = members[key];
+      if (!member) {
+        notFound.textContent = '❌ המשתמש לא נמצא ברשימה. זה אומר שאתם לא ברשימה או ששיניתם שם — יש לפנות לתמיכה.';
+        notFound.style.display = 'block';
+        return;
+      }
+      username.textContent = (member.displayName ? member.displayName + ' ' : '') + '(@' + key + ')';
+      status.textContent = 'סטטוס: ' + member.status + (member.level ? ' · רמה: ' + member.level + ' ' + (member.levelEmoji || '') : '');
+      result.style.display = 'block';
+    }
+
+    searchButton.addEventListener('click', checkMemberStatus);
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') checkMemberStatus();
+    });
+  }());
+</script>
+<script>
+  // === Shopping cart ===
+  (function () {
+    const CART_STORAGE_KEY = 'retzef_cart_items';
+    const cartFab = document.getElementById('cartFab');
+    const cartPanel = document.getElementById('cartPanel');
+    const cartClose = document.getElementById('cartClose');
+    const cartItems = document.getElementById('cartItems');
+    const cartEmptyMsg = document.getElementById('cartEmptyMsg');
+    const cartFooter = document.getElementById('cartFooter');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartBadge = document.getElementById('cartBadge');
+    const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+    let cart = [];
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+      if (Array.isArray(saved)) cart = saved;
+    } catch (error) {
+      cart = [];
+    }
+
+    function saveCart() {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    }
+
+    function renderCart() {
+      const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
+      cartItems.querySelectorAll('.cart-item').forEach((item) => item.remove());
+      cartEmptyMsg.style.display = cart.length ? 'none' : 'block';
+      cartFooter.style.display = cart.length ? 'flex' : 'none';
+      cartBadge.textContent = String(cart.length);
+      cartBadge.classList.toggle('show', cart.length > 0);
+      cartTotal.textContent = `₪${total.toFixed(2)}`;
+
+      cart.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        const label = document.createElement('span');
+        label.textContent = item.name;
+        const details = document.createElement('span');
+        details.style.cssText = 'display:flex;align-items:center;gap:8px;white-space:nowrap;';
+        const price = document.createElement('strong');
+        price.textContent = `₪${Number(item.price).toFixed(2)}`;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'remove-item';
+        remove.setAttribute('aria-label', `הסר ${item.name}`);
+        remove.textContent = '✕';
+        remove.addEventListener('click', function () {
+          cart.splice(index, 1);
+          saveCart();
+          renderCart();
+        });
+        details.append(price, remove);
+        row.append(label, details);
+        cartItems.appendChild(row);
+      });
+    }
+
+    function openCart() {
+      cartPanel.classList.add('open');
+      renderCart();
+    }
+
+    function closeCart() {
+      cartPanel.classList.remove('open');
+    }
+
+    document.querySelectorAll('.add-to-cart-btn').forEach((button) => {
+      button.addEventListener('click', function () {
+        const name = button.dataset.item || 'פריט';
+        const price = Number(button.dataset.price || 0);
+        cart.push({ name, price });
+        saveCart();
+        renderCart();
+        openCart();
+      });
+    });
+
+    cartFab.addEventListener('click', openCart);
+    cartClose.addEventListener('click', closeCart);
+    cartPanel.addEventListener('click', function (event) {
+      if (event.target === cartPanel) closeCart();
+    });
+    cartCheckoutBtn.addEventListener('click', function () {
+      if (!cart.length) return;
+      const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
+      const names = cart.map((item) => item.name).join(', ');
+      closeCart();
+      if (typeof openPaypalModal === 'function') {
+        openPaypalModal(`עגלה: ${names}`, total.toFixed(2));
+      } else {
+        alert('מערכת התשלום לא נטענה כרגע. נסו לרענן את הדף.');
+      }
+    });
+
+    renderCart();
+  }());
+</script>
+</body>
+</html>

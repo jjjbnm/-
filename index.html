@@ -1899,13 +1899,22 @@
         notFound.style.display = 'block';
         return;
       }
-      const member = members[key];
+      const profile = (() => { try { return JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null'); } catch (_) { return null; } })();
+      const profileUsername = String(profile?.username || '').trim().replace(/^@/, '').toLowerCase();
+      const profileDisplayName = String(profile?.displayName || '').trim().toLowerCase();
+      let matchedKey = Object.keys(members).find(name => name.toLowerCase() === key);
+      if (!matchedKey && profileUsername) matchedKey = Object.keys(members).find(name => name.toLowerCase() === profileUsername);
+      if (!matchedKey && profileDisplayName) {
+        matchedKey = Object.keys(members).find(name => name.toLowerCase() === profileDisplayName || String(members[name].displayName || '').toLowerCase() === profileDisplayName);
+      }
+      const member = matchedKey ? members[matchedKey] : null;
       if (!member) {
-        notFound.textContent = '❌ המשתמש לא נמצא ברשימה. זה אומר שאתם לא ברשימה או ששיניתם שם — יש לפנות לתמיכה.';
+        notFound.textContent = '❌ לא נמצא מידע על המשתמש הזה. יש לוודא שהשם או ה־@username נכונים ולפנות לתמיכה אם צריך.';
         notFound.style.display = 'block';
         return;
       }
-      username.textContent = (member.displayName ? member.displayName + ' ' : '') + '(@' + key + ')';
+      const shownUsername = profileUsername || matchedKey;
+      username.textContent = (member.displayName ? member.displayName + ' ' : '') + '(@' + shownUsername + ')';
       status.textContent = 'סטטוס: ' + member.status + (member.level ? ' · רמה: ' + member.level + ' ' + (member.levelEmoji || '') : '');
       result.style.display = 'block';
     }

@@ -40,8 +40,8 @@ module.exports = async (req, res) => {
     );
     const userData = await userRes.json();
     const user = userData?.data?.user || {};
-    const username = user.username || '';
-    const displayName = user.display_name || username;
+    const displayName = user.display_name || user.username || '';
+    const username = user.username || displayName;
     const params = new URLSearchParams({
       tiktok_ok: '1',
       username,

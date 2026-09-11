@@ -1197,9 +1197,11 @@
   }
   function showTikTokGreeting(profile){
     if (!profile || (!profile.username && !profile.displayName)) return;
-    const displayName = profile.displayName || profile.username || 'משתמש TikTok';
-    const roleText = profile.role === 'owner' ? ' 👑 בעלים' : profile.role === 'admin' ? ' 🛠️ מנהל' : '';
-    userGreeting.innerHTML = `שלום, ${displayName} <span dir="ltr">(@${profile.username})</span>${roleText}`;
+    const username = String(profile.username || '').trim().replace(/^@/, '');
+    const known = ROLE_BADGES[username.toLowerCase()];
+    const displayName = known && known.displayName ? known.displayName : (profile.displayName || (username.toLowerCase() === 'ban.real' ? 'הבאן המקורי' : username));
+    const roleText = profile.role === 'owner' ? ' 👑 בעלים' : profile.role === 'admin' ? ' 🔨 מנהל מערכת תמיכה' : (known ? ` ${known.emoji} ${known.label}` : '');
+    userGreeting.innerHTML = `שלום, ${displayName} <span dir="ltr">(@${username})</span>${roleText}`;
     userGreeting.style.display = 'block';
     if (profile.avatarUrl) {
       const img = document.getElementById('profileAvatarImg');

@@ -1,6 +1,11 @@
 // TikTok OAuth callback for Vercel: api/callback.js
 const ROLES = {
-  'your_tiktok_username_here': 'owner',
+  'ban.real': 'owner',
+  'הבאן המקורי': 'owner',
+  'oobbn98': 'admin',
+  'shirel': 'admin',
+  'user613987579196': 'admin',
+  'קבוצת רצף תמיכה': 'admin',
 };
 function resolveRole(username) {
   if (!username) return 'member';

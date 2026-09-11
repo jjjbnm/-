@@ -1150,6 +1150,9 @@
       const avatarUrl = params.get('avatar') || '';
       const role = params.get('role') || 'member';
       localStorage.setItem('retzef_tiktok_profile', JSON.stringify({ username, displayName, avatarUrl, role }));
+      if (username) localStorage.setItem('retzef_username', username);
+      const nameModal = document.getElementById('usernameModal');
+      if (nameModal) nameModal.classList.remove('open');
       const roleLabel = role === 'owner' ? 'בעלים' : role === 'admin' ? 'מנהל' : 'חבר';
       statusEl.textContent = username ? `מחובר בתור @${username} · ${roleLabel} ✅` : 'התחברות בוצעה בהצלחה ✅';
       statusEl.style.display = 'block';
@@ -1193,7 +1196,7 @@
     userGreeting.style.display = 'block';
   }
   function showTikTokGreeting(profile){
-    if (!profile || !profile.username) return;
+    if (!profile || (!profile.username && !profile.displayName)) return;
     const displayName = profile.displayName || profile.username;
     const roleText = profile.role === 'owner' ? ' 👑 בעלים' : profile.role === 'admin' ? ' 🛠️ מנהל' : '';
     userGreeting.innerHTML = `שלום, ${displayName} <span dir="ltr">(@${profile.username})</span>${roleText}`;

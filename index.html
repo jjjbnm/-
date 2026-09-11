@@ -1146,8 +1146,10 @@
     const avatarImg = document.getElementById('profileAvatarImg');
     if (params.get('tiktok_ok') === '1') {
       const username = params.get('username') || '';
+      const displayName = params.get('display_name') || params.get('displayName') || username;
       const avatarUrl = params.get('avatar') || '';
       const role = params.get('role') || 'member';
+      localStorage.setItem('retzef_tiktok_profile', JSON.stringify({ username, displayName, avatarUrl, role }));
       const roleLabel = role === 'owner' ? 'בעלים' : role === 'admin' ? 'מנהל' : 'חבר';
       statusEl.textContent = username ? `מחובר בתור @${username} · ${roleLabel} ✅` : 'התחברות בוצעה בהצלחה ✅';
       statusEl.style.display = 'block';
@@ -1162,7 +1164,7 @@
       statusEl2.style.display = 'block';
     }
     if (params.has('tiktok_ok') || params.has('tiktok_error') || params.has('username') || params.has('avatar') || params.has('role')) {
-      params.delete('tiktok_ok'); params.delete('tiktok_error'); params.delete('username'); params.delete('avatar'); params.delete('role');
+      params.delete('tiktok_ok'); params.delete('tiktok_error'); params.delete('username'); params.delete('display_name'); params.delete('displayName'); params.delete('avatar'); params.delete('role');
       const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
       window.history.replaceState({}, '', clean);
     }
@@ -1190,6 +1192,22 @@
     userGreeting.innerHTML = `שלום, ${shownName}${roleBadge}${premiumBadge}`;
     userGreeting.style.display = 'block';
   }
+  function showTikTokGreeting(profile){
+    if (!profile || !profile.username) return;
+    const displayName = profile.displayName || profile.username;
+    const roleText = profile.role === 'owner' ? ' 👑 בעלים' : profile.role === 'admin' ? ' 🛠️ מנהל' : '';
+    userGreeting.innerHTML = `שלום, ${displayName} <span dir="ltr">(@${profile.username})</span>${roleText}`;
+    userGreeting.style.display = 'block';
+    if (profile.avatarUrl) {
+      const img = document.getElementById('profileAvatarImg');
+      const wrap = document.getElementById('profileAvatar');
+      img.src = profile.avatarUrl;
+      wrap.classList.add('logged-in');
+      wrap.title = `${displayName} (@${profile.username})`;
+    }
+  }
+  const savedTikTokProfile = (() => { try { return JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null'); } catch (_) { return null; } })();
+  if (savedTikTokProfile) showTikTokGreeting(savedTikTokProfile);
   const savedUsername = localStorage.getItem('retzef_username');
   if (savedUsername) {
     showGreeting(savedUsername);
@@ -1893,6 +1911,14 @@
     input.addEventListener('keydown', function (event) {
       if (event.key === 'Enter') checkMemberStatus();
     });
+    try {
+      const profile = JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null');
+      if (profile && profile.username) {
+        input.value = profile.username;
+        checkMemberStatus();
+      }
+    } catch (_) {}
+
   }());
 </script>
 <script>

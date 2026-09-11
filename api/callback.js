@@ -40,8 +40,12 @@ module.exports = async (req, res) => {
     );
     const userData = await userRes.json();
     const user = userData?.data?.user || {};
+    if (userData?.error?.code) {
+      console.error('TikTok user info error:', userData);
+      return res.redirect(302, `/?tiktok_error=${encodeURIComponent(userData.error.code)}`);
+    }
     const displayName = user.display_name || user.username || '';
-    const username = user.username || displayName;
+    const username = user.username || displayName || user.open_id || '';
     const params = new URLSearchParams({
       tiktok_ok: '1',
       username,

@@ -1132,7 +1132,7 @@
 
   document.getElementById('consentYes').addEventListener('click', function(){
     closeConsentModal();
-    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef`;
+    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic,user.info.profile&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef`;
     window.location.href = authUrl;
   });
   document.getElementById('consentNo').addEventListener('click', closeConsentModal);
@@ -1197,7 +1197,7 @@
   }
   function showTikTokGreeting(profile){
     if (!profile || (!profile.username && !profile.displayName)) return;
-    const displayName = profile.displayName || profile.username;
+    const displayName = profile.displayName || profile.username || 'משתמש TikTok';
     const roleText = profile.role === 'owner' ? ' 👑 בעלים' : profile.role === 'admin' ? ' 🛠️ מנהל' : '';
     userGreeting.innerHTML = `שלום, ${displayName} <span dir="ltr">(@${profile.username})</span>${roleText}`;
     userGreeting.style.display = 'block';

@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
     );
     const userData = await userRes.json();
     const user = userData?.data?.user || {};
-    if (userData?.error?.code) {
+    if (userData?.error?.code && userData.error.code !== 'ok') {
       console.error('TikTok user info error:', userData);
       return res.redirect(302, `/?tiktok_error=${encodeURIComponent(userData.error.code)}`);
     }

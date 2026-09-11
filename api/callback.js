@@ -12,6 +12,17 @@ function resolveRole(username) {
   return ROLES[username.toLowerCase()] || 'member';
 }
 
+async function saveProfile(username, profile) {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) throw new Error('profile_storage_not_configured');
+  const response = await fetch(`${url}/set/${encodeURIComponent(`retzef:profile:${username.toLowerCase()}`)}/${encodeURIComponent(JSON.stringify(profile))}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error('profile_storage_error');
+}
+
 module.exports = async (req, res) => {
   const { code, error: tiktokError } = req.query;
   if (tiktokError) return res.redirect(302, `/?tiktok_error=${encodeURIComponent(tiktokError)}`);
@@ -58,6 +69,8 @@ module.exports = async (req, res) => {
       avatar: user.avatar_url || '',
       role: resolveRole(username),
     });
+    await saveProfile(username, { username, displayName, avatarUrl: user.avatar_url || '', role: resolveRole(username) });
+    res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(username)}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`);
     return res.redirect(302, `/?${params.toString()}`);
   } catch (err) {
     console.error('TikTok callback error:', err);

@@ -1138,8 +1138,8 @@
       const displayName = params.get('display_name') || params.get('displayName') || username;
       const avatarUrl = params.get('avatar') || '';
       const role = params.get('role') || 'member';
-      localStorage.setItem('retzef_tiktok_profile', JSON.stringify({ username, displayName, avatarUrl, role }));
-      if (username) localStorage.setItem('retzef_username', username);
+      const serverProfile = { username, displayName, avatarUrl, role };
+      window.__retzefProfile = serverProfile;
       const nameModal = document.getElementById('usernameModal');
       if (nameModal) nameModal.classList.remove('open');
       const roleLabel = role === 'owner' ? 'בעלים' : role === 'admin' ? 'מנהל' : 'חבר';
@@ -1199,13 +1199,16 @@
       wrap.title = `${displayName} (@${profile.username})`;
     }
   }
-  const savedTikTokProfile = (() => { try { return JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null'); } catch (_) { return null; } })();
-  if (savedTikTokProfile && (savedTikTokProfile.username || savedTikTokProfile.displayName)) {
-    showTikTokGreeting(savedTikTokProfile);
-  } else {
-    const savedUsername = localStorage.getItem('retzef_username');
-    if (savedUsername) showGreeting(savedUsername);
+  async function loadServerProfile(){
+    try {
+      const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
+      if (!response.ok) return null;
+      const data = await response.json();
+      if (data.profile) { window.__retzefProfile = data.profile; showTikTokGreeting(data.profile); }
+      return data.profile || null;
+    } catch (_) { return null; }
   }
+  loadServerProfile();
 
 
   // === day streak — anchored so it always increases by 1 per calendar day ===
@@ -1878,7 +1881,7 @@
         notFound.style.display = 'block';
         return;
       }
-      const profile = (() => { try { return JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null'); } catch (_) { return null; } })();
+      const profile = window.__retzefProfile || null;
       const profileUsername = String(profile?.username || '').trim().replace(/^@/, '').toLowerCase();
       const profileDisplayName = String(profile?.displayName || '').trim().toLowerCase();
       let matchedKey = Object.keys(members).find(name => name.toLowerCase() === key);
@@ -1903,10 +1906,14 @@
       if (event.key === 'Enter') checkMemberStatus();
     });
     try {
-      const profile = JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null');
+      const profile = window.__retzefProfile || null;
       if (profile && (profile.username || profile.displayName)) {
         input.value = profile.username || profile.displayName;
         checkMemberStatus();
+      } else {
+        loadServerProfile().then(serverProfile => {
+          if (serverProfile) { input.value = serverProfile.username || serverProfile.displayName || ''; checkMemberStatus(); }
+        });
       }
     } catch (_) {}
 

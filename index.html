@@ -1207,16 +1207,6 @@
     if (savedUsername) showGreeting(savedUsername);
   }
 
-  document.getElementById('usernameSubmit').addEventListener('click', function(){
-    const val = document.getElementById('usernameInput').value.trim();
-    if (!val) return;
-    localStorage.setItem('retzef_username', val);
-    showGreeting(val);
-    usernameModal.classList.remove('open');
-  });
-  document.getElementById('usernameInput').addEventListener('keydown', function(e){
-    if (e.key === 'Enter') document.getElementById('usernameSubmit').click();
-  });
 
   // === day streak — anchored so it always increases by 1 per calendar day ===
   // Anchor date is set so that on 2026-08-26 the count reads 335. No manual

@@ -1207,12 +1207,12 @@
     }
   }
   const savedTikTokProfile = (() => { try { return JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null'); } catch (_) { return null; } })();
-  if (savedTikTokProfile) showTikTokGreeting(savedTikTokProfile);
-  const savedUsername = localStorage.getItem('retzef_username');
-  if (savedUsername) {
-    showGreeting(savedUsername);
+  if (savedTikTokProfile && (savedTikTokProfile.username || savedTikTokProfile.displayName)) {
+    showTikTokGreeting(savedTikTokProfile);
   } else {
-    usernameModal.classList.add('open');
+    const savedUsername = localStorage.getItem('retzef_username');
+    if (savedUsername) showGreeting(savedUsername);
+    else usernameModal.classList.add('open');
   }
 
   document.getElementById('usernameSubmit').addEventListener('click', function(){
@@ -1913,8 +1913,8 @@
     });
     try {
       const profile = JSON.parse(localStorage.getItem('retzef_tiktok_profile') || 'null');
-      if (profile && profile.username) {
-        input.value = profile.username;
+      if (profile && (profile.username || profile.displayName)) {
+        input.value = profile.username || profile.displayName;
         checkMemberStatus();
       }
     } catch (_) {}

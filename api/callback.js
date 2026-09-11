@@ -13,8 +13,8 @@ function resolveRole(username) {
 }
 
 async function saveProfile(username, profile) {
-  const url = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) throw new Error('profile_storage_not_configured');
   const response = await fetch(`${url}/set/${encodeURIComponent(`retzef:profile:${username.toLowerCase()}`)}/${encodeURIComponent(JSON.stringify(profile))}`, {
     method: 'POST',
@@ -69,7 +69,11 @@ module.exports = async (req, res) => {
       avatar: user.avatar_url || '',
       role: resolveRole(username),
     });
-    await saveProfile(username, { username, displayName, avatarUrl: user.avatar_url || '', role: resolveRole(username) });
+    try {
+      await saveProfile(username, { username, displayName, avatarUrl: user.avatar_url || '', role: resolveRole(username) });
+    } catch (storageError) {
+      console.error('Profile storage unavailable; continuing login:', storageError.message);
+    }
     res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(username)}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`);
     return res.redirect(302, `/?${params.toString()}`);
   } catch (err) {

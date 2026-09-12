@@ -8,8 +8,19 @@ async function profile(username) { const raw = await redis('get', `${PREFIX}${us
 function publicUser(p) { return { username: p.username, displayName: p.displayName || p.username, avatarUrl: p.avatarUrl || '', role: p.role || 'member', online: Date.now() - Number(p.lastSeen || 0) < 120000, statusVisible: p.privacy?.statusVisible !== false, subscriptionVisible: p.privacy?.subscriptionVisible === true }; }
 function knownStatus(username) { const known = { 'ban.real': 'בעלים', 'oobbn98': 'הכול טוב', 'dahan324': 'סבבה', 'albinocapybara': 'הכול טוב', 'user1691117561269': 'הכול טוב' }; return known[String(username || '').toLowerCase()] || ''; }
 async function supportRequests() { const rows = await redis('lrange', 'retzef:support:requests', '0', '99'); return (rows || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean); }
+async function joinRequests() { const rows = await redis('lrange', 'retzef:join:requests', '0', '99'); return (rows || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean); }
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
+  const input = body(req); const action = String(input.action || '');
+  if (req.method === 'POST' && action === 'join') {
+    try {
+      const name = String(input.name || '').trim().slice(0, 60); const age = Number(input.age); const gender = String(input.gender || '').trim();
+      if (!name || !Number.isInteger(age) || age < 1 || age > 120 || !['בן', 'בת'].includes(gender)) return res.status(400).json({ error: 'invalid_join_details' });
+      const item = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, age, gender, createdAt: new Date().toISOString(), status: 'new' };
+      await redis('lpush', 'retzef:join:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:join:requests', '0', '199'); await sendTo('user613987579196', { title: 'בקשת הצטרפות חדשה', body: `${name}, גיל ${age}, ביקש/ה להצטרף`, url: '/' });
+      return res.status(201).json({ submitted: true });
+    } catch (e) { console.error('join request:', e.message); return res.status(503).json({ error: e.message === 'storage_not_configured' ? e.message : 'storage_error' }); }
+  }
   const me = cookie(req, 'retzef_profile_id').toLowerCase();
   if (!me) return res.status(401).json({ error: 'tiktok_login_required' });
   try {
@@ -22,10 +33,10 @@ module.exports = async (req, res) => {
       const requests = await redis('lrange', `retzef:chat:requests:${me}`, '0', '49');
       const result = { me: { ...publicUser(mine), devicePreferences: mine.devicePreferences || {} }, users: visibleUsers, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) };
       if (['owner', 'admin'].includes(mine.role) || ['user613987579196', 'ban.real', 'shirel'].includes(me)) result.supportRequests = await supportRequests();
+      if (['owner', 'admin'].includes(mine.role) || ['user613987579196', 'ban.real', 'shirel'].includes(me)) result.joinRequests = await joinRequests();
       return res.status(200).json(result);
     }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
-    const input = body(req); const action = String(input.action || '');
     if (action === 'privacy') {
       mine.privacy = { statusVisible: input.statusVisible !== false, subscriptionVisible: input.subscriptionVisible === true };
       await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ privacy: mine.privacy });

@@ -569,6 +569,11 @@
 </div>
 
 
+<div class="modal-overlay" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
+  <div class="modal-card"><button type="button" class="modal-close" id="joinClose" aria-label="סגירה">✕</button><h3 id="joinTitle">הצטרפות דרך האתר</h3><p>מלאו את הפרטים כדי לשלוח בקשת הצטרפות.</p><form id="joinForm"><label>שם<input id="joinName" maxlength="60" required></label><label>גיל<input id="joinAge" type="number" min="1" max="120" required></label><label>בן או בת<select id="joinGender" required><option value="">בחירה</option><option value="בן">בן</option><option value="בת">בת</option></select></label><button type="submit" class="btn btn-tiktok">שליחת בקשת הצטרפות</button><div id="joinResult" style="margin-top:10px;font-size:13px;"></div></form></div>
+</div>
+
+
 <div class="modal-overlay" id="paypalModal">
   <div class="modal-card" style="text-align:right;">
     <button type="button" id="paypalModalClose" style="position:absolute; top:14px; left:14px; background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;">✕</button>
@@ -613,6 +618,7 @@
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
         <span data-i18n="hero_login_btn">התחברות עם TikTok</span>
       </button>
+      <button type="button" id="joinWebsiteBtn" class="btn btn-ghost glass">הצטרפות דרך האתר</button>
       <a href="#" data-target="contact" class="btn btn-ghost glass tab-jump" data-i18n="hero_tiktok_page_btn">עמוד TikTok של רצף</a>
       <a href="#" data-target="status" class="btn btn-ghost glass tab-jump" data-i18n="hero_check_status_btn">בדיקת סטטוס</a>
     </div>
@@ -1367,7 +1373,7 @@
   async function loadHub(){
     hubUsers.textContent='טוען משתמשים...'; hubRequests.textContent=''; hubChat.style.display='none';
     try { const r=await fetch('/api/users'); const d=await r.json(); if(!r.ok) throw new Error(d.error||'שגיאה');
-      if(d.requests?.length){ const title=document.createElement('div'); title.className='hub-subtitle'; title.textContent='בקשות צ׳אט'; hubRequests.appendChild(title); for(const req of d.requests){ const row=document.createElement('div'); row.className='hub-request'; const name=document.createElement('span'); name.textContent='@'+req.from; const yes=document.createElement('button'); yes.className='hub-btn'; yes.textContent='אישור'; yes.onclick=()=>handleRequest(req.from,'accept'); const no=document.createElement('button'); no.className='hub-btn secondary'; no.textContent='דחייה'; no.onclick=()=>handleRequest(req.from,'deny'); row.append(name,yes,no); hubRequests.appendChild(row); } } if(['owner','admin'].includes(String(window.__retzefProfile?.role||''))){ try { const sr=await fetch('/api/users'); const sd=await sr.json(); if(sr.ok&&sd.supportRequests?.length){ const title=document.createElement('div'); title.className='hub-subtitle'; title.textContent='📩 פניות תמיכה'; hubRequests.appendChild(title); sd.supportRequests.forEach(req=>{ const row=document.createElement('div'); row.className='hub-request'; const text=document.createElement('span'); text.textContent='@'+req.from+': '+req.quote; row.appendChild(text); hubRequests.appendChild(row); }); } } catch(_){} }
+      if(d.requests?.length){ const title=document.createElement('div'); title.className='hub-subtitle'; title.textContent='בקשות צ׳אט'; hubRequests.appendChild(title); for(const req of d.requests){ const row=document.createElement('div'); row.className='hub-request'; const name=document.createElement('span'); name.textContent='@'+req.from; const yes=document.createElement('button'); yes.className='hub-btn'; yes.textContent='אישור'; yes.onclick=()=>handleRequest(req.from,'accept'); const no=document.createElement('button'); no.className='hub-btn secondary'; no.textContent='דחייה'; no.onclick=()=>handleRequest(req.from,'deny'); row.append(name,yes,no); hubRequests.appendChild(row); } } if(['owner','admin'].includes(String(window.__retzefProfile?.role||''))){ try { const sr=await fetch('/api/users'); const sd=await sr.json(); if(sr.ok&&sd.supportRequests?.length){ const title=document.createElement('div'); title.className='hub-subtitle'; title.textContent='📩 פניות תמיכה'; hubRequests.appendChild(title); sd.supportRequests.forEach(req=>{ const row=document.createElement('div'); row.className='hub-request'; const text=document.createElement('span'); text.textContent='@'+req.from+': '+req.quote; row.appendChild(text); hubRequests.appendChild(row); }); } if(sr.ok&&sd.joinRequests?.length){ const title=document.createElement('div'); title.className='hub-subtitle'; title.textContent='👋 בקשות הצטרפות'; hubRequests.appendChild(title); sd.joinRequests.forEach(req=>{ const row=document.createElement('div'); row.className='hub-request'; row.textContent=req.name+' · גיל '+req.age+' · '+req.gender; hubRequests.appendChild(row); }); } } catch(_){} }
       hubUsers.textContent=''; if(!d.users?.length){hubUsers.textContent='אין משתמשים נוספים כרגע.';return;} for(const u of d.users){ const row=document.createElement('div'); row.className='hub-user'; const img=document.createElement('img'); img.src=u.avatarUrl||''; img.alt=''; const info=document.createElement('div'); info.className='hub-user-info'; const name=document.createElement('div'); name.className='hub-user-name'; name.textContent=(u.displayName||u.username)+' · @'+u.username; const state=document.createElement('div'); state.className=u.online?'hub-online':'hub-offline'; state.textContent=u.online?'● מחובר עכשיו':'○ לא מחובר'; info.append(name,state); const btn=document.createElement('button'); btn.className='hub-btn'; btn.textContent=u.chatApproved?'פתח צ׳אט':u.chatPending?'בקשה נשלחה ✅':'בקשו צ׳אט'; btn.disabled=Boolean(u.chatPending); btn.onclick=()=>u.chatApproved?loadChat(u.username):sendRequest(u.username,btn); row.append(img,info,btn); if(u.chatApproved){const details=document.createElement('button');details.className='hub-btn secondary';details.textContent='פרטים';details.onclick=()=>showUserDetails(u);row.appendChild(details);} hubUsers.appendChild(row); }
     } catch(e){hubUsers.textContent='לא ניתן לטעון משתמשים כרגע. נסו שוב.';}
   }
@@ -1384,6 +1390,11 @@
   const consentModal = document.getElementById('consentModal');
   function openConsentModal(forceAccountChooser){ forceTikTokAccountChooser=forceAccountChooser===true; consentModal.classList.add('open'); }
   function closeConsentModal(){ consentModal.classList.remove('open'); }
+  const joinModal=document.getElementById('joinModal');
+  document.getElementById('joinWebsiteBtn').addEventListener('click',()=>joinModal.classList.add('open'));
+  document.getElementById('joinClose').addEventListener('click',()=>joinModal.classList.remove('open'));
+  joinModal.addEventListener('click',e=>{if(e.target===joinModal)joinModal.classList.remove('open');});
+  document.getElementById('joinForm').addEventListener('submit',async e=>{e.preventDefault();const result=document.getElementById('joinResult');const button=e.target.querySelector('button[type="submit"]');button.disabled=true;result.textContent='שולח בקשה...';try{const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join',name:document.getElementById('joinName').value.trim(),age:Number(document.getElementById('joinAge').value),gender:document.getElementById('joinGender').value})});const d=await r.json();if(!r.ok)throw new Error(d.error||'join_failed');result.textContent='✅ הבקשה נשלחה למנהל. נחזור אליכם לאחר בדיקה.';e.target.reset();}catch(_){result.textContent='❌ לא ניתן לשלוח כרגע. נסו שוב.';}button.disabled=false;});
 
   let forceTikTokAccountChooser=false;
   document.getElementById('consentYes').addEventListener('click', function(){

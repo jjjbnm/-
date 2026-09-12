@@ -445,6 +445,24 @@
 </style>
 </head>
 <body>
+<script>
+(function(){
+  const overlay=document.getElementById('retzef-access-error');
+  const text=document.getElementById('retzef-access-error-text');
+  const code=document.getElementById('retzef-access-error-code');
+  function block(errorCode,message){ if(!overlay)return; text.textContent=message; code.textContent=errorCode; overlay.style.display='flex'; document.body.dataset.accessBlocked='true'; }
+  async function checkRegion(){
+    if(!navigator.onLine){ block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האתר זמין רק עם חיבור פעיל.'); return; }
+    try{
+      const response=await fetch('/api/access-check',{cache:'no-store'});
+      const data=await response.json().catch(()=>({}));
+      if(response.status===403 || data.error==='region_not_allowed'){ block('RETZEF_REGION_NOT_ALLOWED','האתר זמין למבקרים מישראל בלבד.'); return; }
+      if(!response.ok || data.allowed!==true){ block('RETZEF_REGION_CHECK_FAILED','לא ניתן לאמת את אזור החיבור. נסו שוב מאוחר יותר.'); }
+    }catch(e){ block('RETZEF_REGION_CHECK_FAILED','לא ניתן לאמת את אזור החיבור. נסו שוב מאוחר יותר.'); }
+  }
+  checkRegion();
+})();
+</script>
 <div id="retzef-access-error" role="alert" aria-live="assertive"><div class="error-box"><h1>לא ניתן להיכנס לאתר</h1><p id="retzef-access-error-text">נדרשת גישה לאינטרנט כדי להשתמש באתר.</p><code id="retzef-access-error-code">RETZEF_OFFLINE</code><p>בדקו את החיבור ונסו שוב.</p><button type="button" onclick="location.reload()">נסה שוב</button></div></div>
 
 <script>

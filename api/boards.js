@@ -49,6 +49,13 @@ module.exports = async (req, res) => {
     const input = bodyOf(req);
     const description = clean(input.description, 300);
     const content = clean(input.content, 5000);
+    const postType = clean(input.postType, 30);
+    const allowedPostTypes = new Set(['הודעה', 'קובץ', 'סקר', 'אירוע', 'עדכון']);
+    const fileName = clean(input.fileName, 255);
+    const fileSize = Number(input.fileSize || 0);
+    if (!allowedPostTypes.has(postType)) return res.status(400).json({ error: 'invalid_post_type' });
+    if (fileName.toLowerCase().endsWith('.apk')) return res.status(400).json({ error: 'apk_files_not_allowed' });
+    if (!Number.isFinite(fileSize) || fileSize < 0 || fileSize > 100 * 1024 * 1024) return res.status(400).json({ error: 'file_too_large' });
     const category = clean(input.category, 80);
     const allowedCategories = new Set(['דיווח על באג', 'עדכון חשוב', 'הודעה כללית', 'אירוע', 'חוקי הקבוצה', 'תחזוקה', 'מנויים ותשלומים', 'חנות', 'תמיכה ועזרה', 'שינוי באתר', 'סקר לקהילה', 'תחרות ופעילות', 'דחוף']);
     if (!description || !content || !category) return res.status(400).json({ error: 'description_content_category_required' });
@@ -60,7 +67,8 @@ module.exports = async (req, res) => {
     }
     const item = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      description, content, category,
+      description, content, category, postType,
+      fileName, fileSize,
       codeRequired: board === 'updates',
       publishedAt: clean(input.publishedAt, 40),
       expiresAt: clean(input.expiresAt, 40),

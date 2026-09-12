@@ -1857,7 +1857,7 @@
 <script>
   (function () {
     const members = {
-      'ban.real': { status: 'בעלים', level: '', levelEmoji: '👑' },
+      'ban.real': { status: 'בעלים', level: '', levelEmoji: '👑', age: '10', birthday: '23 בינואר' },
       'oobbn98': { status: 'הכול טוב', level: 'מנהל', levelEmoji: '👩‍💼', age: '12 (13 ב־2 באוקטובר)', displayName: 'שיראל' },
       'user613987579196': { status: 'הכול טוב', level: 'מנהל מערכת תמיכה', levelEmoji: '🔨' },
       'shirel': { status: 'הכול טוב', level: 'מנהלת', levelEmoji: '👩‍💼' },
@@ -1900,7 +1900,7 @@
       }
       const shownUsername = profileUsername || matchedKey;
       username.textContent = (member.displayName ? member.displayName + ' ' : '') + '(@' + shownUsername + ')';
-      status.textContent = 'סטטוס: ' + member.status + (member.level ? ' · רמה: ' + member.level + ' ' + (member.levelEmoji || '') : '') + (member.age ? ' · גיל: ' + member.age : '');
+      status.textContent = 'סטטוס: ' + member.status + (member.level ? ' · רמה: ' + member.level + ' ' + (member.levelEmoji || '') : '') + (member.age ? ' · גיל: ' + member.age : '') + (member.birthday ? ' · יום הולדת: ' + member.birthday : '');
       result.style.display = 'block';
     }
 

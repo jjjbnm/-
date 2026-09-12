@@ -1858,11 +1858,13 @@
   (function () {
     const members = {
       'ban.real': { status: 'בעלים', level: '', levelEmoji: '👑' },
-      'oobbn98': { status: 'הכול טוב', level: 'מנהלת', levelEmoji: '👩‍💼', displayName: 'שיראל' },
+      'oobbn98': { status: 'הכול טוב', level: 'מנהל', levelEmoji: '👩‍💼', age: '12 (13 ב־2 באוקטובר)', displayName: 'שיראל' },
       'user613987579196': { status: 'הכול טוב', level: 'מנהל מערכת תמיכה', levelEmoji: '🔨' },
       'shirel': { status: 'הכול טוב', level: 'מנהלת', levelEmoji: '👩‍💼' },
+      'dahan324': { status: 'סבבה', level: '', age: '11' },
       'ilai550': { status: 'הכול טוב', level: '' },
-      'albinocapybara': { status: 'הכול טוב', level: '' },
+      'albinocapybara': { status: 'הכול טוב', level: '', age: '12' },
+      'user1691117561269': { status: 'הכול טוב', level: '', age: '13' },
       'talia_isrel8': { status: 'הכול טוב', level: '' },
       'the_gg12': { status: 'הכול טוב', level: '' }
     };
@@ -1898,7 +1900,7 @@
       }
       const shownUsername = profileUsername || matchedKey;
       username.textContent = (member.displayName ? member.displayName + ' ' : '') + '(@' + shownUsername + ')';
-      status.textContent = 'סטטוס: ' + member.status + (member.level ? ' · רמה: ' + member.level + ' ' + (member.levelEmoji || '') : '');
+      status.textContent = 'סטטוס: ' + member.status + (member.level ? ' · רמה: ' + member.level + ' ' + (member.levelEmoji || '') : '') + (member.age ? ' · גיל: ' + member.age : '');
       result.style.display = 'block';
     }
 

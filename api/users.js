@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
       const scan = await redis('scan', '0', 'match', `${PREFIX}*`, 'count', '100');
       const keys = Array.isArray(scan) && Array.isArray(scan[1]) ? scan[1] : [];
       const users = (await Promise.all(keys.slice(0, 100).map(k => profile(k.slice(PREFIX.length))))).filter(Boolean).filter(p => String(p.username).toLowerCase() !== me);
-      const visibleUsers = await Promise.all(users.map(async p => { const targetUsername = String(p.username).toLowerCase(); const approved = await redis('sismember', `retzef:chat:accepted:${me}`, targetUsername); const pendingRows = await redis('lrange', `retzef:chat:requests:${targetUsername}`, '0', '49'); const chatPending = (pendingRows || []).some(row => { try { return JSON.parse(row).from === me; } catch (_) { return false; } }); const result = { ...publicUser(p), chatApproved: String(approved) === '1' || approved === true, chatPending }; if (result.chatApproved && result.statusVisible) result.status = p.status || knownStatus(p.username); if (result.chatApproved && result.subscriptionVisible) result.subscription = p.subscription || p.subscriptionName || ''; return result; }));
+      const visibleUsers = await Promise.all(users.map(async p => { const targetUsername = String(p.username).toLowerCase(); const approved = await redis('sismember', `retzef:chat:accepted:${me}`, targetUsername); const pendingRows = await redis('lrange', `retzef:chat:requests:${targetUsername}`, '0', '49'); const chatPending = (pendingRows || []).some(row => { try { return JSON.parse(row).from === me; } catch (_) { return false; } }); const result = { ...publicUser(p), chatApproved: String(approved) === '1' || approved === true, chatPending, blockedByMe: (mine.blockedUsers || []).includes(targetUsername), mutedByMe: (mine.mutedUsers || []).includes(targetUsername) }; if (result.chatApproved && result.statusVisible) result.status = p.status || knownStatus(p.username); if (result.chatApproved && result.subscriptionVisible) result.subscription = p.subscription || p.subscriptionName || ''; return result; }));
       const requests = await redis('lrange', `retzef:chat:requests:${me}`, '0', '49');
       const result = { me: { ...publicUser(mine), devicePreferences: mine.devicePreferences || {} }, users: visibleUsers, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) };
       if (['owner', 'admin'].includes(mine.role) || ['user613987579196', 'ban.real', 'shirel'].includes(me)) result.supportRequests = await supportRequests();
@@ -55,7 +55,15 @@ module.exports = async (req, res) => {
     }
     const target = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
     if (!target || target === me || !(await profile(target))) return res.status(404).json({ error: 'user_not_found' });
+    if (action === 'block' || action === 'unblock') {
+      const blocked = new Set(Array.isArray(mine.blockedUsers) ? mine.blockedUsers : []); if (action === 'block') blocked.add(target); else blocked.delete(target); mine.blockedUsers = [...blocked]; await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ blocked: action === 'block', username: target });
+    }
+    if (action === 'mute' || action === 'unmute') {
+      const muted = new Set(Array.isArray(mine.mutedUsers) ? mine.mutedUsers : []); if (action === 'mute') muted.add(target); else muted.delete(target); mine.mutedUsers = [...muted]; await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ muted: action === 'mute', username: target });
+    }
     if (action === 'request') {
+      if ((mine.blockedUsers || []).includes(target)) return res.status(403).json({ error: 'user_blocked' });
+      const targetProfile = await profile(target); if ((targetProfile.blockedUsers || []).includes(me)) return res.status(403).json({ error: 'user_blocked' });
       const existingRows = await redis('lrange', `retzef:chat:requests:${target}`, '0', '49');
       if ((existingRows || []).some(row => { try { return JSON.parse(row).from === me; } catch (_) { return false; } })) return res.status(200).json({ sent: true, pending: true });
       const item = JSON.stringify({ from: me, createdAt: new Date().toISOString() }); await redis('lpush', `retzef:chat:requests:${target}`, item); await sendTo(target, { title: 'בקשת צ׳אט חדשה', body: `@${me} רוצה להתחיל צ׳אט איתך`, url: '/' }); return res.status(201).json({ sent: true, pending: true });
@@ -67,6 +75,9 @@ module.exports = async (req, res) => {
       if (!found) return res.status(404).json({ error: 'request_not_found' });
       if (action === 'accept') { await redis('sadd', `retzef:chat:accepted:${me}`, target); await redis('sadd', `retzef:chat:accepted:${target}`, me); }
       return res.status(200).json({ accepted: action === 'accept' });
+    }
+    if (action === 'close') {
+      await redis('srem', `retzef:chat:accepted:${me}`, target); await redis('srem', `retzef:chat:accepted:${target}`, me); return res.status(200).json({ closed: true });
     }
     return res.status(400).json({ error: 'invalid_action' });
   } catch (e) { console.error('users API:', e.message); return res.status(503).json({ error: e.message === 'storage_not_configured' ? e.message : 'storage_error' }); }

@@ -11,18 +11,19 @@ module.exports = async (req, res) => {
     const input = req.method === 'POST' ? body(req) : req.query; const other = String(input.username || '').replace(/^@/, '').toLowerCase();
     if (req.method === 'GET' && String(input.inbox || '') === '1') { const rows = await redis('lrange', `retzef:inbox:${me}`, '0', '99'); return res.status(200).json({ messages: (rows || []).reverse().map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean), inbox: true }); }
     if (!other || other === me) return res.status(400).json({ error: 'user_required' });
-    if (!(await profile(other))) return res.status(404).json({ error: 'user_not_found' });
+    const otherProfile = await profile(other); if (!otherProfile) return res.status(404).json({ error: 'user_not_found' });
+    const myProfile = await profile(me); if ((myProfile?.blockedUsers || []).includes(other) || (otherProfile.blockedUsers || []).includes(me)) return res.status(403).json({ error: 'user_blocked' });
     const privilegedSender = ['ban.real', 'user613987579196'].includes(me);
     if (req.method === 'POST' && input.inbox === true) {
       if (!privilegedSender) return res.status(403).json({ error: 'inbox_read_only' });
       const message = String(input.message || '').trim().slice(0, 2000); if (!message) return res.status(400).json({ error: 'message_required' });
-      const item = JSON.stringify({ from: me, to: other, message, inbox: true, createdAt: new Date().toISOString() }); await redis('lpush', `retzef:inbox:${other}`, item); await redis('ltrim', `retzef:inbox:${other}`, '0', '199'); await sendTo(other, { title: `Inbox חדש מ־@${me}`, body: message.slice(0, 120), url: '/' }); return res.status(201).json({ message: JSON.parse(item), inbox: true });
+      const item = JSON.stringify({ from: me, to: other, message, inbox: true, createdAt: new Date().toISOString() }); await redis('lpush', `retzef:inbox:${other}`, item); await redis('ltrim', `retzef:inbox:${other}`, '0', '199'); if (!(otherProfile.mutedUsers || []).includes(me)) await sendTo(other, { title: `Inbox חדש מ־@${me}`, body: message.slice(0, 120), url: '/' }); return res.status(201).json({ message: JSON.parse(item), inbox: true });
     }
     const accepted = await redis('sismember', `retzef:chat:accepted:${me}`, other);
     if (Number(accepted) !== 1 && accepted !== true) return res.status(403).json({ error: 'chat_not_approved' });
     if (req.method === 'GET') { const rows = await redis('lrange', key(me, other), '0', '99'); return res.status(200).json({ messages: (rows || []).reverse().map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) }); }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const message = String(input.message || '').trim().slice(0, 2000); if (!message) return res.status(400).json({ error: 'message_required' });
-    const item = JSON.stringify({ from: me, to: other, message, createdAt: new Date().toISOString() }); await redis('lpush', key(me, other), item); await redis('ltrim', key(me, other), '0', '199'); await sendTo(other, { title: `הודעה חדשה מ־@${me}`, body: message.slice(0, 120), url: '/' }); return res.status(201).json({ message: JSON.parse(item) });
+    const item = JSON.stringify({ from: me, to: other, message, createdAt: new Date().toISOString() }); await redis('lpush', key(me, other), item); await redis('ltrim', key(me, other), '0', '199'); if (!(otherProfile.mutedUsers || []).includes(me)) await sendTo(other, { title: `הודעה חדשה מ־@${me}`, body: message.slice(0, 120), url: '/' }); return res.status(201).json({ message: JSON.parse(item) });
   } catch (e) { console.error('chat API:', e.message); return res.status(503).json({ error: e.message === 'storage_not_configured' ? e.message : 'storage_error' }); }
 };

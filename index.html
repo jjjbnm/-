@@ -443,7 +443,6 @@
   html[data-theme="dark"] #retzef-access-error{background:#0a0c12;color:#eef0f5} html[data-theme="dark"] #retzef-access-error .error-box{background:#11141d;border-color:#303548}
 
 
-  #retzef-ai{position:fixed;bottom:18px;left:18px;z-index:1000;direction:rtl;font-family:Assistant,sans-serif}#retzef-ai-toggle{border:0;border-radius:999px;background:var(--accent);color:white;padding:13px 18px;font-weight:800;box-shadow:0 8px 24px #0003;cursor:pointer}#retzef-ai-panel{display:none;width:min(360px,calc(100vw - 36px));height:480px;margin-bottom:10px;background:var(--bg2);color:var(--text);border:1px solid var(--glass-border);border-radius:18px;box-shadow:0 16px 50px #0003;overflow:hidden;flex-direction:column}#retzef-ai-panel.open{display:flex}#retzef-ai-head{padding:14px 16px;background:var(--accent);color:white;font-weight:800}#retzef-ai-messages{padding:12px;display:flex;flex-direction:column;gap:9px;overflow:auto;flex:1}.retzef-ai-msg{padding:9px 11px;border-radius:12px;max-width:90%;white-space:pre-wrap}.retzef-ai-user{align-self:flex-start;background:#e8edff}.retzef-ai-bot{align-self:flex-end;background:var(--glass)}#retzef-ai-form{display:flex;gap:7px;padding:10px;border-top:1px solid var(--glass-border)}#retzef-ai-input{min-width:0;flex:1;padding:9px;border:1px solid var(--glass-border);border-radius:10px;background:var(--bg);color:var(--text)}#retzef-ai-send{border:0;border-radius:10px;background:var(--accent);color:white;padding:0 13px;font-weight:800}
 </style>
 </head>
 <body>
@@ -2187,7 +2186,6 @@
   checkConnection();
 })();
 </script>
-<div id="retzef-ai"><div id="retzef-ai-panel"><div id="retzef-ai-head">🤖 העוזר של רצף</div><div id="retzef-ai-messages"><div class="retzef-ai-msg retzef-ai-bot">היי! אני העוזר של רצף, איך אפשר לעזור?</div></div><form id="retzef-ai-form"><input id="retzef-ai-input" autocomplete="off" placeholder="כתבו שאלה..."><button id="retzef-ai-send" type="submit">שלח</button></form></div><button id="retzef-ai-toggle" type="button">🤖 שאלו את העוזר</button></div>
-<script>(function(){const panel=document.getElementById('retzef-ai-panel'),toggle=document.getElementById('retzef-ai-toggle'),form=document.getElementById('retzef-ai-form'),input=document.getElementById('retzef-ai-input'),messages=document.getElementById('retzef-ai-messages');toggle.addEventListener('click',()=>{panel.classList.toggle('open');if(panel.classList.contains('open'))input.focus();});function add(text,who){const el=document.createElement('div');el.className='retzef-ai-msg '+(who==='user'?'retzef-ai-user':'retzef-ai-bot');el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight;return el;}form.addEventListener('submit',async e=>{e.preventDefault();const question=input.value.trim();if(!question)return;input.value='';add(question,'user');const wait=add('חושב...','bot');try{const r=await fetch('/api/assistant',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:question})});const d=await r.json();wait.textContent=d.answer|| (d.error==='ai_not_configured'?'העוזר עדיין לא הוגדר בשרת.': 'אירעה שגיאה. נסו שוב.');}catch(_){wait.textContent='לא ניתן להתחבר לעוזר כרגע.';}});})();</script>
+
 </body>
 </html>

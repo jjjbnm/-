@@ -531,8 +531,14 @@
 <div id="profileMenu" role="menu" aria-label="תפריט משתמש">
   <div class="menu-user" id="profileMenuUser">החשבון שלי</div>
   <button type="button" data-profile-target="settings">⚙️ הגדרות חשבון</button>
-  <button type="button" data-profile-target="devicePreferences">📱 Device Preferences</button>
-  <button type="button" data-profile-target="devicePerformance">⚡ Device Performance</button>
+  <button type="button" id="profileDevicePreferences">📱 Device Preferences</button>
+  <div id="profileDevicePreferencesPanel" style="display:none;padding:8px 13px;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);font-size:12px;">
+    <label style="display:flex;align-items:center;gap:8px;margin:7px 0;"><input type="checkbox" id="profileReduceMotion"> הפחתת אנימציות</label>
+    <label style="display:flex;align-items:center;gap:8px;margin:7px 0;"><input type="checkbox" id="profileBrowserNotifications"> התראות בדפדפן</label>
+    <button type="button" id="saveProfileDevicePreferences" style="font-size:12px;padding:7px;">שמירה</button>
+  </div>
+  <button type="button" id="profileDevicePerformance">⚡ Device Performance</button>
+  <div id="profileDevicePerformancePanel" style="display:none;padding:8px 13px;border-bottom:1px solid var(--glass-border);font-size:12px;white-space:pre-line;"><button type="button" id="runProfileDevicePerformance" style="font-size:12px;padding:7px;">בדיקת ביצועים</button><div id="profileDevicePerformanceResult" style="margin-top:7px;"></div></div>
   <button type="button" data-profile-target="status">🟢 הסטטוס שלי</button>
   <button type="button" data-profile-target="subs">💳 מנויים</button>
   <button type="button" data-profile-target="shop">🛍️ חנות</button>
@@ -1325,6 +1331,10 @@
   document.getElementById('profileQuickUp').addEventListener('click',()=>{quickModal.classList.remove('open');profileMenu.classList.add('open');});
   quickModal.addEventListener('click',e=>{if(e.target===quickModal)quickModal.classList.remove('open');});
   document.getElementById('profileAccounts').addEventListener('click',openAccountManager);
+  document.getElementById('profileDevicePreferences').addEventListener('click',()=>{const panel=document.getElementById('profileDevicePreferencesPanel');const saved=getDevicePreferences();panel.style.display=panel.style.display==='none'?'block':'none';document.getElementById('profileReduceMotion').checked=saved.reduceMotion===true;document.getElementById('profileBrowserNotifications').checked=saved.notifications===true;});
+  document.getElementById('saveProfileDevicePreferences').addEventListener('click',async()=>{const reduceMotion=document.getElementById('profileReduceMotion').checked;const notifications=document.getElementById('profileBrowserNotifications').checked;localStorage.setItem(devicePreferencesKey,JSON.stringify({reduceMotion,notifications}));document.documentElement.dataset.reduceMotion=reduceMotion?'true':'false';if(notifications&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();document.getElementById('saveProfileDevicePreferences').textContent='נשמר ✅';setTimeout(()=>document.getElementById('saveProfileDevicePreferences').textContent='שמירה',1500);});
+  document.getElementById('profileDevicePerformance').addEventListener('click',()=>{document.getElementById('profileDevicePerformancePanel').style.display=document.getElementById('profileDevicePerformancePanel').style.display==='none'?'block':'none';});
+  document.getElementById('runProfileDevicePerformance').addEventListener('click',async()=>{const lines=['חיבור לאינטרנט: '+(navigator.onLine?'✅ מחובר':'❌ לא מחובר'),'JavaScript: ✅ פעיל','מסך: '+screen.width+'×'+screen.height,'ליבות מעבד: '+(navigator.hardwareConcurrency||'לא נמסר'),'זיכרון משוער: '+(navigator.deviceMemory?navigator.deviceMemory+'GB':'לא נמסר')];try{const battery=await navigator.getBattery?.();if(battery)lines.push('סוללה: '+Math.round(battery.level*100)+'%'+(battery.charging?' · בטעינה':''));}catch(_){}document.getElementById('profileDevicePerformanceResult').textContent=lines.join('\n');});
   document.getElementById('profileLogout').addEventListener('click',()=>{document.cookie='retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax';window.__retzefProfile=null;profileMenu.classList.remove('open');location.reload();});
   const hubModal=document.getElementById('userHubModal'), hubUsers=document.getElementById('hubUsers'), hubRequests=document.getElementById('hubRequests'), hubChat=document.getElementById('hubChat'), hubChatTitle=document.getElementById('hubChatTitle'), hubChatMessages=document.getElementById('hubChatMessages'), hubChatInput=document.getElementById('hubChatInput');
   let activeChatUser='';

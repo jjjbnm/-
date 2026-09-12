@@ -18,8 +18,8 @@ module.exports = async (req, res) => {
       const message = String(input.message || '').trim().slice(0, 2000); if (!message) return res.status(400).json({ error: 'message_required' });
       const item = JSON.stringify({ from: me, to: other, message, inbox: true, createdAt: new Date().toISOString() }); await redis('lpush', `retzef:inbox:${other}`, item); await redis('ltrim', `retzef:inbox:${other}`, '0', '199'); await sendTo(other, { title: `Inbox חדש מ־@${me}`, body: message.slice(0, 120), url: '/' }); return res.status(201).json({ message: JSON.parse(item), inbox: true });
     }
-    const accepted = privilegedSender ? 1 : await redis('sismember', `retzef:chat:accepted:${me}`, other);
-    if (!privilegedSender && Number(accepted) !== 1 && accepted !== true) return res.status(403).json({ error: 'chat_not_approved' });
+    const accepted = await redis('sismember', `retzef:chat:accepted:${me}`, other);
+    if (Number(accepted) !== 1 && accepted !== true) return res.status(403).json({ error: 'chat_not_approved' });
     if (req.method === 'GET') { const rows = await redis('lrange', key(me, other), '0', '99'); return res.status(200).json({ messages: (rows || []).reverse().map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) }); }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const message = String(input.message || '').trim().slice(0, 2000); if (!message) return res.status(400).json({ error: 'message_required' });

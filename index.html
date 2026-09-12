@@ -1501,6 +1501,9 @@
   const paypalButtonContainer = document.getElementById('paypalButtonContainer');
   const applePayButtonContainer = document.getElementById('applePayButtonContainer');
   const googlePayButtonContainer = document.getElementById('googlePayButtonContainer');
+  function closePaypalModal(){ paypalModal.classList.remove('open'); paypalButtonContainer.innerHTML=''; applePayButtonContainer.innerHTML=''; googlePayButtonContainer.innerHTML=''; }
+  document.getElementById('paypalModalClose').addEventListener('click', closePaypalModal);
+  paypalModal.addEventListener('click', e => { if(e.target === paypalModal) closePaypalModal(); });
 
   function openPaypalModal(itemName, price){
     paypalItemName.textContent = itemName;
@@ -1716,6 +1719,10 @@
   const subModal = document.getElementById('subModal');
   const subItemName = document.getElementById('subItemName');
   const subButtonContainer = document.getElementById('subButtonContainer');
+  function closeSubscriptionModal(){ subModal.classList.remove('open'); subButtonContainer.innerHTML=''; }
+  document.getElementById('subModalClose').addEventListener('click', closeSubscriptionModal);
+  subModal.addEventListener('click', e => { if(e.target === subModal) closeSubscriptionModal(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closePaypalModal(); closeSubscriptionModal(); } });
 
   function openSubscriptionModal(itemName, planKey){
     subItemName.textContent = itemName;

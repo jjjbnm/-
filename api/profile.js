@@ -23,9 +23,12 @@ module.exports = async (req, res) => {
   const username = getCookie(req, 'retzef_profile_id');
   if (!username) return res.status(401).json({ error: 'not_authenticated' });
   try {
-    const profile = await kv('get', `retzef:profile:${username.toLowerCase()}`);
+    const profileRaw = await kv('get', `retzef:profile:${username.toLowerCase()}`);
+    const profile = typeof profileRaw === 'string' ? JSON.parse(profileRaw) : profileRaw;
     if (!profile) return res.status(404).json({ error: 'profile_not_found' });
-    return res.status(200).json({ profile: typeof profile === 'string' ? JSON.parse(profile) : profile });
+    profile.lastSeen = Date.now();
+    await kv('set', `retzef:profile:${username.toLowerCase()}`, JSON.stringify(profile));
+    return res.status(200).json({ profile });
   } catch (error) {
     console.error('profile API error:', error.message);
     return res.status(503).json({ error: error.message === 'profile_storage_not_configured' ? 'profile_storage_not_configured' : 'storage_error' });

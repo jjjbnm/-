@@ -451,6 +451,12 @@
   #profileQuickModal .quick-up{position:absolute;right:14px;top:12px;border:0;background:var(--accent);color:#fff;border-radius:9px;width:32px;height:32px;font-size:21px;line-height:28px;cursor:pointer}
   #profileQuickModal .quick-action{width:100%;margin-top:12px;border:0;border-radius:11px;background:var(--accent);color:#fff;padding:11px;font:700 14px Assistant,sans-serif;cursor:pointer}
 
+
+  #userHubModal{display:none;position:fixed;inset:0;z-index:1350;background:#0006;align-items:center;justify-content:center;padding:16px;direction:rtl}
+  #userHubModal.open{display:flex}
+  #userHubModal .hub-card{width:min(520px,100%);max-height:82vh;overflow:auto;background:var(--bg2);color:var(--text);border:1px solid var(--glass-border);border-radius:22px;padding:20px;box-shadow:0 18px 60px #0004;position:relative}
+  #userHubModal h3{margin:0 0 6px;font-size:21px}.hub-subtitle{color:var(--muted);font-size:13px;margin-bottom:14px}.hub-close{position:absolute;left:14px;top:12px;border:0;background:transparent;color:var(--muted);font-size:22px;cursor:pointer}.hub-request{padding:10px;border-radius:13px;background:var(--glass);margin:8px 0;display:flex;align-items:center;justify-content:space-between;gap:8px}.hub-user{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--glass-border)}.hub-user img{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#ddd}.hub-user-info{flex:1}.hub-user-name{font-weight:700}.hub-online{font-size:12px;color:#16a34a}.hub-offline{font-size:12px;color:var(--muted)}.hub-btn{border:0;border-radius:9px;padding:8px 11px;background:var(--accent);color:#fff;font:700 13px Assistant,sans-serif;cursor:pointer}.hub-btn.secondary{background:var(--glass);color:var(--text)}#hubChat{display:none;margin-top:12px;border-top:1px solid var(--glass-border);padding-top:12px}.hub-chat-messages{max-height:210px;overflow:auto;display:flex;flex-direction:column;gap:7px}.hub-msg{padding:8px 10px;border-radius:11px;background:var(--glass);max-width:85%;white-space:pre-wrap}.hub-msg.mine{align-self:flex-start;background:#dfe7ff}.hub-chat-form{display:flex;gap:7px;margin-top:10px}.hub-chat-form input{min-width:0;flex:1;padding:9px;border:1px solid var(--glass-border);border-radius:10px;background:var(--bg);color:var(--text)}
+
   #retzef-ai{position:fixed;bottom:18px;left:18px;z-index:1000;direction:rtl;font-family:Assistant,sans-serif}#retzef-ai-toggle{border:0;border-radius:999px;background:var(--accent);color:white;padding:13px 18px;font-weight:800;box-shadow:0 8px 24px #0003;cursor:pointer}#retzef-ai-panel{display:none;width:min(360px,calc(100vw - 36px));height:480px;margin-bottom:10px;background:var(--bg2);color:var(--text);border:1px solid var(--glass-border);border-radius:18px;box-shadow:0 16px 50px #0003;overflow:hidden;flex-direction:column}#retzef-ai-panel.open{display:flex}#retzef-ai-head{padding:14px 16px;background:var(--accent);color:white;font-weight:800}#retzef-ai-messages{padding:12px;display:flex;flex-direction:column;gap:9px;overflow:auto;flex:1}.retzef-ai-msg{padding:9px 11px;border-radius:12px;max-width:90%;white-space:pre-wrap}.retzef-ai-user{align-self:flex-start;background:#e8edff}.retzef-ai-bot{align-self:flex-end;background:var(--glass)}#retzef-ai-form{display:flex;gap:7px;padding:10px;border-top:1px solid var(--glass-border)}#retzef-ai-input{min-width:0;flex:1;padding:9px;border:1px solid var(--glass-border);border-radius:10px;background:var(--bg);color:var(--text)}#retzef-ai-send{border:0;border-radius:10px;background:var(--accent);color:white;padding:0 13px;font-weight:800}
 </style>
 </head>
@@ -529,11 +535,13 @@
   <button type="button" data-profile-target="shop">🛍️ חנות</button>
   <button type="button" data-profile-target="boards">📢 מודעות</button>
   <button type="button" data-profile-target="profile">👤 פרטי משתמש</button>
+  <button type="button" id="profileUsers">👥 משתמשים וצ׳אט</button>
   <button type="button" id="profileLogout">🚪 התנתקות</button>
 </div>
 <div id="profileQuickModal" role="dialog" aria-modal="true" aria-labelledby="profileQuickTitle">
   <div class="quick-card"><button type="button" class="quick-up" id="profileQuickUp" aria-label="יציאה">↑</button><button type="button" class="quick-close" id="profileQuickClose" aria-label="סגירה">✕</button><h3 id="profileQuickTitle"></h3><div class="quick-body" id="profileQuickBody"></div></div>
 </div>
+<div id="userHubModal" role="dialog" aria-modal="true"><div class="hub-card"><button type="button" class="hub-close" id="hubClose">✕</button><h3>👥 משתמשים וצ׳אט</h3><div class="hub-subtitle">רק משתמשים מחוברים יכולים להופיע כאן. שיחה נפתחת רק לאחר אישור.</div><div id="hubRequests"></div><div id="hubUsers"><p class="hub-subtitle">טוען משתמשים...</p></div><div id="hubChat"><b id="hubChatTitle"></b><div class="hub-chat-messages" id="hubChatMessages"></div><form class="hub-chat-form" id="hubChatForm"><input id="hubChatInput" maxlength="2000" placeholder="כתבו הודעה..." required><button class="hub-btn" type="submit">שלח</button></form></div></div></div>
 
 <div class="modal-overlay" id="consentModal">
   <div class="modal-card">
@@ -1256,18 +1264,8 @@
     const username=profile.username||'לא מחובר';
     const displayName=profile.displayName||username;
     const role=profile.role==='owner'?'בעלים 👑':profile.role==='admin'?'מנהל/ת 👩‍💼':'חבר/ה';
-    const knownAccount={
-      'ban.real':{age:'10',birthday:'23 בינואר'},
-      'oobbn98':{age:'12',birthday:'13 ב־2 באוקטובר'},
-      'dahan324':{age:'11'},
-      'albinocapybara':{age:'12'},
-      'user1691117561269':{age:'13'}
-    };
-    const knownDetails=knownAccount[String(username).replace(/^@/,'').toLowerCase()]||{};
-    const accountAge=profile.age||knownDetails.age||'לא נמסר על ידי TikTok';
-    const accountBirthday=profile.birthday||knownDetails.birthday||'';
     quickTitle.textContent=action==='settings'?'⚙️ הגדרות חשבון':action==='status'?'🟢 הסטטוס שלי':action==='profile'?'👤 פרטי משתמש':'💳 המנוי שלי';
-    if(action==='settings') quickBody.innerHTML=`<p><b>חשבון TikTok</b></p><p>שם תצוגה: ${displayName}</p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p><p>גיל: ${accountAge}</p>${accountBirthday?`<p>יום הולדת: ${accountBirthday}</p>`:''}<p>התחברות: ${window.__retzefProfile?'מחובר ✅':'לא מחובר'}</p><button type="button" class="quick-action" id="quickDarkMode">🌗 החלפת מצב כהה/בהיר</button>`;
+    if(action==='settings') quickBody.innerHTML=`<p><b>חשבון TikTok</b></p><p>שם תצוגה: ${displayName}</p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p><p>גיל: ${profile.age||'לא נמסר על ידי TikTok'}</p><p>התחברות: ${window.__retzefProfile?'מחובר ✅':'לא מחובר'}</p><button type="button" class="quick-action" id="quickDarkMode">🌗 החלפת מצב כהה/בהיר</button>`;
     else if(action==='status') quickBody.innerHTML=`<p><b>${displayName}</b> (@${username})</p><p>תפקיד: ${role}</p><p>סטטוס: ${profile.role==='owner'?'בעלים':'הכול טוב'}</p>`;
     else if(action==='profile') quickBody.innerHTML=`<p>שם תצוגה: <b>${displayName}</b></p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p>`;
     else quickBody.innerHTML=`<p>${localStorage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האתר.</p>`;
@@ -1279,6 +1277,23 @@
   document.getElementById('profileQuickUp').addEventListener('click',()=>{quickModal.classList.remove('open');profileMenu.classList.add('open');});
   quickModal.addEventListener('click',e=>{if(e.target===quickModal)quickModal.classList.remove('open');});
   document.getElementById('profileLogout').addEventListener('click',()=>{document.cookie='retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax';window.__retzefProfile=null;profileMenu.classList.remove('open');location.reload();});
+  const hubModal=document.getElementById('userHubModal'), hubUsers=document.getElementById('hubUsers'), hubRequests=document.getElementById('hubRequests'), hubChat=document.getElementById('hubChat'), hubChatTitle=document.getElementById('hubChatTitle'), hubChatMessages=document.getElementById('hubChatMessages'), hubChatInput=document.getElementById('hubChatInput');
+  let activeChatUser='';
+  function hubText(el,text){el.textContent=text;}
+  async function loadHub(){
+    hubUsers.textContent='טוען משתמשים...'; hubRequests.textContent=''; hubChat.style.display='none';
+    try { const r=await fetch('/api/users'); const d=await r.json(); if(!r.ok) throw new Error(d.error||'שגיאה');
+      if(d.requests?.length){ const title=document.createElement('div'); title.className='hub-subtitle'; title.textContent='בקשות שיחה'; hubRequests.appendChild(title); for(const req of d.requests){ const row=document.createElement('div'); row.className='hub-request'; const name=document.createElement('span'); name.textContent='@'+req.from; const yes=document.createElement('button'); yes.className='hub-btn'; yes.textContent='אישור'; yes.onclick=()=>handleRequest(req.from,'accept'); const no=document.createElement('button'); no.className='hub-btn secondary'; no.textContent='דחייה'; no.onclick=()=>handleRequest(req.from,'deny'); row.append(name,yes,no); hubRequests.appendChild(row); } }
+      hubUsers.textContent=''; if(!d.users?.length){hubUsers.textContent='אין משתמשים נוספים כרגע.';return;} for(const u of d.users){ const row=document.createElement('div'); row.className='hub-user'; const img=document.createElement('img'); img.src=u.avatarUrl||''; img.alt=''; const info=document.createElement('div'); info.className='hub-user-info'; const name=document.createElement('div'); name.className='hub-user-name'; name.textContent=(u.displayName||u.username)+' · @'+u.username; const state=document.createElement('div'); state.className=u.online?'hub-online':'hub-offline'; state.textContent=u.online?'● מחובר עכשיו':'○ לא מחובר'; info.append(name,state); const btn=document.createElement('button'); btn.className='hub-btn'; btn.textContent='בקשו שיחה'; btn.onclick=()=>sendRequest(u.username,btn); row.append(img,info,btn); hubUsers.appendChild(row); }
+    } catch(e){hubUsers.textContent='לא ניתן לטעון משתמשים כרגע. נסו שוב.';}
+  }
+  async function sendRequest(username,btn){try{const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'request',username})});if(!r.ok)throw 0;btn.textContent='הבקשה נשלחה';btn.disabled=true;}catch(_){btn.textContent='נכשלה הבקשה';}}
+  async function handleRequest(username,action){await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,username})});loadHub();}
+  async function openHub(){profileMenu.classList.remove('open');hubModal.classList.add('open');await loadHub();}
+  document.getElementById('profileUsers').addEventListener('click',openHub); document.getElementById('hubClose').addEventListener('click',()=>hubModal.classList.remove('open')); hubModal.addEventListener('click',e=>{if(e.target===hubModal)hubModal.classList.remove('open');});
+  document.getElementById('hubChatForm').addEventListener('submit',async e=>{e.preventDefault();const message=hubChatInput.value.trim();if(!message||!activeChatUser)return;const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:activeChatUser,message})});if(r.ok){hubChatInput.value='';loadChat(activeChatUser);}});
+  async function loadChat(username){activeChatUser=username;hubChat.style.display='block';hubChatTitle.textContent='שיחה עם @'+username;const r=await fetch('/api/chat?username='+encodeURIComponent(username));const d=await r.json();hubChatMessages.textContent='';(d.messages||[]).forEach(m=>{const el=document.createElement('div');el.className='hub-msg '+(m.from===(window.__retzefProfile?.username||'').toLowerCase()?'mine':'');el.textContent=(m.from===username?'@'+m.from+': ':'')+m.message;hubChatMessages.appendChild(el);});hubChatMessages.scrollTop=hubChatMessages.scrollHeight;}
+
   document.addEventListener('click',e=>{if(profileMenu.classList.contains('open')&&!profileMenu.contains(e.target)&&!document.getElementById('profileAvatar').contains(e.target))profileMenu.classList.remove('open');});
 
   const consentModal = document.getElementById('consentModal');

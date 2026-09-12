@@ -26,6 +26,11 @@ function bodyOf(req) {
 function clean(value, max = 2000) {
   return String(value || '').trim().slice(0, max);
 }
+function getCookie(req, name) {
+  const raw = req.headers.cookie || '';
+  const match = raw.split(';').map(v => v.trim()).find(v => v.startsWith(name + '='));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : '';
+}
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   const board = req.query.board === 'updates' ? 'updates' : 'announcements';
@@ -36,6 +41,11 @@ module.exports = async (req, res) => {
       return res.status(200).json({ board, items });
     }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
+    const profileId = getCookie(req, 'retzef_profile_id');
+    if (!profileId) return res.status(401).json({ error: 'tiktok_login_required' });
+    const storedProfile = await redis('get', `retzef:profile:${profileId.toLowerCase()}`);
+    if (!storedProfile) return res.status(401).json({ error: 'tiktok_login_required' });
+    const profile = typeof storedProfile === 'string' ? JSON.parse(storedProfile) : storedProfile;
     const input = bodyOf(req);
     const description = clean(input.description, 300);
     const content = clean(input.content, 5000);
@@ -54,7 +64,8 @@ module.exports = async (req, res) => {
       expiresAt: clean(input.expiresAt, 40),
       link: clean(input.link, 500),
       image: clean(input.image, 500),
-      author: clean(input.author, 100) || 'קהילת רצף',
+      author: clean(profile.displayName, 100) || clean(profile.username, 100) || profileId,
+      authorUsername: clean(profile.username, 100) || profileId,
       createdAt: new Date().toISOString(),
     };
     await redis('lpush', BOARD_KEYS[board], JSON.stringify(item));

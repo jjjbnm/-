@@ -535,14 +535,14 @@
     <button class="tab-btn active" data-target="home" data-i18n="nav_home">🏠 בית</button>
     <button class="tab-btn" data-target="status" data-i18n="nav_status">🟢 סטטוס</button>
     <button class="tab-btn" data-target="rules" data-i18n="nav_rules">📜 חוקים</button>
-    <button class="tab-btn" data-target="subs" data-i18n="nav_subs">💳 מנויים</button>
+    <button class="tab-btn protected-tab" data-target="subs" data-i18n="nav_subs">💳 מנויים</button>
     <button class="tab-btn" data-target="team" data-i18n="nav_team">👥 בעלים ומנהלים</button>
     <button class="tab-btn" data-target="scope" data-i18n="nav_scope">🎂 גיל ותנאים</button>
-    <button class="tab-btn" data-target="shop" data-i18n="nav_shop">🛍️ חנות</button>
+    <button class="tab-btn protected-tab" data-target="shop" data-i18n="nav_shop">🛍️ חנות</button>
     <button class="tab-btn" data-target="settings" data-i18n="nav_settings">⚙️ הגדרות</button>
     <button class="tab-btn" data-target="about" data-i18n="nav_about">ℹ️ אודות וגרסה</button>
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">📩 יצירת קשר</button>
-      <button class="tab-btn" data-target="boards">📢 מודעות</button>
+      <button class="tab-btn protected-tab" data-target="boards">📢 מודעות</button>
 </nav>
 
   <!-- HOME -->
@@ -1590,7 +1590,13 @@
   // === tab switching ===
   const tabBtns = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.tab-panel');
+  const protectedTabs = new Set(['boards', 'subs', 'shop']);
   function activateTab(target){
+    if (protectedTabs.has(target) && !window.__retzefProfile) {
+      if (typeof openConsentModal === 'function') openConsentModal();
+      else alert('כדי להיכנס לטאב הזה צריך להתחבר עם TikTok.');
+      return;
+    }
     panels.forEach(p => p.classList.toggle('active', p.id === target));
     tabBtns.forEach(b => b.classList.toggle('active', b.dataset.target === target));
     window.scrollTo({top: 0, behavior:'smooth'});
@@ -2060,7 +2066,7 @@
   function render(board,items){
     const target=document.getElementById(board==='updates'?'updatesList':'announcementsList');
     if(!items.length){target.innerHTML='<p class="board-empty">אין עדיין פרסומים בלוח הזה.</p>';return;}
-    target.innerHTML=items.map(item=>`<article class="board-card"><h4>${esc(item.description)}</h4><div class="board-meta"><span class="board-tag">${esc(item.category)}</span><span>👤 ${esc(item.author)}</span><span>📅 ${new Date(item.createdAt).toLocaleDateString('he-IL')}</span>${item.publishedAt?`<span>יצא: ${esc(item.publishedAt)}</span>`:''}${item.expiresAt?`<span>נגמר: ${esc(item.expiresAt)}</span>`:''}</div><p>${esc(item.content)}</p>${item.image?`<img src="${esc(item.image)}" alt="">`:''}${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">🔗 לפרטים נוספים</a>`:''}</article>`).join('');
+    target.innerHTML=items.map(item=>`<article class="board-card"><h4>${esc(item.description)}</h4><div class="board-meta"><span class="board-tag">${esc(item.category)}</span><span>👤 ${esc(item.author)}${item.authorUsername ? ` <b dir="ltr">(@${esc(item.authorUsername)})</b>` : ''}</span><span>📅 ${new Date(item.createdAt).toLocaleDateString('he-IL')}</span>${item.publishedAt?`<span>יצא: ${esc(item.publishedAt)}</span>`:''}${item.expiresAt?`<span>נגמר: ${esc(item.expiresAt)}</span>`:''}</div><p>${esc(item.content)}</p>${item.image?`<img src="${esc(item.image)}" alt="">`:''}${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">🔗 לפרטים נוספים</a>`:''}</article>`).join('');
   }
   async function load(board){try{const r=await fetch(`${api}?board=${board}`,{cache:'no-store'});const d=await r.json();if(r.ok)render(board,d.items||[]);else throw new Error(d.error||'error')}catch(e){document.getElementById(board==='updates'?'updatesList':'announcementsList').innerHTML='<p class="board-empty">לא ניתן לטעון כרגע. נסו שוב מאוחר יותר.</p>';}}
   document.querySelectorAll('.board-open').forEach(button=>button.addEventListener('click',()=>{type.value=button.dataset.board;document.getElementById('boardComposerTitle').textContent=button.dataset.board==='updates'?'פרסום עדכון':'פרסום מודעה';document.getElementById('updateOnlyFields').style.display=button.dataset.board==='updates'?'block':'none';message.textContent='';composer.style.display='block';composer.scrollIntoView({behavior:'smooth',block:'start'});}));

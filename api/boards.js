@@ -76,6 +76,8 @@ module.exports = async (req, res) => {
     if (fileName.toLowerCase().endsWith('.apk')) return res.status(400).json({ error: 'apk_files_not_allowed' });
     if (!Number.isFinite(fileSize) || fileSize < 0 || fileSize > 100 * 1024 * 1024) return res.status(400).json({ error: 'file_too_large' });
     const category = clean(input.category, 80);
+    const link = clean(input.link, 500);
+    const image = clean(input.image, 500);
     const allowedCategories = new Set(['דיווח על באג', 'עדכון חשוב', 'הודעה כללית', 'אירוע', 'חוקי הקבוצה', 'תחזוקה', 'מנויים ותשלומים', 'חנות', 'תמיכה ועזרה', 'שינוי באתר', 'סקר לקהילה', 'תחרות ופעילות', 'דחוף']);
     if (!description || !content || (postType === 'הודעה' && !category)) return res.status(400).json({ error: 'description_content_category_required' });
     if (!allowedCategories.has(category)) return res.status(400).json({ error: 'invalid_category' });
@@ -91,8 +93,8 @@ module.exports = async (req, res) => {
       codeRequired: board === 'updates',
       publishedAt: clean(input.publishedAt, 40),
       expiresAt: clean(input.expiresAt, 40),
-      link: clean(input.link, 500),
-      image: clean(input.image, 500),
+      link,
+      image,
       author: clean(profile.displayName, 100) || clean(profile.username, 100) || profileId,
       authorUsername: clean(profile.username, 100) || profileId,
       createdAt: new Date().toISOString(),

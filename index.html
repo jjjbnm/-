@@ -435,9 +435,17 @@
   .modal-actions{display:flex; gap:10px;}
   .modal-actions .btn{flex:1; justify-content:center; padding:12px;}
   .boards-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.board-column{padding:22px}.board-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid var(--glass-border);padding-bottom:16px}.board-heading h3{font-size:20px}.board-heading p{color:var(--muted);font-size:13px}.board-icon{font-size:28px;display:block;margin-bottom:4px}.board-heading .btn{padding:9px 12px;font-size:12px}.board-list{display:flex;flex-direction:column;gap:12px;padding-top:16px}.board-empty{color:var(--muted);font-size:14px;text-align:center;padding:22px}.board-card{padding:15px;border:1px solid var(--glass-border);border-radius:15px;background:var(--bg2)}.board-card h4{font-size:16px;margin-bottom:5px}.board-card .board-meta{display:flex;gap:7px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:9px}.board-card .board-tag{color:var(--accent);font-weight:700}.board-card p{font-size:14px;white-space:pre-wrap}.board-card img{width:100%;max-height:210px;object-fit:cover;border-radius:11px;margin-top:10px}.board-card a{color:var(--accent);font-weight:700;font-size:13px;display:inline-block;margin-top:9px}.board-composer{padding:24px;margin-top:18px}.board-composer-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.board-composer label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;margin-bottom:13px}.board-composer input,.board-composer textarea{width:100%;border:1px solid var(--glass-border);border-radius:11px;background:var(--bg2);color:var(--text);padding:11px;font-family:inherit;font-size:14px}.board-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.board-message{margin-top:10px;color:var(--muted);font-size:13px}@media(max-width:700px){.boards-grid{grid-template-columns:1fr}.board-heading{flex-direction:column}.board-form-grid{grid-template-columns:1fr}}
+
+  #retzef-access-error{display:none;position:fixed;inset:0;z-index:99999;background:#f3f4f9;color:#161a26;padding:28px;align-items:center;justify-content:center;text-align:center;font-family:Assistant,Arial,sans-serif}
+  #retzef-access-error .error-box{max-width:560px;background:#fff;border:1px solid #e2e5ef;border-radius:22px;padding:32px;box-shadow:0 18px 60px rgba(20,25,50,.16)}
+  #retzef-access-error h1{font-size:28px;margin-bottom:10px} #retzef-access-error p{margin:8px 0;color:#656b80}
+  #retzef-access-error code{display:inline-block;direction:ltr;background:#f0f2f8;border-radius:8px;padding:8px 12px;font-weight:800;color:#b42318;margin:12px 0}
+  html[data-theme="dark"] #retzef-access-error{background:#0a0c12;color:#eef0f5} html[data-theme="dark"] #retzef-access-error .error-box{background:#11141d;border-color:#303548}
+
 </style>
 </head>
 <body>
+<div id="retzef-access-error" role="alert" aria-live="assertive"><div class="error-box"><h1>לא ניתן להיכנס לאתר</h1><p id="retzef-access-error-text">נדרשת גישה לאינטרנט כדי להשתמש באתר.</p><code id="retzef-access-error-code">RETZEF_OFFLINE</code><p>בדקו את החיבור ונסו שוב.</p><button type="button" onclick="location.reload()">נסה שוב</button></div></div>
 
 <script>
   // מציג כל שגיאת JS ישירות על המסך — כדי לאתר תקלות מהטלפון, בלי מחשב/devtools
@@ -2090,6 +2098,26 @@
   document.getElementById('boardComposerClose').addEventListener('click',()=>composer.style.display='none');
   form.addEventListener('submit',async e=>{e.preventDefault();message.textContent='מפרסם...';const profile=window.__retzefProfile||{};const selectedFile=document.getElementById('boardFile').files[0];if(selectedFile){if(selectedFile.name.toLowerCase().endsWith('.apk')){message.textContent='❌ אסור להעלות קובצי APK';return;}if(selectedFile.size>100*1024*1024){message.textContent='❌ גודל הקובץ המרבי הוא 100MB';return;}}const data={description:boardDescription.value,content:boardContent.value,category:boardCategory.value,postType:document.getElementById('boardTypeSelect').value,code:boardCode.value,publishedAt:boardPublishedAt.value,expiresAt:boardExpiresAt.value,link:boardLink.value,image:boardImage.value,fileName:selectedFile?selectedFile.name:'',fileSize:selectedFile?selectedFile.size:0,author:profile.displayName||profile.username||'קהילת רצף'};try{const r=await fetch(`${api}?board=${type.value}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d=await r.json();if(!r.ok)throw new Error(d.error||'error');message.textContent='✅ פורסם בהצלחה';form.reset();type.value=type.value;document.getElementById('updateOnlyFields').style.display=type.value==='updates'?'block':'none';await load(type.value);}catch(err){message.textContent=err.message==='invalid_update_code'?'❌ קוד עדכון שגוי':err.message==='updates_code_not_configured'?'❌ קוד העדכונים עדיין לא הוגדר בשרת':'❌ הפרסום נכשל, נסו שוב';}});
   load('announcements');load('updates');
+})();
+</script>
+<script>
+(function(){
+  const overlay=document.getElementById('retzef-access-error');
+  const text=document.getElementById('retzef-access-error-text');
+  const code=document.getElementById('retzef-access-error-code');
+  function block(errorCode, message){
+    if(!overlay)return;
+    text.textContent=message; code.textContent=errorCode; overlay.style.display='flex';
+    document.body.dataset.accessBlocked='true';
+  }
+  function checkConnection(){
+    if(!navigator.onLine) block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האתר דורש חיבור פעיל.');
+  }
+  window.addEventListener('offline',()=>block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האתר דורש חיבור פעיל.'));
+  window.addEventListener('online',()=>location.reload());
+  window.addEventListener('error',()=>{ if(navigator.onLine) block('RETZEF_LOAD_ERROR','אירעה שגיאה בטעינת האתר.'); });
+  window.addEventListener('unhandledrejection',()=>{ if(navigator.onLine) block('RETZEF_RUNTIME_ERROR','אירעה שגיאה טכנית באתר.'); });
+  checkConnection();
 })();
 </script>
 </body>

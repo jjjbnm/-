@@ -14,9 +14,10 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       const scan = await redis('scan', '0', 'match', `${PREFIX}*`, 'count', '100');
       const keys = Array.isArray(scan) && Array.isArray(scan[1]) ? scan[1] : [];
-      const users = (await Promise.all(keys.slice(0, 100).map(k => profile(k.slice(PREFIX.length))))).filter(Boolean).filter(p => String(p.username).toLowerCase() !== me).map(publicUser);
+      const users = (await Promise.all(keys.slice(0, 100).map(k => profile(k.slice(PREFIX.length))))).filter(Boolean).filter(p => String(p.username).toLowerCase() !== me);
+      const visibleUsers = await Promise.all(users.map(async p => { const approved = await redis('sismember', `retzef:chat:accepted:${me}`, String(p.username).toLowerCase()); return { ...publicUser(p), chatApproved: String(approved) === '1' || approved === true }; }));
       const requests = await redis('lrange', `retzef:chat:requests:${me}`, '0', '49');
-      return res.status(200).json({ me: publicUser(mine), users, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) });
+      return res.status(200).json({ me: publicUser(mine), users: visibleUsers, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) });
     }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const input = body(req); const action = String(input.action || '');

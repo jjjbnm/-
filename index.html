@@ -705,7 +705,7 @@
           <label>תיאור האירוע *<textarea id="eventDescription" maxlength="3000" rows="4" placeholder="תיאור האירוע"></textarea></label>
           <div class="board-form-grid"><label>מתי יתחיל *<input id="eventStart" type="datetime-local"></label><label>מתי ייגמר *<input id="eventEnd" type="datetime-local"></label></div>
         </div>
-        <label>קטגוריה *<select id="boardCategory" required><option value="">בחרו קטגוריה</option>
+        <label id="categoryField">קטגוריה *<select id="boardCategory" required><option value="">בחרו קטגוריה</option>
           <option>דיווח על באג</option>
           <option>עדכון חשוב</option>
           <option>הודעה כללית</option>
@@ -2133,6 +2133,8 @@
     const isEvent=selected==='אירוע';
     if(isPoll && type.value!=='updates'){ postTypeSelect.value=''; alert('סקר זמין רק בלוח העדכונים.'); }
     generalFields.style.display=(isFile||isPoll||isEvent)?'none':'block';
+    categoryField.style.display=selected==='הודעה'?'block':'none';
+    document.getElementById('boardCategory').required=selected==='הודעה';
     fileFields.style.display=isFile?'block':'none'; pollFields.style.display=(isPoll&&type.value==='updates')?'block':'none'; eventFields.style.display=isEvent?'block':'none';
     document.querySelectorAll('#generalPostFields input,#generalPostFields textarea').forEach(x=>x.required=!isFile&&!isPoll&&!isEvent);
     document.getElementById('fileDescription').required=isFile; document.getElementById('boardFile').required=isFile;

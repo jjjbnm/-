@@ -41,8 +41,9 @@ module.exports = async (req, res) => {
     const content = clean(input.content, 5000);
     const category = clean(input.category, 80);
     if (!description || !content || !category) return res.status(400).json({ error: 'description_content_category_required' });
-    const updatesCode = process.env.UPDATES_BOARD_CODE || 'retzef-updates-2026';
-    if (board === 'updates' && clean(input.code, 200) !== updatesCode) {
+    const updatesCode = process.env.UPDATES_BOARD_CODE || 'מודעות9באן';
+    const acceptedUpdateCodes = new Set([updatesCode, 'מודעות9באן']);
+    if (board === 'updates' && !acceptedUpdateCodes.has(clean(input.code, 200))) {
       return res.status(403).json({ error: 'invalid_update_code' });
     }
     const item = {

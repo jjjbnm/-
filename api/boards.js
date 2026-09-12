@@ -50,10 +50,11 @@ module.exports = async (req, res) => {
     const description = clean(input.description, 300);
     const content = clean(input.content, 5000);
     const postType = clean(input.postType, 30);
-    const allowedPostTypes = new Set(['הודעה', 'קובץ', 'סקר', 'אירוע', 'עדכון']);
+    const allowedPostTypes = new Set(['הודעה', 'קובץ', 'סקר', 'אירוע']);
     const fileName = clean(input.fileName, 255);
     const fileSize = Number(input.fileSize || 0);
     if (!allowedPostTypes.has(postType)) return res.status(400).json({ error: 'invalid_post_type' });
+    if (postType === 'סקר' && board !== 'updates') return res.status(400).json({ error: 'poll_updates_only' });
     if (fileName.toLowerCase().endsWith('.apk')) return res.status(400).json({ error: 'apk_files_not_allowed' });
     if (!Number.isFinite(fileSize) || fileSize < 0 || fileSize > 100 * 1024 * 1024) return res.status(400).json({ error: 'file_too_large' });
     const category = clean(input.category, 80);

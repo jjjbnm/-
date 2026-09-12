@@ -4,8 +4,14 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ allowed: false, error: 'method_not_allowed' });
 
   try {
+    const vercelCountry = String(req.headers['x-vercel-ip-country'] || '').toUpperCase();
+    if (vercelCountry) {
+      res.setHeader('Cache-Control', 'no-store');
+      if (vercelCountry !== 'IL') return res.status(403).json({ allowed: false, error: 'region_not_allowed', countryCode: vercelCountry });
+      return res.status(200).json({ allowed: true, countryCode: 'IL' });
+    }
     const forwarded = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || '';
-    const clientIp = String(forwarded).split(',')[0].trim();
+    const clientIp = String(forwarded).split(',')[0].trim() || String(req.socket?.remoteAddress || '').trim();
     if (!clientIp) return res.status(503).json({ allowed: false, error: 'client_ip_unknown' });
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), GEO_TIMEOUT_MS);

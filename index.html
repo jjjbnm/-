@@ -683,11 +683,28 @@
       <div class="board-composer-head"><div><span class="eyebrow" style="margin-bottom:4px;">פרסום חדש</span><h3 id="boardComposerTitle">פרסום מודעה</h3></div><button type="button" id="boardComposerClose" class="btn btn-ghost">✕</button></div>
       <form id="boardForm">
         <input type="hidden" id="boardType" value="announcements">
-        <label>תיאור קצר *<input id="boardDescription" required maxlength="300" placeholder="למשל: מפגש קהילה חדש"></label>
-        <label>תוכן *<textarea id="boardContent" required maxlength="5000" rows="5" placeholder="כתבו כאן את תוכן המודעה או העדכון"></textarea></label>
         <label>סוג פרסום *<select id="boardTypeSelect" required>
-          <option value="">בחרו סוג</option><option>הודעה</option><option>קובץ</option><option>סקר</option><option>אירוע</option><option>עדכון</option>
+          <option value="">בחרו סוג</option><option value="הודעה">הודעה</option><option value="קובץ">קובץ</option><option value="סקר">סקר</option><option value="אירוע">אירוע</option>
         </select></label>
+        <div id="generalPostFields">
+          <label>תיאור קצר *<input id="boardDescription" required maxlength="300" placeholder="למשל: מפגש קהילה חדש"></label>
+          <label>תוכן *<textarea id="boardContent" required maxlength="5000" rows="5" placeholder="כתבו כאן את תוכן המודעה או העדכון"></textarea></label>
+          <div class="board-form-grid"><label>קישור (אופציונלי)<input id="boardLink" type="url" placeholder="https://..."></label><label>תמונה (אופציונלי)<input id="boardImage" type="url" placeholder="קישור לתמונה"></label></div>
+        </div>
+        <div id="filePostFields" style="display:none;">
+          <label>תיאור הקובץ *<input id="fileDescription" maxlength="300" placeholder="מה יש בקובץ?"></label>
+          <label>קובץ להעלאה *<input id="boardFile" type="file" accept="*/*"><small style="color:var(--muted);font-weight:400;">עד 100MB. קובצי APK אסורים.</small></label>
+        </div>
+        <div id="pollPostFields" style="display:none;">
+          <label>שאלת הסקר *<input id="pollQuestion" maxlength="300" placeholder="למשל: מתי נוח לכם?"></label>
+          <div id="pollAnswers"><label>תשובה 1 *<input class="poll-answer" maxlength="200" required></label><label>תשובה 2 *<input class="poll-answer" maxlength="200" required></label></div>
+          <button type="button" id="addPollAnswer" class="btn btn-ghost">＋ הוסף תשובה</button>
+        </div>
+        <div id="eventPostFields" style="display:none;">
+          <label>שם האירוע *<input id="eventName" maxlength="200" placeholder="שם האירוע"></label>
+          <label>תיאור האירוע *<textarea id="eventDescription" maxlength="3000" rows="4" placeholder="תיאור האירוע"></textarea></label>
+          <div class="board-form-grid"><label>מתי יתחיל *<input id="eventStart" type="datetime-local"></label><label>מתי ייגמר *<input id="eventEnd" type="datetime-local"></label></div>
+        </div>
         <label>קטגוריה *<select id="boardCategory" required><option value="">בחרו קטגוריה</option>
           <option>דיווח על באג</option>
           <option>עדכון חשוב</option>
@@ -706,8 +723,6 @@
           <label>קוד עדכון *<input id="boardCode" type="password" autocomplete="off" placeholder="הקוד שקיבלתם"></label>
           <div class="board-form-grid"><label>מתי יצא<input id="boardPublishedAt" type="datetime-local"></label><label>מתי ייגמר<input id="boardExpiresAt" type="datetime-local"></label></div>
         </div>
-        <div class="board-form-grid"><label>קישור (אופציונלי)<input id="boardLink" type="url" placeholder="https://..."></label><label>תמונה (אופציונלי)<input id="boardImage" type="url" placeholder="קישור לתמונה"></label></div>
-        <label>קובץ מצורף (אופציונלי, עד 100MB; APK אסור)<input id="boardFile" type="file" accept="*/*"><small style="color:var(--muted);font-weight:400;">הקובץ ייבדק לפני הפרסום. אסור להעלות קובצי APK או קובץ מעל 100MB.</small></label>
         <button class="btn btn-primary" type="submit">📣 פרסום</button><p id="boardFormMessage" class="board-message"></p>
       </form>
     </div>
@@ -2106,15 +2121,35 @@
   const api='/api/boards'; const composer=document.getElementById('boardComposer'); const form=document.getElementById('boardForm');
   const type=document.getElementById('boardType'); const message=document.getElementById('boardFormMessage');
   const esc=value=>String(value||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const postTypeSelect=document.getElementById('boardTypeSelect');
+  const generalFields=document.getElementById('generalPostFields');
+  const fileFields=document.getElementById('filePostFields');
+  const pollFields=document.getElementById('pollPostFields');
+  const eventFields=document.getElementById('eventPostFields');
+  function syncPostTypeFields(){
+    const selected=postTypeSelect.value;
+    const isPoll=selected==='סקר';
+    const isFile=selected==='קובץ';
+    const isEvent=selected==='אירוע';
+    if(isPoll && type.value!=='updates'){ postTypeSelect.value=''; alert('סקר זמין רק בלוח העדכונים.'); }
+    generalFields.style.display=(isFile||isPoll||isEvent)?'none':'block';
+    fileFields.style.display=isFile?'block':'none'; pollFields.style.display=(isPoll&&type.value==='updates')?'block':'none'; eventFields.style.display=isEvent?'block':'none';
+    document.querySelectorAll('#generalPostFields input,#generalPostFields textarea').forEach(x=>x.required=!isFile&&!isPoll&&!isEvent);
+    document.getElementById('fileDescription').required=isFile; document.getElementById('boardFile').required=isFile;
+    document.getElementById('pollQuestion').required=isPoll&&type.value==='updates'; document.querySelectorAll('.poll-answer').forEach(x=>x.required=isPoll&&type.value==='updates');
+    document.getElementById('eventName').required=isEvent; document.getElementById('eventDescription').required=isEvent; document.getElementById('eventStart').required=isEvent; document.getElementById('eventEnd').required=isEvent;
+  }
+  postTypeSelect.addEventListener('change',syncPostTypeFields);
+  document.getElementById('addPollAnswer').addEventListener('click',()=>{const count=document.querySelectorAll('.poll-answer').length+1;const label=document.createElement('label');label.innerHTML=`תשובה ${count} *<input class="poll-answer" maxlength="200" required>`;document.getElementById('pollAnswers').appendChild(label);});
   function render(board,items){
     const target=document.getElementById(board==='updates'?'updatesList':'announcementsList');
     if(!items.length){target.innerHTML='<p class="board-empty">אין עדיין פרסומים בלוח הזה.</p>';return;}
     target.innerHTML=items.map(item=>`<article class="board-card"><h4>${esc(item.description)}</h4><div class="board-meta"><span class="board-tag">${esc(item.postType||'הודעה')}</span><span class="board-tag">${esc(item.category)}</span><span>👤 ${esc(item.author)}${item.authorUsername ? ` <b dir="ltr">(@${esc(item.authorUsername)})</b>` : ''}</span><span>📅 ${new Date(item.createdAt).toLocaleDateString('he-IL')}</span>${item.publishedAt?`<span>יצא: ${esc(item.publishedAt)}</span>`:''}${item.expiresAt?`<span>נגמר: ${esc(item.expiresAt)}</span>`:''}</div><p>${esc(item.content)}</p>${item.image?`<img src="${esc(item.image)}" alt="">`:''}${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">🔗 לפרטים נוספים</a>`:''}</article>`).join('');
   }
   async function load(board){try{const r=await fetch(`${api}?board=${board}`,{cache:'no-store'});const d=await r.json();if(r.ok)render(board,d.items||[]);else throw new Error(d.error||'error')}catch(e){document.getElementById(board==='updates'?'updatesList':'announcementsList').innerHTML='<p class="board-empty">לא ניתן לטעון כרגע. נסו שוב מאוחר יותר.</p>';}}
-  document.querySelectorAll('.board-open').forEach(button=>button.addEventListener('click',()=>{type.value=button.dataset.board;document.getElementById('boardComposerTitle').textContent=button.dataset.board==='updates'?'פרסום עדכון':'פרסום מודעה';document.getElementById('updateOnlyFields').style.display=button.dataset.board==='updates'?'block':'none';message.textContent='';composer.style.display='block';composer.scrollIntoView({behavior:'smooth',block:'start'});}));
+  document.querySelectorAll('.board-open').forEach(button=>button.addEventListener('click',()=>{type.value=button.dataset.board;postTypeSelect.value='';syncPostTypeFields();document.getElementById('boardComposerTitle').textContent=button.dataset.board==='updates'?'פרסום עדכון':'פרסום מודעה';document.getElementById('updateOnlyFields').style.display=button.dataset.board==='updates'?'block':'none';message.textContent='';composer.style.display='block';composer.scrollIntoView({behavior:'smooth',block:'start'});}));
   document.getElementById('boardComposerClose').addEventListener('click',()=>composer.style.display='none');
-  form.addEventListener('submit',async e=>{e.preventDefault();message.textContent='מפרסם...';const profile=window.__retzefProfile||{};const selectedFile=document.getElementById('boardFile').files[0];if(selectedFile){if(selectedFile.name.toLowerCase().endsWith('.apk')){message.textContent='❌ אסור להעלות קובצי APK';return;}if(selectedFile.size>100*1024*1024){message.textContent='❌ גודל הקובץ המרבי הוא 100MB';return;}}const data={description:boardDescription.value,content:boardContent.value,category:boardCategory.value,postType:document.getElementById('boardTypeSelect').value,code:boardCode.value,publishedAt:boardPublishedAt.value,expiresAt:boardExpiresAt.value,link:boardLink.value,image:boardImage.value,fileName:selectedFile?selectedFile.name:'',fileSize:selectedFile?selectedFile.size:0,author:profile.displayName||profile.username||'קהילת רצף'};try{const r=await fetch(`${api}?board=${type.value}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d=await r.json();if(!r.ok)throw new Error(d.error||'error');message.textContent='✅ פורסם בהצלחה';form.reset();type.value=type.value;document.getElementById('updateOnlyFields').style.display=type.value==='updates'?'block':'none';await load(type.value);}catch(err){message.textContent=err.message==='invalid_update_code'?'❌ קוד עדכון שגוי':err.message==='updates_code_not_configured'?'❌ קוד העדכונים עדיין לא הוגדר בשרת':'❌ הפרסום נכשל, נסו שוב';}});
+  form.addEventListener('submit',async e=>{e.preventDefault();message.textContent='מפרסם...';const selectedType=postTypeSelect.value;const selectedFile=document.getElementById('boardFile').files[0];if(selectedType==='סקר'&&type.value!=='updates'){message.textContent='❌ סקר זמין רק בלוח העדכונים';return;}if(selectedType==='קובץ'){if(!selectedFile){message.textContent='❌ חובה לבחור קובץ';return;}if(selectedFile.name.toLowerCase().endsWith('.apk')){message.textContent='❌ אסור להעלות קובצי APK';return;}if(selectedFile.size>100*1024*1024){message.textContent='❌ גודל הקובץ המרבי הוא 100MB';return;}}const profile=window.__retzefProfile||{};const answers=[...document.querySelectorAll('.poll-answer')].map(x=>x.value.trim()).filter(Boolean);let description='',content='';if(selectedType==='קובץ'){description=document.getElementById('fileDescription').value;content=`קובץ מצורף: ${selectedFile.name}`;}else if(selectedType==='סקר'){description=document.getElementById('pollQuestion').value;content=JSON.stringify({question:description,answers});}else if(selectedType==='אירוע'){description=document.getElementById('eventName').value;content=JSON.stringify({description:document.getElementById('eventDescription').value,start:document.getElementById('eventStart').value,end:document.getElementById('eventEnd').value});}else{description=document.getElementById('boardDescription').value;content=document.getElementById('boardContent').value;}const data={description,content,category:boardCategory.value,postType:selectedType,code:boardCode.value,publishedAt:boardPublishedAt.value,expiresAt:boardExpiresAt.value,link:document.getElementById('boardLink')?.value||'',image:document.getElementById('boardImage')?.value||'',fileName:selectedFile?selectedFile.name:'',fileSize:selectedFile?selectedFile.size:0,author:profile.displayName||profile.username||'קהילת רצף'};try{const r=await fetch(`${api}?board=${type.value}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d=await r.json();if(!r.ok)throw new Error(d.error||'error');message.textContent='✅ פורסם בהצלחה';form.reset();type.value=type.value;postTypeSelect.value='';syncPostTypeFields();document.getElementById('updateOnlyFields').style.display=type.value==='updates'?'block':'none';await load(type.value);}catch(err){message.textContent=err.message==='invalid_update_code'?'❌ קוד עדכון שגוי':err.message==='apk_files_not_allowed'?'❌ אסור להעלות קובצי APK':err.message==='file_too_large'?'❌ גודל הקובץ המרבי הוא 100MB':err.message==='invalid_post_type'?'❌ סוג פרסום לא חוקי':'❌ הפרסום נכשל, נסו שוב';}});
   load('announcements');load('updates');
 })();
 </script>

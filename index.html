@@ -1472,7 +1472,7 @@
       const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
       if (!response.ok) return null;
       const data = await response.json();
-      if (data.profile) { window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); setTimeout(enableWebPush, 0); }
+      if (data.profile) { window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
       return data.profile || null;
     } catch (_) { return null; }
   }

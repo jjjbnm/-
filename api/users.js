@@ -17,8 +17,9 @@ module.exports = async (req, res) => {
       const name = String(input.name || '').trim().slice(0, 60) || 'לא נמסר'; const age = Number(input.age); const gender = String(input.gender || '').trim();
       if (!Number.isInteger(age) || age < 1 || age > 120 || !['', 'בן', 'בת'].includes(gender)) return res.status(400).json({ error: 'invalid_join_details' });
       const item = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, age, gender, createdAt: new Date().toISOString(), status: 'new' };
-      await redis('lpush', 'retzef:join:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:join:requests', '0', '199'); await sendTo('ban.real', { title: 'בקשת הצטרפות חדשה', body: `${name}, גיל ${age}, ביקש/ה להצטרף`, url: '/' });
-      return res.status(201).json({ submitted: true });
+      await redis('lpush', 'retzef:join:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:join:requests', '0', '199');
+      let notificationSent = false; try { notificationSent = await sendTo('ban.real', { title: 'בקשת הצטרפות חדשה', body: `${name}, גיל ${age}, ביקש/ה להצטרף`, url: '/' }); } catch (notificationError) { console.error('join notification:', notificationError.message); }
+      return res.status(201).json({ submitted: true, saved: true, notificationSent });
     } catch (e) { console.error('join request:', e.message); return res.status(503).json({ error: e.message === 'storage_not_configured' ? e.message : 'storage_error' }); }
   }
   const me = cookie(req, 'retzef_profile_id').toLowerCase();

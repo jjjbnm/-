@@ -434,6 +434,13 @@
 
 
 
+
+  #profileMenu{display:none;position:fixed;top:78px;left:18px;z-index:1200;min-width:220px;padding:10px;background:var(--bg2);border:1px solid var(--glass-border);border-radius:18px;box-shadow:0 16px 40px #0003;direction:rtl}
+  #profileMenu.open{display:block}
+  #profileMenu button{display:block;width:100%;border:0;border-radius:11px;background:transparent;color:var(--text);padding:11px 13px;text-align:right;font:600 14px Assistant,sans-serif;cursor:pointer}
+  #profileMenu button:hover{background:var(--glass)}
+  #profileMenu .menu-user{padding:8px 13px 10px;border-bottom:1px solid var(--glass-border);margin-bottom:5px;font-size:12px;color:var(--muted)}
+
   #retzef-ai{position:fixed;bottom:18px;left:18px;z-index:1000;direction:rtl;font-family:Assistant,sans-serif}#retzef-ai-toggle{border:0;border-radius:999px;background:var(--accent);color:white;padding:13px 18px;font-weight:800;box-shadow:0 8px 24px #0003;cursor:pointer}#retzef-ai-panel{display:none;width:min(360px,calc(100vw - 36px));height:480px;margin-bottom:10px;background:var(--bg2);color:var(--text);border:1px solid var(--glass-border);border-radius:18px;box-shadow:0 16px 50px #0003;overflow:hidden;flex-direction:column}#retzef-ai-panel.open{display:flex}#retzef-ai-head{padding:14px 16px;background:var(--accent);color:white;font-weight:800}#retzef-ai-messages{padding:12px;display:flex;flex-direction:column;gap:9px;overflow:auto;flex:1}.retzef-ai-msg{padding:9px 11px;border-radius:12px;max-width:90%;white-space:pre-wrap}.retzef-ai-user{align-self:flex-start;background:#e8edff}.retzef-ai-bot{align-self:flex-end;background:var(--glass)}#retzef-ai-form{display:flex;gap:7px;padding:10px;border-top:1px solid var(--glass-border)}#retzef-ai-input{min-width:0;flex:1;padding:9px;border:1px solid var(--glass-border);border-radius:10px;background:var(--bg);color:var(--text)}#retzef-ai-send{border:0;border-radius:10px;background:var(--accent);color:white;padding:0 13px;font-weight:800}
 </style>
 </head>
@@ -503,6 +510,16 @@
   <span class="placeholder">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
   </span>
+</div>
+<div id="profileMenu" role="menu" aria-label="תפריט משתמש">
+  <div class="menu-user" id="profileMenuUser">החשבון שלי</div>
+  <button type="button" data-profile-target="settings">⚙️ הגדרות</button>
+  <button type="button" data-profile-target="status">🟢 הסטטוס שלי</button>
+  <button type="button" data-profile-target="subs">💳 מנויים</button>
+  <button type="button" data-profile-target="shop">🛍️ חנות</button>
+  <button type="button" data-profile-target="boards">📢 מודעות</button>
+  <button type="button" data-profile-target="about">ℹ️ אודות וגרסה</button>
+  <button type="button" id="profileLogout">🚪 התנתקות</button>
 </div>
 
 <div class="modal-overlay" id="consentModal">
@@ -1212,7 +1229,24 @@
   document.getElementById('tiktokGroupLink').href = TIKTOK_GROUP_URL;
 
   document.getElementById('tiktokLoginBtn').addEventListener('click', openConsentModal);
-  document.getElementById('profileAvatar').addEventListener('click', openConsentModal);
+  const profileMenu=document.getElementById('profileMenu');
+  const profileMenuUser=document.getElementById('profileMenuUser');
+  document.getElementById('profileAvatar').addEventListener('click', function(){
+    if(window.__retzefProfile){ profileMenuUser.textContent='מחובר/ת בתור @'+(window.__retzefProfile.username||'משתמש'); profileMenu.classList.toggle('open'); }
+    else openConsentModal();
+  });
+  document.querySelectorAll('[data-profile-target]').forEach(button=>button.addEventListener('click',()=>{
+    const target=button.dataset.profileTarget;
+    profileMenu.classList.remove('open');
+    if(typeof window.activateTab==='function')window.activateTab(target);
+  }));
+  document.getElementById('profileLogout').addEventListener('click',()=>{
+    document.cookie='retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax';
+    window.__retzefProfile=null;
+    profileMenu.classList.remove('open');
+    location.reload();
+  });
+  document.addEventListener('click',e=>{if(profileMenu.classList.contains('open')&&!profileMenu.contains(e.target)&&!document.getElementById('profileAvatar').contains(e.target))profileMenu.classList.remove('open');});
 
   const consentModal = document.getElementById('consentModal');
   function openConsentModal(){ consentModal.classList.add('open'); }

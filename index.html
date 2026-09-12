@@ -1087,6 +1087,32 @@
     <h2 class="sec-title" data-i18n="settings_title">הגדרות</h2>
     <p class="sec-sub">שנה את המראה של האתר — הצבעים, מצב כהה/בהיר, ועוצמת אפקט הזכוכית.</p>
 
+    <div class="settings-card glass" id="accountSettingsCard">
+      <h3>⚙️ הגדרות חשבון</h3>
+      <div id="accountSettingsContent" style="color:var(--muted);">טוען פרטי חשבון...</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+        <label class="toggle-row"><span>לאפשר למשתמשים שאושרו לראות את הסטטוס שלי</span><input type="checkbox" id="settingsPrivacyStatus" checked></label>
+        <label class="toggle-row"><span>לאפשר למשתמשים שאושרו לראות את המנוי שלי</span><input type="checkbox" id="settingsPrivacySubscription"></label>
+        <button type="button" class="btn btn-ghost glass" id="saveAccountSettingsBtn" style="width:100%;justify-content:center;">שמירת הגדרות חשבון</button>
+      </div>
+    </div>
+
+    <div class="settings-card glass" id="devicePreferencesCard">
+      <h3>📱 Device Preferences</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <label class="toggle-row"><span>הפחתת אנימציות</span><input type="checkbox" id="reduceMotionPreference"></label>
+        <label class="toggle-row"><span>התראות בדפדפן</span><input type="checkbox" id="browserNotificationsPreference"></label>
+        <button type="button" class="btn btn-ghost glass" id="saveDevicePreferencesBtn" style="width:100%;justify-content:center;">שמירת העדפות מכשיר</button>
+      </div>
+    </div>
+
+    <div class="settings-card glass" id="devicePerformanceCard">
+      <h3>⚡ Device Performance</h3>
+      <p style="font-size:12.5px;color:var(--muted);">בדיקה מקומית של הדפדפן והמכשיר. המידע לא נשלח לשרת.</p>
+      <button type="button" class="btn btn-ghost glass" id="devicePerformanceBtn" style="width:100%;justify-content:center;">בדיקת ביצועי מכשיר</button>
+      <div id="devicePerformanceResult" style="margin-top:10px;font-size:12.5px;color:var(--muted);white-space:pre-line;"></div>
+    </div>
+
     <div class="settings-card glass">
       <h3>🔍 אבחון מערכת</h3>
       <p style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">בודק חיבור, PayPal והשרת — שימושי אם משהו לא עובד.</p>
@@ -1432,7 +1458,7 @@
       const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
       if (!response.ok) return null;
       const data = await response.json();
-      if (data.profile) { window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); setTimeout(enableWebPush, 0); }
+      if (data.profile) { window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); setTimeout(enableWebPush, 0); }
       return data.profile || null;
     } catch (_) { return null; }
   }
@@ -1502,6 +1528,20 @@
   document.getElementById('langEn').addEventListener('click', () => { setLanguage('en'); saveSiteSettings(); });
 
   // === settings tab ===
+  const devicePreferencesKey='retzef_device_preferences';
+  function loadAccountSettingsPanel(){
+    const profile=window.__retzefProfile; const content=document.getElementById('accountSettingsContent');
+    if(!profile){content.innerHTML='<p>כדי לראות את הגדרות החשבון, יש להתחבר עם TikTok.</p>';return;}
+    const role=profile.role==='owner'?'בעלים 👑':profile.role==='admin'?'מנהל מערכת תמיכה 🔨':'חבר/ה';
+    content.innerHTML=`<p>שם תצוגה: <b>${profile.displayName||profile.username}</b></p><p dir="ltr">Username: @${profile.username||''}</p><p>תפקיד: ${role}</p>`;
+    document.getElementById('settingsPrivacyStatus').checked=profile.privacy?.statusVisible!==false;
+    document.getElementById('settingsPrivacySubscription').checked=profile.privacy?.subscriptionVisible===true;
+  }
+  function loadDevicePreferences(){try{const p=JSON.parse(localStorage.getItem(devicePreferencesKey)||'{}');document.getElementById('reduceMotionPreference').checked=p.reduceMotion===true;document.getElementById('browserNotificationsPreference').checked=p.notifications===true;document.documentElement.dataset.reduceMotion=p.reduceMotion?'true':'false';}catch(_){} }
+  document.getElementById('saveAccountSettingsBtn').addEventListener('click',async()=>{const button=document.getElementById('saveAccountSettingsBtn');if(!window.__retzefProfile){button.textContent='צריך להתחבר עם TikTok';return;}button.textContent='שומר...';try{const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'privacy',statusVisible:document.getElementById('settingsPrivacyStatus').checked,subscriptionVisible:document.getElementById('settingsPrivacySubscription').checked})});button.textContent=r.ok?'נשמר ✅':'השמירה נכשלה';}catch(_){button.textContent='השמירה נכשלה';}setTimeout(()=>button.textContent='שמירת הגדרות חשבון',1800);});
+  document.getElementById('saveDevicePreferencesBtn').addEventListener('click',async()=>{const reduceMotion=document.getElementById('reduceMotionPreference').checked;const notifications=document.getElementById('browserNotificationsPreference').checked;localStorage.setItem(devicePreferencesKey,JSON.stringify({reduceMotion,notifications}));document.documentElement.dataset.reduceMotion=reduceMotion?'true':'false';if(notifications&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();const button=document.getElementById('saveDevicePreferencesBtn');button.textContent='נשמר ✅';setTimeout(()=>button.textContent='שמירת העדפות מכשיר',1800);});
+  document.getElementById('devicePerformanceBtn').addEventListener('click',async()=>{const result=document.getElementById('devicePerformanceResult');const lines=['חיבור לאינטרנט: '+(navigator.onLine?'✅ מחובר':'❌ לא מחובר'),'JavaScript: ✅ פעיל','מסך: '+screen.width+'×'+screen.height,'ליבות מעבד: '+(navigator.hardwareConcurrency||'לא נמסר'),'זיכרון משוער: '+(navigator.deviceMemory?navigator.deviceMemory+'GB':'לא נמסר'),'דפדפן: '+navigator.userAgent.slice(0,90)];if(navigator.connection)lines.push('רשת: '+(navigator.connection.effectiveType||'לא נמסר'));try{const battery=await navigator.getBattery?.();if(battery)lines.push('סוללה: '+Math.round(battery.level*100)+'%'+(battery.charging?' · בטעינה':''));}catch(_){}result.textContent=lines.join('\n');});
+  loadAccountSettingsPanel(); loadDevicePreferences();
   document.getElementById('systemDiagnoseBtn').addEventListener('click', async function(){
     const resultEl = document.getElementById('systemDiagnoseResult');
     resultEl.textContent = 'בודק...';

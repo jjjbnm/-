@@ -2141,10 +2141,20 @@
   }
   postTypeSelect.addEventListener('change',syncPostTypeFields);
   document.getElementById('addPollAnswer').addEventListener('click',()=>{const count=document.querySelectorAll('.poll-answer').length+1;const label=document.createElement('label');label.innerHTML=`תשובה ${count} *<input class="poll-answer" maxlength="200" required>`;document.getElementById('pollAnswers').appendChild(label);});
+  function formatPostContent(item){
+    if(item.postType==='סקר'){
+      try{const poll=JSON.parse(item.content);return `<div class="board-poll"><p>${esc(poll.question||item.description)}</p>${(poll.answers||[]).map((answer,index)=>`<button type="button" class="btn btn-ghost" disabled>${index+1}. ${esc(answer)}</button>`).join('')}</div>`;}catch(_){return esc(item.content);}
+    }
+    if(item.postType==='אירוע'){
+      try{const event=JSON.parse(item.content);return `<div class="board-event"><p>${esc(event.description||'')}</p><p>🕒 מתחיל: ${esc(event.start||'לא צוין')}</p><p>🏁 נגמר: ${esc(event.end||'לא צוין')}</p></div>`;}catch(_){return esc(item.content);}
+    }
+    if(item.postType==='קובץ'&&item.fileName)return `<p>📎 ${esc(item.fileName)}${item.fileSize?` · ${(Number(item.fileSize)/1024/1024).toFixed(2)}MB`:''}</p>`;
+    return `<p>${esc(item.content)}</p>`;
+  }
   function render(board,items){
     const target=document.getElementById(board==='updates'?'updatesList':'announcementsList');
     if(!items.length){target.innerHTML='<p class="board-empty">אין עדיין פרסומים בלוח הזה.</p>';return;}
-    target.innerHTML=items.map(item=>`<article class="board-card"><h4>${esc(item.description)}</h4><div class="board-meta"><span class="board-tag">${esc(item.postType||'הודעה')}</span><span class="board-tag">${esc(item.category)}</span><span>👤 ${esc(item.author)}${item.authorUsername ? ` <b dir="ltr">(@${esc(item.authorUsername)})</b>` : ''}</span><span>📅 ${new Date(item.createdAt).toLocaleDateString('he-IL')}</span>${item.publishedAt?`<span>יצא: ${esc(item.publishedAt)}</span>`:''}${item.expiresAt?`<span>נגמר: ${esc(item.expiresAt)}</span>`:''}</div><p>${esc(item.content)}</p>${item.image?`<img src="${esc(item.image)}" alt="">`:''}${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">🔗 לפרטים נוספים</a>`:''}</article>`).join('');
+    target.innerHTML=items.map(item=>`<article class="board-card"><h4>${esc(item.description)}</h4><div class="board-meta"><span class="board-tag">${esc(item.postType||'הודעה')}</span><span class="board-tag">${esc(item.category)}</span><span>👤 ${esc(item.author)}${item.authorUsername ? ` <b dir="ltr">(@${esc(item.authorUsername)})</b>` : ''}</span><span>📅 ${new Date(item.createdAt).toLocaleDateString('he-IL')}</span>${item.publishedAt?`<span>יצא: ${esc(item.publishedAt)}</span>`:''}${item.expiresAt?`<span>נגמר: ${esc(item.expiresAt)}</span>`:''}</div>${formatPostContent(item)}${item.image?`<img src="${esc(item.image)}" alt="">`:''}${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">🔗 לפרטים נוספים</a>`:''}</article>`).join('');
   }
   async function load(board){try{const r=await fetch(`${api}?board=${board}`,{cache:'no-store'});const d=await r.json();if(r.ok)render(board,d.items||[]);else throw new Error(d.error||'error')}catch(e){document.getElementById(board==='updates'?'updatesList':'announcementsList').innerHTML='<p class="board-empty">לא ניתן לטעון כרגע. נסו שוב מאוחר יותר.</p>';}}
   document.querySelectorAll('.board-open').forEach(button=>button.addEventListener('click',()=>{type.value=button.dataset.board;postTypeSelect.value='';syncPostTypeFields();document.getElementById('boardComposerTitle').textContent=button.dataset.board==='updates'?'פרסום עדכון':'פרסום מודעה';document.getElementById('updateOnlyFields').style.display=button.dataset.board==='updates'?'block':'none';message.textContent='';composer.style.display='block';composer.scrollIntoView({behavior:'smooth',block:'start'});}));

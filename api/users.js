@@ -5,6 +5,7 @@ function cfg() { return { url: process.env.KV_REST_API_URL || process.env.UPSTAS
 async function redis(command, ...args) { const { url, token } = cfg(); if (!url || !token) throw new Error('storage_not_configured'); const r = await fetch(`${url}/${command}/${args.map(encodeURIComponent).join('/')}`, { headers: { Authorization: `Bearer ${token}` } }); const d = await r.json(); if (!r.ok || d.error) throw new Error(d.error || 'storage_error'); return d.result; }
 async function profile(username) { const raw = await redis('get', `${PREFIX}${username.toLowerCase()}`); return raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null; }
 function publicUser(p) { return { username: p.username, displayName: p.displayName || p.username, avatarUrl: p.avatarUrl || '', role: p.role || 'member', online: Date.now() - Number(p.lastSeen || 0) < 120000, statusVisible: p.privacy?.statusVisible !== false, subscriptionVisible: p.privacy?.subscriptionVisible === true }; }
+function knownStatus(username) { const known = { 'ban.real': 'בעלים', 'oobbn98': 'הכול טוב', 'dahan324': 'סבבה', 'albinocapybara': 'הכול טוב', 'user1691117561269': 'הכול טוב' }; return known[String(username || '').toLowerCase()] || ''; }
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   const me = cookie(req, 'retzef_profile_id').toLowerCase();
@@ -15,7 +16,7 @@ module.exports = async (req, res) => {
       const scan = await redis('scan', '0', 'match', `${PREFIX}*`, 'count', '100');
       const keys = Array.isArray(scan) && Array.isArray(scan[1]) ? scan[1] : [];
       const users = (await Promise.all(keys.slice(0, 100).map(k => profile(k.slice(PREFIX.length))))).filter(Boolean).filter(p => String(p.username).toLowerCase() !== me);
-      const visibleUsers = await Promise.all(users.map(async p => { const approved = await redis('sismember', `retzef:chat:accepted:${me}`, String(p.username).toLowerCase()); return { ...publicUser(p), chatApproved: String(approved) === '1' || approved === true }; }));
+      const visibleUsers = await Promise.all(users.map(async p => { const approved = await redis('sismember', `retzef:chat:accepted:${me}`, String(p.username).toLowerCase()); const result = { ...publicUser(p), chatApproved: String(approved) === '1' || approved === true }; if (result.chatApproved && result.statusVisible) result.status = p.status || knownStatus(p.username); if (result.chatApproved && result.subscriptionVisible) result.subscription = p.subscription || p.subscriptionName || ''; return result; }));
       const requests = await redis('lrange', `retzef:chat:requests:${me}`, '0', '49');
       return res.status(200).json({ me: publicUser(mine), users: visibleUsers, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) });
     }

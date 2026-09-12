@@ -1256,8 +1256,8 @@
     const username=profile.username||'לא מחובר';
     const displayName=profile.displayName||username;
     const role=profile.role==='owner'?'בעלים 👑':profile.role==='admin'?'מנהל/ת 👩‍💼':'חבר/ה';
-    quickTitle.textContent=action==='settings'?'⚙️ הגדרות':action==='status'?'🟢 הסטטוס שלי':action==='profile'?'👤 פרטי משתמש':'💳 המנוי שלי';
-    if(action==='settings') quickBody.innerHTML='<p>הגדרות מהירות</p><button type="button" class="quick-action" id="quickDarkMode">🌗 החלפת מצב כהה/בהיר</button>';
+    quickTitle.textContent=action==='settings'?'⚙️ הגדרות חשבון':action==='status'?'🟢 הסטטוס שלי':action==='profile'?'👤 פרטי משתמש':'💳 המנוי שלי';
+    if(action==='settings') quickBody.innerHTML=`<p><b>חשבון TikTok</b></p><p>שם תצוגה: ${displayName}</p><p dir="ltr">Username: @${username}</p><p>התחברות: ${window.__retzefProfile?'מחובר ✅':'לא מחובר'}</p><button type="button" class="quick-action" id="quickDarkMode">🌗 החלפת מצב כהה/בהיר</button>`;
     else if(action==='status') quickBody.innerHTML=`<p><b>${displayName}</b> (@${username})</p><p>תפקיד: ${role}</p><p>סטטוס: ${profile.role==='owner'?'בעלים':'הכול טוב'}</p>`;
     else if(action==='profile') quickBody.innerHTML=`<p>שם תצוגה: <b>${displayName}</b></p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p>`;
     else quickBody.innerHTML=`<p>${localStorage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האתר.</p>`;

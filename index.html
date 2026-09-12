@@ -440,10 +440,13 @@
 <body>
 <script>
 (function(){
-  const overlay=document.getElementById('retzef-access-error');
-  const text=document.getElementById('retzef-access-error-text');
-  const code=document.getElementById('retzef-access-error-code');
-  function block(errorCode,message){ if(!overlay)return; text.textContent=message; code.textContent=errorCode; overlay.style.display='flex'; document.body.dataset.accessBlocked='true'; }
+  function block(errorCode,message){
+    const overlay=document.getElementById('retzef-access-error');
+    const text=document.getElementById('retzef-access-error-text');
+    const code=document.getElementById('retzef-access-error-code');
+    if(!overlay){ setTimeout(()=>block(errorCode,message),50); return; }
+    text.textContent=message; code.textContent=errorCode; overlay.style.display='flex'; document.body.dataset.accessBlocked='true';
+  }
   async function checkRegion(){
     if(!navigator.onLine){ block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האתר זמין רק עם חיבור פעיל.'); return; }
     try{

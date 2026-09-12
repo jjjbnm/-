@@ -1320,7 +1320,7 @@
     setTimeout(()=>toast.classList.remove('open'),8000);
   }
   document.getElementById('hubNotificationOpen').addEventListener('click',()=>{document.getElementById('hubNotification').classList.remove('open');openHub();});
-  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);for(const u of (d.users||[]).filter(x=>x.chatApproved)){const mr=await fetch('/api/chat?username='+encodeURIComponent(u.username));if(!mr.ok)continue;const md=await mr.json();const last=(md.messages||[]).slice(-1)[0];if(last&&last.from!==String(window.__retzefProfile.username||'').toLowerCase())notifyChatMessage(last);}}catch(_){} }
+  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);for(const u of (d.users||[]).filter(x=>x.chatApproved)){const mr=await fetch('/api/chat?username='+encodeURIComponent(u.username));if(!mr.ok)continue;const md=await mr.json();const last=(md.messages||[]).slice(-1)[0];if(last&&last.from!==String(window.__retzefProfile.username||'').toLowerCase())notifyChatMessage(last);}if(['owner','admin'].includes(String(window.__retzefProfile.role||''))){const sr=await fetch('/api/support');if(sr.ok){const sd=await sr.json();const latest=sd.requests?.[0];const signature=latest?String(latest.id):'';const previous=localStorage.getItem('retzef_last_support_request')||'';if(latest&&signature!==previous){localStorage.setItem('retzef_last_support_request',signature);const toast=document.getElementById('hubNotification');document.getElementById('hubNotificationText').textContent='📩 פנייה חדשה למערכת התמיכה מ־@'+latest.from;toast.classList.add('open');if('Notification' in window&&Notification.permission==='granted')new Notification('פניית תמיכה חדשה',{body:'מ־@'+latest.from});setTimeout(()=>toast.classList.remove('open'),10000);}}}}catch(_){} }
   setInterval(pollChatRequests,20000);
 
   function hubText(el,text){el.textContent=text;}
@@ -1432,7 +1432,7 @@
       const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
       if (!response.ok) return null;
       const data = await response.json();
-      if (data.profile) { window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); }
+      if (data.profile) { window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); setTimeout(enableWebPush, 0); }
       return data.profile || null;
     } catch (_) { return null; }
   }

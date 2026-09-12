@@ -434,6 +434,7 @@
   .modal-card p{font-size:14px; color:var(--muted); margin-bottom:22px;}
   .modal-actions{display:flex; gap:10px;}
   .modal-actions .btn{flex:1; justify-content:center; padding:12px;}
+  .boards-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.board-column{padding:22px}.board-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid var(--glass-border);padding-bottom:16px}.board-heading h3{font-size:20px}.board-heading p{color:var(--muted);font-size:13px}.board-icon{font-size:28px;display:block;margin-bottom:4px}.board-heading .btn{padding:9px 12px;font-size:12px}.board-list{display:flex;flex-direction:column;gap:12px;padding-top:16px}.board-empty{color:var(--muted);font-size:14px;text-align:center;padding:22px}.board-card{padding:15px;border:1px solid var(--glass-border);border-radius:15px;background:var(--bg2)}.board-card h4{font-size:16px;margin-bottom:5px}.board-card .board-meta{display:flex;gap:7px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:9px}.board-card .board-tag{color:var(--accent);font-weight:700}.board-card p{font-size:14px;white-space:pre-wrap}.board-card img{width:100%;max-height:210px;object-fit:cover;border-radius:11px;margin-top:10px}.board-card a{color:var(--accent);font-weight:700;font-size:13px;display:inline-block;margin-top:9px}.board-composer{padding:24px;margin-top:18px}.board-composer-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.board-composer label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;margin-bottom:13px}.board-composer input,.board-composer textarea{width:100%;border:1px solid var(--glass-border);border-radius:11px;background:var(--bg2);color:var(--text);padding:11px;font-family:inherit;font-size:14px}.board-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.board-message{margin-top:10px;color:var(--muted);font-size:13px}@media(max-width:700px){.boards-grid{grid-template-columns:1fr}.board-heading{flex-direction:column}.board-form-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -541,7 +542,8 @@
     <button class="tab-btn" data-target="settings" data-i18n="nav_settings">⚙️ הגדרות</button>
     <button class="tab-btn" data-target="about" data-i18n="nav_about">ℹ️ אודות וגרסה</button>
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">📩 יצירת קשר</button>
-  </nav>
+      <button class="tab-btn" data-target="boards">📢 מודעות</button>
+</nav>
 
   <!-- HOME -->
   <section id="home" class="tab-panel active">
@@ -636,6 +638,37 @@
     </div>
   </section>
 
+  <!-- BOARDS -->
+  <section id="boards" class="tab-panel">
+    <span class="eyebrow">קהילת רצף</span>
+    <h2 class="sec-title">לוח מודעות ועדכונים</h2>
+    <p class="sec-sub">פרסומים חשובים, הודעות ועדכונים של הקהילה — זמינים לכולם מכל מכשיר.</p>
+    <div class="boards-grid">
+      <div class="board-column glass">
+        <div class="board-heading"><div><span class="board-icon">📌</span><h3>לוח מודעות</h3><p>כולם יכולים לפרסם מודעה.</p></div><button class="btn btn-primary board-open" data-board="announcements">➕ פרסום מודעה</button></div>
+        <div id="announcementsList" class="board-list"><p class="board-empty">טוען מודעות...</p></div>
+      </div>
+      <div class="board-column glass">
+        <div class="board-heading"><div><span class="board-icon">🔔</span><h3>לוח עדכונים</h3><p>פרסום עדכון דורש קוד.</p></div><button class="btn btn-primary board-open" data-board="updates">➕ פרסום עדכון</button></div>
+        <div id="updatesList" class="board-list"><p class="board-empty">טוען עדכונים...</p></div>
+      </div>
+    </div>
+    <div id="boardComposer" class="glass board-composer" style="display:none;">
+      <div class="board-composer-head"><div><span class="eyebrow" style="margin-bottom:4px;">פרסום חדש</span><h3 id="boardComposerTitle">פרסום מודעה</h3></div><button type="button" id="boardComposerClose" class="btn btn-ghost">✕</button></div>
+      <form id="boardForm">
+        <input type="hidden" id="boardType" value="announcements">
+        <label>תיאור קצר *<input id="boardDescription" required maxlength="300" placeholder="למשל: מפגש קהילה חדש"></label>
+        <label>תוכן *<textarea id="boardContent" required maxlength="5000" rows="5" placeholder="כתבו כאן את תוכן המודעה או העדכון"></textarea></label>
+        <label>קטגוריה *<input id="boardCategory" required maxlength="80" placeholder="למשל: חשוב, אירוע, כלל"></label>
+        <div id="updateOnlyFields" style="display:none;">
+          <label>קוד עדכון *<input id="boardCode" type="password" autocomplete="off" placeholder="הקוד שקיבלתם"></label>
+          <div class="board-form-grid"><label>מתי יצא<input id="boardPublishedAt" type="datetime-local"></label><label>מתי ייגמר<input id="boardExpiresAt" type="datetime-local"></label></div>
+        </div>
+        <div class="board-form-grid"><label>קישור (אופציונלי)<input id="boardLink" type="url" placeholder="https://..."></label><label>תמונה (אופציונלי)<input id="boardImage" type="url" placeholder="קישור לתמונה"></label></div>
+        <button class="btn btn-primary" type="submit">📣 פרסום</button><p id="boardFormMessage" class="board-message"></p>
+      </form>
+    </div>
+  </section>
   <!-- RULES -->
   <section id="rules" class="tab-panel">
     <span class="eyebrow" data-i18n="rules_eyebrow">חוקי הקבוצה</span>
@@ -2018,6 +2051,23 @@
 
     renderCart();
   }());
+</script>
+<script>
+(function(){
+  const api='/api/boards'; const composer=document.getElementById('boardComposer'); const form=document.getElementById('boardForm');
+  const type=document.getElementById('boardType'); const message=document.getElementById('boardFormMessage');
+  const esc=value=>String(value||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  function render(board,items){
+    const target=document.getElementById(board==='updates'?'updatesList':'announcementsList');
+    if(!items.length){target.innerHTML='<p class="board-empty">אין עדיין פרסומים בלוח הזה.</p>';return;}
+    target.innerHTML=items.map(item=>`<article class="board-card"><h4>${esc(item.description)}</h4><div class="board-meta"><span class="board-tag">${esc(item.category)}</span><span>👤 ${esc(item.author)}</span><span>📅 ${new Date(item.createdAt).toLocaleDateString('he-IL')}</span>${item.publishedAt?`<span>יצא: ${esc(item.publishedAt)}</span>`:''}${item.expiresAt?`<span>נגמר: ${esc(item.expiresAt)}</span>`:''}</div><p>${esc(item.content)}</p>${item.image?`<img src="${esc(item.image)}" alt="">`:''}${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">🔗 לפרטים נוספים</a>`:''}</article>`).join('');
+  }
+  async function load(board){try{const r=await fetch(`${api}?board=${board}`,{cache:'no-store'});const d=await r.json();if(r.ok)render(board,d.items||[]);else throw new Error(d.error||'error')}catch(e){document.getElementById(board==='updates'?'updatesList':'announcementsList').innerHTML='<p class="board-empty">לא ניתן לטעון כרגע. נסו שוב מאוחר יותר.</p>';}}
+  document.querySelectorAll('.board-open').forEach(button=>button.addEventListener('click',()=>{type.value=button.dataset.board;document.getElementById('boardComposerTitle').textContent=button.dataset.board==='updates'?'פרסום עדכון':'פרסום מודעה';document.getElementById('updateOnlyFields').style.display=button.dataset.board==='updates'?'block':'none';message.textContent='';composer.style.display='block';composer.scrollIntoView({behavior:'smooth',block:'start'});}));
+  document.getElementById('boardComposerClose').addEventListener('click',()=>composer.style.display='none');
+  form.addEventListener('submit',async e=>{e.preventDefault();message.textContent='מפרסם...';const profile=window.__retzefProfile||{};const data={description:boardDescription.value,content:boardContent.value,category:boardCategory.value,code:boardCode.value,publishedAt:boardPublishedAt.value,expiresAt:boardExpiresAt.value,link:boardLink.value,image:boardImage.value,author:profile.displayName||profile.username||'קהילת רצף'};try{const r=await fetch(`${api}?board=${type.value}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d=await r.json();if(!r.ok)throw new Error(d.error||'error');message.textContent='✅ פורסם בהצלחה';form.reset();type.value=type.value;document.getElementById('updateOnlyFields').style.display=type.value==='updates'?'block':'none';await load(type.value);}catch(err){message.textContent=err.message==='invalid_update_code'?'❌ קוד עדכון שגוי':err.message==='updates_code_not_configured'?'❌ קוד העדכונים עדיין לא הוגדר בשרת':'❌ הפרסום נכשל, נסו שוב';}});
+  load('announcements');load('updates');
+})();
 </script>
 </body>
 </html>

@@ -1281,6 +1281,11 @@
   document.getElementById('profileLogout').addEventListener('click',()=>{document.cookie='retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax';window.__retzefProfile=null;profileMenu.classList.remove('open');location.reload();});
   const hubModal=document.getElementById('userHubModal'), hubUsers=document.getElementById('hubUsers'), hubRequests=document.getElementById('hubRequests'), hubChat=document.getElementById('hubChat'), hubChatTitle=document.getElementById('hubChatTitle'), hubChatMessages=document.getElementById('hubChatMessages'), hubChatInput=document.getElementById('hubChatInput');
   let activeChatUser='';
+  async function enableWebPush(){
+    if(!window.__retzefProfile||!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))return;
+    try{const r=await fetch('/api/push');const info=await r.json();if(!info.configured||!info.publicKey)return;const permission=Notification.permission==='granted'? 'granted':await Notification.requestPermission();if(permission!=='granted')return;const reg=await navigator.serviceWorker.register('/push-sw.js');let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:Uint8Array.from(atob(info.publicKey.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))});await fetch('/api/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'subscribe',subscription:sub.toJSON()})});}catch(e){console.warn('Web Push unavailable',e);}
+  }
+
   let lastRequestSignature=localStorage.getItem('retzef_last_chat_request')||'';
   let lastMessageSignature=localStorage.getItem('retzef_last_chat_message')||'';
   function notifyChatMessage(message){
@@ -1311,7 +1316,7 @@
   }
   async function sendRequest(username,btn){try{const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'request',username})});if(!r.ok)throw 0;btn.textContent='הבקשה נשלחה';btn.disabled=true;}catch(_){btn.textContent='נכשלה הבקשה';}}
   async function handleRequest(username,action){await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,username})});loadHub();}
-  async function openHub(){profileMenu.classList.remove('open');hubModal.classList.add('open');if('Notification' in window&&Notification.permission==='default'){try{await Notification.requestPermission();}catch(_){}}await loadHub();}
+  async function openHub(){profileMenu.classList.remove('open');hubModal.classList.add('open');await enableWebPush();await loadHub();}
   document.getElementById('profileUsers').addEventListener('click',openHub); document.getElementById('hubClose').addEventListener('click',()=>hubModal.classList.remove('open')); hubModal.addEventListener('click',e=>{if(e.target===hubModal)hubModal.classList.remove('open');});
   document.getElementById('hubChatForm').addEventListener('submit',async e=>{e.preventDefault();const message=hubChatInput.value.trim();if(!message||!activeChatUser)return;const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:activeChatUser,message})});if(r.ok){hubChatInput.value='';loadChat(activeChatUser);}});
   function showUserDetails(u){activeChatUser='';hubChat.style.display='block';hubChatTitle.textContent='פרטים על @'+u.username;hubChatMessages.textContent='';const el=document.createElement('div');el.className='hub-msg';const parts=['תפקיד: '+(u.role||'חבר/ה')];parts.push(u.status!==undefined?'סטטוס: '+u.status:'סטטוס לא משותף');parts.push(u.subscription!==undefined?'מנוי: '+(u.subscription||'לא קיים'):'המנוי לא משותף');el.textContent=parts.join('\\n');hubChatMessages.appendChild(el);document.getElementById('hubChatForm').style.display='none';}

@@ -89,6 +89,9 @@ class MainActivity : AppCompatActivity() {
         val host = uri.host.orEmpty()
         val internal = host == "chi-liart-74.vercel.app"
         if (internal) return false
+        // Keep TikTok Login Kit inside the app so Android browser tabs and
+        // browser navigation controls do not cover the login flow.
+        if (host == "www.tiktok.com" && uri.path.orEmpty().startsWith("/v2/auth/authorize")) return false
         if (uri.scheme == "http" || uri.scheme == "https" || uri.scheme == "tiktok") {
             return try { startActivity(Intent(Intent.ACTION_VIEW, uri)); true } catch (_: ActivityNotFoundException) { false }
         }

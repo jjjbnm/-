@@ -1959,7 +1959,7 @@
     categoryField.style.display=selected==='הודעה'?'block':'none';
     document.getElementById('boardCategory').required=selected==='הודעה';
     fileFields.style.display=isFile?'block':'none'; pollFields.style.display=(isPoll&&type.value==='updates')?'block':'none'; eventFields.style.display=isEvent?'block':'none';
-    document.querySelectorAll('#generalPostFields input,#generalPostFields textarea').forEach(x=>x.required=!isFile&&!isPoll&&!isEvent);
+    document.querySelectorAll('#generalPostFields input:not(#boardLink):not(#boardImage),#generalPostFields textarea').forEach(x=>x.required=!isFile&&!isPoll&&!isEvent);document.getElementById('boardLink').required=false;document.getElementById('boardImage').required=false;
     document.getElementById('fileDescription').required=isFile; document.getElementById('boardFile').required=isFile;
     document.getElementById('pollQuestion').required=isPoll&&type.value==='updates'; document.querySelectorAll('.poll-answer').forEach(x=>x.required=isPoll&&type.value==='updates');
     document.getElementById('eventName').required=isEvent; document.getElementById('eventDescription').required=isEvent; document.getElementById('eventStart').required=isEvent; document.getElementById('eventEnd').required=isEvent;

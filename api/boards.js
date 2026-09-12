@@ -50,7 +50,9 @@ module.exports = async (req, res) => {
     const description = clean(input.description, 300);
     const content = clean(input.content, 5000);
     const category = clean(input.category, 80);
+    const allowedCategories = new Set(['דיווח על באג', 'עדכון חשוב', 'הודעה כללית', 'אירוע', 'חוקי הקבוצה', 'תחזוקה', 'מנויים ותשלומים', 'חנות', 'תמיכה ועזרה', 'שינוי באתר', 'סקר לקהילה', 'תחרות ופעילות', 'דחוף']);
     if (!description || !content || !category) return res.status(400).json({ error: 'description_content_category_required' });
+    if (!allowedCategories.has(category)) return res.status(400).json({ error: 'invalid_category' });
     const updatesCode = process.env.UPDATES_BOARD_CODE || 'מודעות9באן';
     const acceptedUpdateCodes = new Set([updatesCode, 'מודעות9באן']);
     if (board === 'updates' && !acceptedUpdateCodes.has(clean(input.code, 200))) {

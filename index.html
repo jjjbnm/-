@@ -659,7 +659,20 @@
         <input type="hidden" id="boardType" value="announcements">
         <label>תיאור קצר *<input id="boardDescription" required maxlength="300" placeholder="למשל: מפגש קהילה חדש"></label>
         <label>תוכן *<textarea id="boardContent" required maxlength="5000" rows="5" placeholder="כתבו כאן את תוכן המודעה או העדכון"></textarea></label>
-        <label>קטגוריה *<input id="boardCategory" required maxlength="80" placeholder="למשל: חשוב, אירוע, כלל"></label>
+        <label>קטגוריה *<select id="boardCategory" required><option value="">בחרו קטגוריה</option>
+          <option>דיווח על באג</option>
+          <option>עדכון חשוב</option>
+          <option>הודעה כללית</option>
+          <option>אירוע</option>
+          <option>חוקי הקבוצה</option>
+          <option>תחזוקה</option>
+          <option>מנויים ותשלומים</option>
+          <option>חנות</option>
+          <option>תמיכה ועזרה</option>
+          <option>שינוי באתר</option>
+          <option>סקר לקהילה</option>
+          <option>תחרות ופעילות</option>
+          <option>דחוף</option></select></label>
         <div id="updateOnlyFields" style="display:none;">
           <label>קוד עדכון *<input id="boardCode" type="password" autocomplete="off" placeholder="הקוד שקיבלתם"></label>
           <div class="board-form-grid"><label>מתי יצא<input id="boardPublishedAt" type="datetime-local"></label><label>מתי ייגמר<input id="boardExpiresAt" type="datetime-local"></label></div>

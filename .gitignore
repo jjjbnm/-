@@ -1,3 +1,5 @@
 
 # Local Android signing artifacts
 android-keys/
+
+node_modules/

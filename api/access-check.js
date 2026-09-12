@@ -1,4 +1,5 @@
 const GEO_TIMEOUT_MS = 5000;
+const VPN_PROVIDER_PATTERN = /proton\s*vpn|protonvpn|nordvpn|expressvpn|surfshark|cyberghost|private internet access|pia vpn|mullvad|ipvanish|windscribe|hide\.me|hotspot shield|tunnelbear|hola vpn|hidemyass|purevpn|vyprvpn|strongvpn|atlas vpn|urban vpn|privadovpn|perfect privacy|tor exit|vpn|proxy|anonymous|datacenter|hosting/i;
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ allowed: false, error: 'method_not_allowed' });
@@ -20,7 +21,10 @@ export default async function handler(req, res) {
     const geo = await response.json();
     if (geo.success === false) throw new Error('geo_provider_failed');
     const security = geo.security || {};
-    if (security.vpn || security.proxy || security.tor || security.hosting) {
+    const connection = geo.connection || {};
+    const networkText = [geo.isp, geo.org, geo.organization, connection.isp, connection.org, connection.organization, geo.asn].filter(Boolean).join(' ');
+    const providerDetected = VPN_PROVIDER_PATTERN.test(networkText);
+    if (security.vpn || security.proxy || security.tor || security.hosting || security.datacenter || providerDetected) {
       return res.status(403).json({ allowed: false, error: 'vpn_detected', countryCode: String(geo.country_code || vercelCountry || '').toUpperCase() });
     }
     const countryCode = String(geo.country_code || vercelCountry || '').toUpperCase();

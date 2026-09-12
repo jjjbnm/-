@@ -1275,7 +1275,7 @@
     if(!accounts.length) list.innerHTML='<p style="color:var(--muted);">אין עדיין חשבונות שמורים.</p>';
     accounts.forEach(account=>{const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:9px;margin:8px 0;padding:8px;border:1px solid var(--glass-border);border-radius:12px;';const name=document.createElement('span');name.style.flex='1';name.textContent=(account.displayName||account.username)+' · @'+account.username;const button=document.createElement('button');button.type='button';button.className='quick-action';button.textContent=String(window.__retzefProfile?.username||'').toLowerCase()===account.username?'מחובר ✅':'החלף';button.disabled=button.textContent==='מחובר ✅';button.onclick=()=>switchAccount(account.username);row.append(name,button);list.appendChild(row);});
     quickModal.classList.add('open');
-    document.getElementById('addTikTokAccount').addEventListener('click',()=>{quickModal.classList.remove('open');openConsentModal();});
+    document.getElementById('addTikTokAccount').addEventListener('click',()=>{quickModal.classList.remove('open');openConsentModal(true);});
   }
   function openProfileAction(action){
     const profile=window.__retzefProfile||{};
@@ -1342,12 +1342,13 @@
   document.addEventListener('click',e=>{if(profileMenu.classList.contains('open')&&!profileMenu.contains(e.target)&&!document.getElementById('profileAvatar').contains(e.target))profileMenu.classList.remove('open');});
 
   const consentModal = document.getElementById('consentModal');
-  function openConsentModal(){ consentModal.classList.add('open'); }
+  function openConsentModal(forceAccountChooser){ forceTikTokAccountChooser=forceAccountChooser===true; consentModal.classList.add('open'); }
   function closeConsentModal(){ consentModal.classList.remove('open'); }
 
+  let forceTikTokAccountChooser=false;
   document.getElementById('consentYes').addEventListener('click', function(){
     closeConsentModal();
-    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic,user.info.profile&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef`;
+    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic,user.info.profile&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef&disable_auto_auth=${forceTikTokAccountChooser?'1':'0'}`;
     window.location.href = authUrl;
   });
   document.getElementById('consentNo').addEventListener('click', closeConsentModal);

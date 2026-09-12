@@ -435,7 +435,7 @@
 
 
 
-  #profileMenu{display:none;position:fixed;top:78px;left:18px;z-index:1200;min-width:220px;padding:10px;background:var(--bg2);border:1px solid var(--glass-border);border-radius:18px;box-shadow:0 16px 40px #0003;direction:rtl}
+  #profileMenu{display:none;position:fixed;top:78px;left:18px;z-index:1200;min-width:220px;max-width:calc(100vw - 36px);max-height:calc(100vh - 96px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:10px;background:var(--bg2);border:1px solid var(--glass-border);border-radius:18px;box-shadow:0 16px 40px #0003;direction:rtl}
   #profileMenu.open{display:block}
   #profileMenu button{display:block;width:100%;border:0;border-radius:11px;background:transparent;color:var(--text);padding:11px 13px;text-align:right;font:600 14px Assistant,sans-serif;cursor:pointer}
   #profileMenu button:hover{background:var(--glass)}

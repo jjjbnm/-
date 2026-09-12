@@ -62,6 +62,11 @@ module.exports = async (req, res) => {
     }
     const displayName = user.display_name || user.username || '';
     const username = user.username || displayName || user.open_id || '';
+    // TikTok Login Kit does not normally expose the account's country or IP.
+    // Keep any optional country field only if TikTok ever returns one, and record
+    // the country of the IP used during this login separately.
+    const accountCountry = user.country_code || user.country || user.region || '';
+    const loginCountry = String(req.headers['x-vercel-ip-country'] || '').toUpperCase();
     const params = new URLSearchParams({
       tiktok_ok: '1',
       username,
@@ -70,7 +75,7 @@ module.exports = async (req, res) => {
       role: resolveRole(username),
     });
     try {
-      await saveProfile(username, { username, displayName, avatarUrl: user.avatar_url || '', role: resolveRole(username) });
+      await saveProfile(username, { username, displayName, avatarUrl: user.avatar_url || '', role: resolveRole(username), accountCountry, loginCountry });
     } catch (storageError) {
       console.error('Profile storage unavailable; continuing login:', storageError.message);
     }

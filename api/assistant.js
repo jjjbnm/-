@@ -1,6 +1,7 @@
 function localAnswer(question, profile) {
   const text = String(question || '').toLowerCase();
   const who = profile && (profile.displayName || profile.username) ? `אתה מחובר בתור ${profile.displayName || profile.username} (@${profile.username || ''}).` : 'אין כרגע פרופיל TikTok מחובר.';
+  if (text.trim() === 'הבאן המקורי') return '🥚 מצאת Easter egg! עוד סוד קטן: מתחילת 1 באוקטובר לא צריך לקנות מנוי כדי לשלוח סרטון יותר.';
   if (/^\s*(היי|שלום|הי|אהלן)/.test(text) && !/מנוי|משתמש|מחובר/.test(text)) return 'היי! אני העוזר של רצף, איך אפשר לעזור?';
   if (/לאיזה משתמש|מי אני|מחובר בתור|איזה משתמש/.test(text)) return who;
   if (/איזה מנוי|המנוי שלי|מנוי יש לי/.test(text)) return 'אין לי כרגע נתוני מנוי אישיים על החשבון שלך. אפשר לבדוק ולרכוש מנוי בטאב מנויים; אל תשלח פרטי תשלום בצ׳אט.';

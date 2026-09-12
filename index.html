@@ -1282,6 +1282,14 @@
   const hubModal=document.getElementById('userHubModal'), hubUsers=document.getElementById('hubUsers'), hubRequests=document.getElementById('hubRequests'), hubChat=document.getElementById('hubChat'), hubChatTitle=document.getElementById('hubChatTitle'), hubChatMessages=document.getElementById('hubChatMessages'), hubChatInput=document.getElementById('hubChatInput');
   let activeChatUser='';
   let lastRequestSignature=localStorage.getItem('retzef_last_chat_request')||'';
+  let lastMessageSignature=localStorage.getItem('retzef_last_chat_message')||'';
+  function notifyChatMessage(message){
+    const from=message?.from||'משתמש'; const signature=String(from)+'|'+String(message?.createdAt||'');
+    if(signature===lastMessageSignature)return; lastMessageSignature=signature; localStorage.setItem('retzef_last_chat_message',signature);
+    const toast=document.getElementById('hubNotification'); document.getElementById('hubNotificationText').textContent='💬 הודעה חדשה מ־@'+from; toast.classList.add('open');
+    if('Notification' in window && Notification.permission==='granted') new Notification('הודעה חדשה בצ׳אט', {body:'@'+from+' שלח/ה הודעה חדשה'});
+    setTimeout(()=>toast.classList.remove('open'),8000);
+  }
   function notifyChatRequest(request){
     const from=request?.from||'משתמש'; const signature=String(from)+'|'+String(request?.createdAt||'');
     if(signature===lastRequestSignature)return; lastRequestSignature=signature; localStorage.setItem('retzef_last_chat_request',signature);
@@ -1290,7 +1298,7 @@
     setTimeout(()=>toast.classList.remove('open'),8000);
   }
   document.getElementById('hubNotificationOpen').addEventListener('click',()=>{document.getElementById('hubNotification').classList.remove('open');openHub();});
-  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);}catch(_){} }
+  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);for(const u of (d.users||[]).filter(x=>x.chatApproved)){const mr=await fetch('/api/chat?username='+encodeURIComponent(u.username));if(!mr.ok)continue;const md=await mr.json();const last=(md.messages||[]).slice(-1)[0];if(last&&last.from!==String(window.__retzefProfile.username||'').toLowerCase())notifyChatMessage(last);}}catch(_){} }
   setInterval(pollChatRequests,20000);
 
   function hubText(el,text){el.textContent=text;}

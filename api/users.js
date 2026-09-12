@@ -14,8 +14,8 @@ module.exports = async (req, res) => {
   const input = body(req); const action = String(input.action || '');
   if (req.method === 'POST' && action === 'join') {
     try {
-      const name = String(input.name || '').trim().slice(0, 60); const age = Number(input.age); const gender = String(input.gender || '').trim();
-      if (!name || !Number.isInteger(age) || age < 1 || age > 120 || !['בן', 'בת'].includes(gender)) return res.status(400).json({ error: 'invalid_join_details' });
+      const name = String(input.name || '').trim().slice(0, 60) || 'לא נמסר'; const age = Number(input.age); const gender = String(input.gender || '').trim();
+      if (!Number.isInteger(age) || age < 1 || age > 120 || !['', 'בן', 'בת'].includes(gender)) return res.status(400).json({ error: 'invalid_join_details' });
       const item = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, age, gender, createdAt: new Date().toISOString(), status: 'new' };
       await redis('lpush', 'retzef:join:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:join:requests', '0', '199'); await sendTo('ban.real', { title: 'בקשת הצטרפות חדשה', body: `${name}, גיל ${age}, ביקש/ה להצטרף`, url: '/' });
       return res.status(201).json({ submitted: true });

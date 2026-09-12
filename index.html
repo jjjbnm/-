@@ -456,20 +456,28 @@
   checkRegion();
 })();
 </script>
-<div id="retzef-access-error" role="alert" aria-live="assertive"><div class="error-box"><h1>לא ניתן להיכנס לאתר</h1><p id="retzef-access-error-text">נדרשת גישה לאינטרנט כדי להשתמש באתר.</p><code id="retzef-access-error-code">RETZEF_OFFLINE</code><p>בדקו את החיבור ונסו שוב.</p><button type="button" onclick="location.reload()">נסה שוב</button></div></div>
+<div id="retzef-access-error" role="alert" aria-live="assertive"><div class="error-box"><h1>לא ניתן להיכנס לאתר</h1><p id="retzef-access-error-text">נדרשת גישה לאינטרנט כדי להשתמש באתר.</p><code id="retzef-access-error-code">RETZEF_OFFLINE</code><p>בדקו את החיבור ונסו שוב.</p><button type="button" onclick="location.reload()">נסה שוב</button><button type="button" onclick="window.contactSupport(document.getElementById('retzef-access-error-code').textContent,document.getElementById('retzef-access-error-text').textContent)">פנייה לתמיכה והעתקת השגיאה</button></div></div>
 
 <script>
+  window.contactSupport = function(errorName, errorMessage){
+    var supportUrl = 'https://www.tiktok.com/@user613987579196?_r=1&_t=ZS-99fpXDPPMO2';
+    var message = 'היי קיבלתי שגיאה (' + (errorName || 'לא ידוע') + ') ורציתי לשאול איך לתקן. ' + (errorMessage || 'שגיאות יכולים לקרוא בקוד אז יש לפנות לתמיכה');
+    try { navigator.clipboard.writeText(message); } catch (_) {}
+    window.open(supportUrl, '_blank', 'noopener');
+  };
   // מציג כל שגיאת JS ישירות על המסך — כדי לאתר תקלות מהטלפון, בלי מחשב/devtools
   window.addEventListener('error', function(e){
     var box = document.createElement('div');
     box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999999;background:#b91c1c;color:#fff;padding:14px;font-size:13px;direction:ltr;text-align:left;white-space:pre-wrap;font-family:monospace;';
     box.textContent = 'JS ERROR: ' + e.message + '\n@ ' + e.filename + ':' + e.lineno + ':' + e.colno;
+    var support = document.createElement('button'); support.textContent = 'פנייה לתמיכה והעתקת השגיאה'; support.style.cssText = 'display:block;margin-top:10px;padding:8px;'; support.onclick = function(){ window.contactSupport('JS ERROR', e.message); }; box.appendChild(support);
     document.body.insertBefore(box, document.body.firstChild);
   });
   window.addEventListener('unhandledrejection', function(e){
     var box = document.createElement('div');
     box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999999;background:#b91c1c;color:#fff;padding:14px;font-size:13px;direction:ltr;text-align:left;white-space:pre-wrap;font-family:monospace;';
     box.textContent = 'PROMISE ERROR: ' + (e.reason && e.reason.message ? e.reason.message : e.reason);
+    var support = document.createElement('button'); support.textContent = 'פנייה לתמיכה והעתקת השגיאה'; support.style.cssText = 'display:block;margin-top:10px;padding:8px;'; support.onclick = function(){ window.contactSupport('PROMISE ERROR', box.textContent); }; box.appendChild(support);
     document.body.insertBefore(box, document.body.firstChild);
   });
 </script>

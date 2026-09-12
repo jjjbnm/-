@@ -1,5 +1,5 @@
 const GEO_TIMEOUT_MS = 5000;
-const VPN_PROVIDER_PATTERN = /proton\s*vpn|protonvpn|nordvpn|expressvpn|surfshark|cyberghost|private internet access|pia vpn|mullvad|ipvanish|windscribe|hide\.me|hotspot shield|tunnelbear|hola vpn|hidemyass|purevpn|vyprvpn|strongvpn|atlas vpn|urban vpn|privadovpn|perfect privacy|tor exit|vpn|proxy|anonymous|datacenter|hosting/i;
+const VPN_PROVIDER_PATTERN = /proton\s*vpn|protonvpn|nordvpn|expressvpn|surfshark|cyberghost|private internet access|pia vpn|mullvad|ipvanish|windscribe|hide\.me|hotspot shield|tunnelbear|hola vpn|hidemyass|purevpn|vyprvpn|strongvpn|atlas vpn|urban vpn|privadovpn|perfect privacy|google one vpn|google vpn|mozilla vpn|avast secureline|avg secure vpn|bitdefender vpn|kaspersky vpn|mcafee vpn|vpn unlimited|vpncity|purevpn|privatevpn|hide my ass|tor exit|openvpn|wireguard|vpn|proxy|anonymous|datacenter|hosting/i;
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ allowed: false, error: 'method_not_allowed' });

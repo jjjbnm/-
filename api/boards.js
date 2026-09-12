@@ -40,6 +40,24 @@ module.exports = async (req, res) => {
       const items = (rows || []).map(row => { try { return JSON.parse(row); } catch (_) { return null; } }).filter(Boolean);
       return res.status(200).json({ board, items });
     }
+    if (req.method === 'DELETE') {
+      const profileId = getCookie(req, 'retzef_profile_id');
+      if (!profileId) return res.status(401).json({ error: 'tiktok_login_required' });
+      const storedProfile = await redis('get', `retzef:profile:${profileId.toLowerCase()}`);
+      if (!storedProfile) return res.status(401).json({ error: 'tiktok_login_required' });
+      const input = bodyOf(req);
+      const id = clean(input.id, 100);
+      if (!id) return res.status(400).json({ error: 'id_required' });
+      if (board === 'updates' && !new Set([process.env.UPDATES_BOARD_CODE || 'מודעות9באן', 'מודעות9באן']).has(clean(input.code, 200))) {
+        return res.status(403).json({ error: 'invalid_update_code' });
+      }
+      const rows = await redis('lrange', BOARD_KEYS[board], '0', '49');
+      const kept = (rows || []).filter(row => { try { return JSON.parse(row).id !== id; } catch (_) { return true; } });
+      await redis('del', BOARD_KEYS[board]);
+      for (let i = kept.length - 1; i >= 0; i -= 1) await redis('rpush', BOARD_KEYS[board], kept[i]);
+      if (kept.length === (rows || []).length) return res.status(404).json({ error: 'post_not_found' });
+      return res.status(200).json({ deleted: true, id });
+    }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const profileId = getCookie(req, 'retzef_profile_id');
     if (!profileId) return res.status(401).json({ error: 'tiktok_login_required' });

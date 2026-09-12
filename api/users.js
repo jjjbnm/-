@@ -7,6 +7,7 @@ async function redis(command, ...args) { const { url, token } = cfg(); if (!url 
 async function profile(username) { const raw = await redis('get', `${PREFIX}${username.toLowerCase()}`); return raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null; }
 function publicUser(p) { return { username: p.username, displayName: p.displayName || p.username, avatarUrl: p.avatarUrl || '', role: p.role || 'member', online: Date.now() - Number(p.lastSeen || 0) < 120000, statusVisible: p.privacy?.statusVisible !== false, subscriptionVisible: p.privacy?.subscriptionVisible === true }; }
 function knownStatus(username) { const known = { 'ban.real': 'בעלים', 'oobbn98': 'הכול טוב', 'dahan324': 'סבבה', 'albinocapybara': 'הכול טוב', 'user1691117561269': 'הכול טוב' }; return known[String(username || '').toLowerCase()] || ''; }
+async function supportRequests() { const rows = await redis('lrange', 'retzef:support:requests', '0', '99'); return (rows || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean); }
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   const me = cookie(req, 'retzef_profile_id').toLowerCase();
@@ -19,13 +20,22 @@ module.exports = async (req, res) => {
       const users = (await Promise.all(keys.slice(0, 100).map(k => profile(k.slice(PREFIX.length))))).filter(Boolean).filter(p => String(p.username).toLowerCase() !== me);
       const visibleUsers = await Promise.all(users.map(async p => { const targetUsername = String(p.username).toLowerCase(); const approved = await redis('sismember', `retzef:chat:accepted:${me}`, targetUsername); const pendingRows = await redis('lrange', `retzef:chat:requests:${targetUsername}`, '0', '49'); const chatPending = (pendingRows || []).some(row => { try { return JSON.parse(row).from === me; } catch (_) { return false; } }); const result = { ...publicUser(p), chatApproved: String(approved) === '1' || approved === true, chatPending }; if (result.chatApproved && result.statusVisible) result.status = p.status || knownStatus(p.username); if (result.chatApproved && result.subscriptionVisible) result.subscription = p.subscription || p.subscriptionName || ''; return result; }));
       const requests = await redis('lrange', `retzef:chat:requests:${me}`, '0', '49');
-      return res.status(200).json({ me: publicUser(mine), users: visibleUsers, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) });
+      const result = { me: publicUser(mine), users: visibleUsers, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) };
+      if (['owner', 'admin'].includes(mine.role) || ['user613987579196', 'ban.real', 'shirel'].includes(me)) result.supportRequests = await supportRequests();
+      return res.status(200).json(result);
     }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const input = body(req); const action = String(input.action || '');
     if (action === 'privacy') {
       mine.privacy = { statusVisible: input.statusVisible !== false, subscriptionVisible: input.subscriptionVisible === true };
       await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ privacy: mine.privacy });
+    }
+    if (action === 'support') {
+      const quote = String(input.quote || '').trim().slice(0, 2000); if (!quote) return res.status(400).json({ error: 'quote_required' });
+      const item = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, from: me, displayName: mine.displayName || me, quote, createdAt: new Date().toISOString(), status: 'new' };
+      await redis('lpush', 'retzef:support:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:support:requests', '0', '199');
+      await sendTo('user613987579196', { title: 'פניית תמיכה חדשה', body: `פנייה חדשה מ־@${me}`, url: '/' });
+      return res.status(201).json({ forwarded: true, request: item });
     }
     const target = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
     if (!target || target === me || !(await profile(target))) return res.status(404).json({ error: 'user_not_found' });

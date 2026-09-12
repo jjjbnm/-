@@ -325,94 +325,6 @@
     .profile-avatar{width:42px; height:42px; top:12px; left:12px;}
   }
 
-  /* AI assistant widget */
-  .ai-fab{
-    position:fixed; bottom:22px; left:22px; z-index:20;
-    width:56px; height:56px; border-radius:50%; border:none; cursor:pointer;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    color:#fff; font-size:24px;
-    box-shadow:0 10px 28px rgba(91,140,255,0.35);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .18s ease;
-  }
-  .ai-fab:hover{transform:scale(1.06);}
-
-  /* shopping cart */
-  .cart-fab{
-    position:fixed; bottom:22px; right:22px; z-index:20;
-    width:56px; height:56px; border-radius:50%; border:none; cursor:pointer;
-    background:var(--bg2); border:1px solid var(--glass-border);
-    color:var(--text); font-size:22px;
-    box-shadow:0 10px 28px rgba(20,23,40,0.18);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .18s ease;
-  }
-  .cart-fab:hover{transform:scale(1.06);}
-  .cart-badge{
-    position:absolute; top:-4px; left:-4px; min-width:20px; height:20px; border-radius:999px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;
-    font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;
-    padding:0 4px; display:none;
-  }
-  .cart-badge.show{display:flex;}
-  .cart-panel{
-    position:fixed; bottom:88px; right:22px; z-index:20;
-    width:min(340px, calc(100vw - 44px)); max-height:min(480px, 70vh);
-    display:none; flex-direction:column; overflow:hidden;
-    background:var(--bg2); border:1px solid var(--glass-border); border-radius:20px;
-    box-shadow:0 20px 60px rgba(20,23,40,0.25);
-  }
-  .cart-panel.open{display:flex;}
-  .cart-panel-header{
-    padding:14px 16px; border-bottom:1px solid var(--glass-border);
-    display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14px;
-  }
-  .cart-panel-header button{background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;}
-  .cart-items{flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:8px;}
-  .cart-item{display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; padding:8px 0; border-bottom:1px solid var(--glass-border);}
-  .cart-item .remove-item{background:none; border:none; color:#b91c1c; cursor:pointer; font-size:16px; flex-shrink:0;}
-  .cart-empty{padding:24px; text-align:center; color:var(--muted); font-size:13px;}
-  .cart-footer{padding:14px 16px; border-top:1px solid var(--glass-border); display:flex; flex-direction:column; gap:10px;}
-  .cart-total{display:flex; justify-content:space-between; font-weight:800; font-family:'Rubik'; font-size:16px;}
-  .add-to-cart-btn{
-    display:flex; align-items:center; gap:6px;
-    border-radius:10px; border:1px solid var(--glass-border); background:var(--glass);
-    color:var(--text); cursor:pointer; font-family:'Assistant'; font-weight:600;
-  }
-  .subscribe-btn{
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    border-radius:10px; border:1px solid var(--accent); background:transparent;
-    color:var(--accent); cursor:pointer; font-family:'Assistant'; font-weight:700;
-  }
-
-  .ai-panel{
-    position:fixed; bottom:88px; left:22px; z-index:20;
-    width:min(340px, calc(100vw - 44px)); max-height:min(480px, 70vh);
-    display:none; flex-direction:column; overflow:hidden;
-    background:var(--bg2); border:1px solid var(--glass-border); border-radius:20px;
-    box-shadow:0 20px 60px rgba(20,23,40,0.25);
-  }
-  .ai-panel.open{display:flex;}
-  .ai-panel-header{
-    padding:14px 16px; border-bottom:1px solid var(--glass-border);
-    display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14px;
-  }
-  .ai-panel-header button{background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;}
-  .ai-messages{flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:10px; font-size:13.5px;}
-  .ai-msg{padding:9px 13px; border-radius:12px; max-width:88%; line-height:1.5;}
-  .ai-msg.user{align-self:flex-end; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;}
-  .ai-msg.bot{align-self:flex-start; background:rgba(120,120,140,0.1); color:var(--text);}
-  .ai-msg.bot.loading{color:var(--muted); font-style:italic;}
-  .ai-input-row{display:flex; gap:8px; padding:12px; border-top:1px solid var(--glass-border);}
-  .ai-input-row input{
-    flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--glass-border);
-    background:var(--bg); color:var(--text); font-family:'Assistant'; font-size:13.5px;
-  }
-  .ai-input-row button{
-    padding:10px 16px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size:13.5px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;
-  }
-
   /* consent modal — this is the SITE asking before sending the user to TikTok's own screen */
   .modal-overlay{
     position:fixed; inset:0; background:rgba(10,12,18,0.45);
@@ -1123,14 +1035,12 @@
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">אחסון</span><span style="font-weight:700;">Vercel + GitHub</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">תשלומים</span><span style="font-weight:700;">PayPal · Apple Pay · Google Pay</span></div>
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">התחברות</span><span style="font-weight:700;">TikTok Login Kit</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">עוזר</span><span style="font-weight:700;">מקומי, חינמי</span></div>
       </div>
     </div>
 
     <div class="settings-card glass">
       <h3>📝 יומן שינויים</h3>
       <ul style="font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:6px; padding-inline-start:18px;">
-        <li>הוספת עוזר רצף (מקומי, חינמי)</li>
         <li>הוספת PWA — התקנה למסך הבית</li>
         <li>הוספת חנות ומחשבון מחיר</li>
         <li>הוספת התחברות TikTok + תשלומי PayPal</li>
@@ -1155,21 +1065,6 @@
 
 </div>
 
-<button type="button" class="ai-fab" id="aiFab" title="עוזר AI">🤖</button>
-
-<div class="ai-panel" id="aiPanel">
-  <div class="ai-panel-header">
-    <span>עוזר רצף</span>
-    <button type="button" id="aiClose">✕</button>
-  </div>
-  <div class="ai-messages" id="aiMessages">
-    <div class="ai-msg bot">שאלו אותי על חוקי הקבוצה, סטטוס, מנויים, חנות או ערעורים.</div>
-  </div>
-  <div class="ai-input-row">
-    <input type="text" id="aiInput" placeholder="שאלה...">
-    <button type="button" id="aiSend">שלח</button>
-  </div>
-</div>
 
 <button type="button" class="cart-fab" id="cartFab" title="עגלת קניות">
   🛒
@@ -1315,175 +1210,6 @@
     const el = document.getElementById('streakDays');
     if (el) el.textContent = dayCount;
   })();
-
-  // === AI assistant widget ===
-  const aiFab = document.getElementById('aiFab');
-  const aiPanel = document.getElementById('aiPanel');
-  const aiMessages = document.getElementById('aiMessages');
-  const aiInput = document.getElementById('aiInput');
-  const aiSend = document.getElementById('aiSend');
-
-  aiFab.addEventListener('click', () => aiPanel.classList.toggle('open'));
-  document.getElementById('aiClose').addEventListener('click', () => aiPanel.classList.remove('open'));
-
-  const AI_CONTEXT = `אתה עוזר AI באתר הרשמי של קבוצת TikTok בשם "רצף". יש לקבוצה אתר תמיכה משלה (האתר הזה שבו אתה נמצא), עם טאבים לסטטוס, חוקים, מנויים, בעלים ומנהלים, חנות, הגדרות, גיל ותנאים, ויצירת קשר — אפשר להפנות לשם כשרלוונטי. בטאב "הגדרות" אפשר לשנות מצב כהה/בהיר, צבע ראשי של האתר, ועוצמת אפקט הזכוכית. הבעלים של הקבוצה נקרא "הבאן המקורי", ו-shirel היא מנהלת. בראש העמוד מוצג מונה "רצף: X ימים" שעולה אוטומטית באחד כל יום.
-בטאב "חנות" אפשר לקנות (ולשלם ישירות דרך PayPal באתר): תג תורם (₪0.38), תג עשיר (₪3.75), לקבל ערעור (₪1.88), תג מנהל (חינם, מנהל בלבד), שינוי שם/תמונת קבוצה (₪3.75 חד פעמי), מחיקת הקבוצה (₪375), הקיק אנשים (₪187.5), להיות בעלים חדש (₪262.5), להיות מנהל בלי ניסיון (₪18.75 יכול לגרום לחסימה). גם מנויי הסרטון ומנויי רצף פלוס/פרימיום ניתנים לתשלום ישיר דרך PayPal בעמוד.
-אם מישהו מספר שקיבל אזהרה/סטטוס/באן ומסביר על מה — אל תסתפק בלהפנות אותו לבעלים ולא תגיד לו "אל תסמוך על ה-AI". תעזור לו בפועל: קודם תבדוק מול שלושת החוקים הרשמיים (ספאם, קללות כלפי היוצר/מנהלים/חברים, שינוי שם/תמונת הקבוצה, ואיסור הזכרת עזה/פלסטין/לבנון/איראן/עיראק) האם הסיבה שהוא מתאר בכלל תואמת חוק קיים. אם היא לא תואמת אף חוק רשמי — תגיד לו את זה בבירור וישירות (למשל: "זו לא סיבה שמופיעה בחוקי הקבוצה"), ועדיין תעזור לו לנסח ערעור קצר וברור שמסביר את זה, לשליחה ל"הבאן המקורי": מה קרה, מי נתן את הסטטוס, מתי, ולמה זה לא תואם אף חוק רשמי. אם הסיבה כן תואמת חוק אמיתי — תסביר את זה בכנות ותעזור לו לנסח ערעור שמביע הבנה/התנצלות ובקשה לבדיקה מחדש, בהתאם למה שהוא בוחר.
-אם מישהו מזכיר עצה או תשובה שקיבל מ-AI אחר (כמו Gemini/ChatGPT) לגבי סטטוס בקבוצה — תתייחס לתוכן שהוא מביא לגופו (תבדוק מול החוקים כמו למעלה), ולא תפטור אותו בביטול גורף על "אל תסמוך על AI".
-ענה בעברית, קצר וברור.
-מידע על הקבוצה:
-- מערכת סטטוס: 🟢 הכול טוב, 🟡 אזהרה ראשונה, 🟠 אזהרה שנייה (בסיכון), 🔴 אזהרה חמורה (בסכנה), ⚫ באן, ☠️ חסימה לצמיתות.
-- חוקים: 1) לא לספים. 2) לא לקלל את היוצר/מנהלים/חברים. 3) אסור לשנות שם או תמונה של הקבוצה. אסור להזכיר עזה/פלסטין/לבנון/איראן/עיראק.
-- החל מ-1.9.2026 שליחת סרטונים דורשת מנוי. יש שתי מערכות מנויים נפרדות:
-  (א) "מנוי סרטון" — קובע מה מותר לשלוח בכלל: מנוי סרטון רגיל (2.5₪/חודש, אפשר לשלוח סרטונים שלנו) או מנוי סרטון פלוס (5₪/חודש, אפשר לשלוח לייבים, סרטונים שלנו, וסרטונים של כולם). יש גם לוח הנחות תקופתי למנוי סרטון: 20–25 בינואר חינם, 1 באפריל המחיר עולה בשקל, 1–5 בספטמבר הנחה 50%, 25 בספטמבר הנחה 25%, 1–10 בנובמבר הנחה 11%.
-  (ב) מנויי "רצף פלוס" — הטבות קהילה נוספות (לא קשור ישירות להרשאת שליחת סרטונים):
-- מנוי "רצף פלוס 🔥": מקום נוסף לספאם, אפשרות לפרסום, ניתן לשנות שם, תג פלוס, תמיכה פלוס, שליחת סרטוני הקבוצה בלבד. מחירים: חודש ₪4.67, שנה ₪6.75 שבוע ₪1.86, 3 ימים ₪1.11, יום חינם (באישור בלבד).
-- מנוי "רצף פלוס פרימיום 🔥": שני מקומות לספאם, פרסום בסרטון, שינוי שם ותמונת קבוצה, תג פלוס פרימיום, תמיכה עם מנהל, שליחת כל סרטון (כולל לייבים וסרטונים אישיים). מחירים: חודש ₪6.75 שנה ₪7.5 שבוע ₪3.73, 3 ימים ₪2.23, 10 שעות חינם (באישור בלבד).
-- "מנוי מנהל": חינם, שמור למנהלים בלבד, כולל את כל הרשאות רצף פלוס פרימיום.
-- מנהלים מקבלים 1₪ הנחה על כל מנוי בתשלום. חברי צוות נבחרים (כמו shirel) מקבלים מנוי בחינם.
-- גיל כניסה: 15- כרגע, יעלה ל-16- ב-2027. חשוב: כתבו תמיד "15-" ו-"16-" בדיוק כך (מינוס אחרי המספר) — זה הסימון הרשמי של הקבוצה, גם אם זה נראה לא שגרתי. לעולם אל תכתבו "15+" או "16+".
-- קללה כלפי מנהל יכולה להוריד ישר לסיכון/סכנה/באן. אם מישהו מקלל בפרטי אבל הוא בקבוצה, המנהל שנפגע צריך להעביר הוכחות; אם מאומת, המקלל מקבל באן.
-אם שואלים משהו שלא קשור לקבוצה, ענה בקצרה ובאדיבות שאתה כאן בעיקר לעזור עם שאלות על רצף.`;
-
-  function localAnswer(question){
-    const t = question.toLowerCase();
-
-    if (/הבאן המקורי/.test(question)) {
-      return '🥚 You found an Easter egg! כל הכבוד שמצאת את זה. וגם — סוד קטן: החל מ-1 באוקטובר אין יותר צורך במנוי בשביל לשלוח סרטונים — אפשר לשלוח סרטונים בלי מנוי בכלל.';
-    }
-
-    if (/ערעור/.test(t)) {
-      return 'בשביל ערעור על סטטוס/אזהרה/באן: תכתוב הודעה ל"הבאן המקורי" (הבעלים) שכוללת — מה קרה, מי נתן את הסטטוס, מתי, ולמה לדעתך זו טעות או שאתה מצטער. בדוק קודם מול טאב "חוקים" אם הסיבה בכלל תואמת אחד משלושת החוקים הרשמיים (ספאם, קללות, שינוי שם/תמונה, הזכרת מדינות אסורות) — אם לא, זה שווה לציין בערעור.';
-    }
-    if (/באן|חסימה|⚫|☠️/.test(t)) {
-      return 'סולם הסטטוס: 🟢 הכול טוב → 🟡 אזהרה ראשונה → 🟠 בסיכון → 🔴 בסכנה → ⚫ באן → ☠️ חסימה לצמיתות. פרטים מלאים בטאב "סטטוס", כולל רשימת מי בבאן כרגע.';
-    }
-    if (/סטטוס|אזהר/.test(t)) {
-      return 'הסטטוס עולה לפי חומרת החריגה מהחוקים ולא מתאפס לבד — מנהל מטפל בכל שלב. הרשימה המלאה (🟢🟡🟠🔴⚫☠️) נמצאת בטאב "סטטוס".';
-    }
-    if (/חוק/.test(t)) {
-      return 'שלושת החוקים: 1) לא לספים. 2) לא לקלל את היוצר/מנהלים/חברים. 3) אסור לשנות שם/תמונת הקבוצה. בנוסף אסור להזכיר עזה/פלסטין/לבנון/איראן/עיראק. פירוט מלא בטאב "חוקים".';
-    }
-    if (/גיל/.test(t)) {
-      return 'גיל הכניסה כרגע: 15-. יעלה ל-16- ב-2027.';
-    }
-    if (/לייב|כולם|סרטונים שלנו|מנוי סרטון/.test(t)) {
-      return 'מנוי סרטון רגיל (2.5₪/חודש): רק "אפשר לשלוח סרטונים שלנו". מנוי סרטון פלוס (5₪/חודש): גם לייבים, גם סרטונים שלנו, גם סרטונים של כולם. יש גם לוח הנחות עונתי — בטאב "מנויים".';
-    }
-    if (/רצף פלוס|פרימיום|ספאם|תג פלוס/.test(t)) {
-      return 'רצף פלוס 🔥: מקום נוסף לספאם, פרסום, שינוי שם, תג פלוס, תמיכה פלוס (חודש ₪4.67). רצף פלוס פרימיום 🔥: שני מקומות לספאם, שינוי שם+תמונה, תג פרימיום, תמיכה עם מנהל, כל הסרטונים (חודש ₪6.75). פירוט מלא בטאב "מנויים".';
-    }
-    if (/מנוי|מחיר|תשלום|לשלם/.test(t)) {
-      return 'יש כמה סוגי מנוי: מנוי סרטון (רגיל/פלוס), רצף פלוס ופרימיום, ומנוי מנהל (חינם, למנהלים בלבד). כל הפרטים והמחירים בטאב "מנויים".';
-    }
-    if (/חנות|לקנות|תג תורם|תג עשיר|קיק|למחוק/.test(t)) {
-      return 'בטאב "חנות" אפשר לקנות: תג תורם (₪0.38), תג עשיר (₪3.75), ערעור (₪1.88), תג מנהל (חינם, מנהל בלבד), שינוי שם/תמונה (₪3.75), מחיקת קבוצה (₪375), הקיק (₪187.5), בעלים חדש (₪262.5), מנהל בלי ניסיון (₪18.75 ⚠️ מסוכן).';
-    }
-    if (/מנהל|בעלים|shirel|שירל/.test(t)) {
-      return 'הבעלים: "הבאן המקורי" 👑. shirel היא מנהלת 🛡️. רשימה מעודכנת בטאב "בעלים ומנהלים".';
-    }
-    if (/רצף\b.*ימים|כמה ימים|סטריק/.test(t)) {
-      return 'המונה "🔥 רצף: X ימים" בראש העמוד עולה אוטומטית באחד כל יום.';
-    }
-    if (/הגדרות|צבע|כהה|בהיר|שפה|english/.test(t)) {
-      return 'בטאב "הגדרות" אפשר לשנות מצב כהה/בהיר, צבע ראשי של האתר, עוצמת אפקט הזכוכית, גודל טקסט, ואפילו את שפת הניווט (עברית/English).';
-    }
-    if (/paypal|תשלום|לשלם|כרטיס אשראי|apple pay|google pay/.test(t)) {
-      return 'תשלום מתבצע דרך PayPal ישירות באתר — לוחצים "🛒 קנה" על כל פריט/מנוי. Apple Pay ו-Google Pay מופיעים אוטומטית אם הם זמינים במכשיר שלכם.';
-    }
-    if (/עגלה|cart/.test(t)) {
-      return 'העיגול 🛒 בפינה התחתונה הוא עגלת קניות — לוחצים "➕ הוסף לעגלה" על כל פריט, ואז "💳 לתשלום" בעגלה כדי לשלם על הכול יחד ב-PayPal אחד.';
-    }
-    if (/tiktok|טיקטוק/.test(t)) {
-      return 'ההתחברות עם TikTok מבקשת רק את השם הציבורי והתמונה שלכם — אין לה גישה לפרסום, הודעות, עוקבים או כל פעולה בחשבון. לוחצים על העיגול/הכפתור בראש העמוד כדי להתחבר.';
-    }
-    if (/קשר|תמיכה|עזרה|בעיה/.test(t)) {
-      return 'לתמיכה או דיווח על בעיה, לחצו על "✉️ עלי לפנות לתמיכה" בעמוד הבית או בטאב "יצירת קשר" — זה פותח הודעה פרטית ל-TikTok שלנו.';
-    }
-    if (/רצף\b(?!.*ימים)|מה זה האתר|על מה האתר/.test(t)) {
-      return 'רצף הוא קבוצת TikTok, והאתר הזה הוא בית התמיכה הרשמי שלה — חוקים, סטטוס, מנויים, חנות והתחברות, במקום אחד.';
-    }
-    return 'הנה סיכום מהיר על רצף: 🟢🟡🟠🔴⚫☠️ סולם סטטוס לפי חומרת חריגה מהחוקים. 3 חוקי בסיס — לא לספים, לא לקלל, לא לשנות שם/תמונת קבוצה — ואיסור הזכרת מדינות מסוימות. גיל כניסה 15-, יעלה ל-16- ב-2027. מנוי סרטון (רגיל/פלוס) קובע מה מותר לשלוח; רצף פלוס/פרימיום נותנים הטבות קהילה נוספות. הבעלים: "הבאן המקורי", ו-shirel מנהלת. חנות עם תגים ושירותים שונים, כולם משולמים דרך PayPal. לפירוט מלא על כל נושא — פשוט תשאלו עליו ישירות, או עברו לטאב המתאים למעלה.';
-  }
-
-  function addMessage(text, cls){
-    const div = document.createElement('div');
-    div.className = `ai-msg ${cls}`;
-    div.textContent = text;
-    aiMessages.appendChild(div);
-    aiMessages.scrollTop = aiMessages.scrollHeight;
-    return div;
-  }
-
-  let aiHistory = [];
-
-  async function sendAiMessage(){
-    const text = aiInput.value.trim();
-    if (!text) return;
-    aiInput.value = '';
-    addMessage(text, 'user');
-    aiHistory.push({ role: 'user', content: text });
-    const loadingEl = addMessage('...', 'bot loading');
-
-    try {
-      const res = await fetch(`${PAYPAL_API_BASE_URL}/api/claude-chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ system: AI_CONTEXT, messages: aiHistory }),
-      });
-      const data = await res.json();
-      if (res.ok && data.reply) {
-        loadingEl.textContent = data.reply;
-        loadingEl.classList.remove('loading');
-        aiHistory.push({ role: 'assistant', content: data.reply });
-      } else {
-        console.warn('Claude API not available, using local fallback:', data.error);
-        const reply = localAnswer(text);
-        loadingEl.textContent = reply;
-        loadingEl.classList.remove('loading');
-        aiHistory.pop(); // don't keep the failed turn in history sent to the real API
-      }
-    } catch (err) {
-      console.warn('Claude API request failed, using local fallback:', err);
-      const reply = localAnswer(text);
-      loadingEl.textContent = reply;
-      loadingEl.classList.remove('loading');
-      aiHistory.pop();
-    }
-  }
-
-  aiSend.addEventListener('click', sendAiMessage);
-  aiInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendAiMessage(); });
-
-  // === banned users — עדכנו את הרשימה הזו ידנית לפי הצורך ===
-  const BANNED_USERS = [
-    // "username1",
-    // "username2",
-  ];
-
-  (function renderBannedList(){
-    const listEl = document.getElementById('bannedNames');
-    const emptyEl = document.getElementById('bannedEmpty');
-    if (BANNED_USERS.length === 0) {
-      emptyEl.style.display = 'block';
-      return;
-    }
-    BANNED_USERS.forEach(name => {
-      const li = document.createElement('li');
-      li.textContent = `@${name}`;
-      li.style.padding = '8px 12px';
-      li.style.borderRadius = '10px';
-      li.style.background = 'rgba(239,68,68,.08)';
-      li.style.color = '#b91c1c';
-      li.style.fontWeight = '600';
-      listEl.appendChild(li);
-    });
-  })();
-
-  document.getElementById('bannedToggleBtn').addEventListener('click', function(){
-    const panel = document.getElementById('bannedList');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-  });
 
   // === language toggle (EN/HE) — headings & nav translated, detailed body text stays Hebrew ===
   const I18N = {

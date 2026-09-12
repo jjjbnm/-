@@ -449,7 +449,7 @@
     try{
       const response=await fetch('/api/access-check',{cache:'no-store'});
       const data=await response.json().catch(()=>({}));
-      if(response.status===403 || data.error==='region_not_allowed'){ block('RETZEF_REGION_NOT_ALLOWED','האתר זמין למבקרים מישראל בלבד.'); return; }
+      if(response.status===403 && data.error==='vpn_detected'){ block('RETZEF_VPN_DETECTED','זוהה VPN, Proxy או רשת מארחת. כבו את ה-VPN ונסו שוב.'); return; } if(response.status===403 || data.error==='region_not_allowed'){ block('RETZEF_REGION_NOT_ALLOWED','האתר זמין למבקרים מישראל בלבד.'); return; }
       if(!response.ok || data.allowed!==true){ block('RETZEF_REGION_CHECK_FAILED','לא ניתן לאמת את אזור החיבור. נסו שוב מאוחר יותר.'); }
     }catch(e){ block('RETZEF_REGION_CHECK_FAILED','לא ניתן לאמת את אזור החיבור. נסו שוב מאוחר יותר.'); }
   }

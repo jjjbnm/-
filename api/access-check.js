@@ -2,34 +2,31 @@ const GEO_TIMEOUT_MS = 5000;
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ allowed: false, error: 'method_not_allowed' });
-
+  res.setHeader('Cache-Control', 'no-store');
   try {
     const vercelCountry = String(req.headers['x-vercel-ip-country'] || '').toUpperCase();
-    if (vercelCountry) {
-      res.setHeader('Cache-Control', 'no-store');
-      if (vercelCountry !== 'IL') return res.status(403).json({ allowed: false, error: 'region_not_allowed', countryCode: vercelCountry });
-      return res.status(200).json({ allowed: true, countryCode: 'IL' });
-    }
     const forwarded = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || '';
     const clientIp = String(forwarded).split(',')[0].trim() || String(req.socket?.remoteAddress || '').trim();
     if (!clientIp) return res.status(503).json({ allowed: false, error: 'client_ip_unknown' });
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), GEO_TIMEOUT_MS);
-    const response = await fetch(`https://ipapi.co/${encodeURIComponent(clientIp)}/json/`, {
+    const response = await fetch(`https://ipwho.is/${encodeURIComponent(clientIp)}`, {
       headers: { Accept: 'application/json', 'User-Agent': 'retzef-support-access-check/1.0' },
       signal: controller.signal,
     });
     clearTimeout(timeout);
     if (!response.ok) throw new Error(`geo_provider_${response.status}`);
     const geo = await response.json();
-    const countryCode = String(geo.country_code || '').toUpperCase();
-    if (!countryCode) throw new Error('country_unknown');
-
-    res.setHeader('Cache-Control', 'no-store');
-    if (countryCode !== 'IL') {
-      return res.status(403).json({ allowed: false, error: 'region_not_allowed', countryCode });
+    if (geo.success === false) throw new Error('geo_provider_failed');
+    const security = geo.security || {};
+    if (security.vpn || security.proxy || security.tor || security.hosting) {
+      return res.status(403).json({ allowed: false, error: 'vpn_detected', countryCode: String(geo.country_code || vercelCountry || '').toUpperCase() });
     }
-    return res.status(200).json({ allowed: true, countryCode: 'IL' });
+    const countryCode = String(geo.country_code || vercelCountry || '').toUpperCase();
+    if (!countryCode) return res.status(503).json({ allowed: false, error: 'country_unknown' });
+    if (countryCode !== 'IL') return res.status(403).json({ allowed: false, error: 'region_not_allowed', countryCode });
+    return res.status(200).json({ allowed: true, countryCode: 'IL', vpnDetected: false });
   } catch (error) {
     return res.status(503).json({ allowed: false, error: 'region_check_failed' });
   }

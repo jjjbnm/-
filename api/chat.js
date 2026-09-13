@@ -17,6 +17,7 @@ module.exports = async (req, res) => {
     const myProfile = await profile(me); if ((myProfile?.blockedUsers || []).includes(other) || (otherProfile.blockedUsers || []).includes(me)) return res.status(403).json({ error: 'user_blocked' });
     const privilegedSender = ['ban.real', 'user613987579196'].includes(me);
     if (req.method === 'POST' && String(input.callAction || '')) {
+      const approved = await redis('sismember', `retzef:chat:accepted:${me}`, other); if (Number(approved) !== 1 && approved !== true) return res.status(403).json({ error: 'chat_not_approved' });
       const callAction = String(input.callAction); if (!voiceAllowed(myProfile, otherProfile)) return res.status(403).json({ error: 'voice_requires_13_or_trusted_contact' });
       const callId = String(input.callId || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80); if (!callId) return res.status(400).json({ error: 'call_id_required' });
       const event = JSON.stringify({ callId, action: callAction, from: me, to: other, data: input.data || null, createdAt: new Date().toISOString() }); await redis('lpush', `retzef:call:${other}`, event); await redis('ltrim', `retzef:call:${other}`, '0', '49'); if (['invite','answer','reject','end'].includes(callAction)) try { await sendTo(other, { title: callAction === 'invite' ? 'שיחה קולית נכנסת' : 'עדכון שיחה קולית', body: callAction === 'invite' ? `@${me} מתקשר/ת אליך` : 'פתחו את הצ׳אט לצפייה', url: '/' }); } catch (_) {} return res.status(201).json({ sent: true, event: JSON.parse(event) });

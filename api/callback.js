@@ -81,7 +81,7 @@ module.exports = async (req, res) => {
       role: resolveRole(username),
     });
     try {
-      await saveProfile(username, { username, displayName, avatarUrl: user.avatar_url || '', role: resolveRole(username), accountCountry, loginCountry });
+      await saveProfile(username, { ...(existingProfile || {}), username, displayName, avatarUrl: user.avatar_url || '', role: resolveRole(username), age: Number(joinRequest?.age || existingProfile?.age || 0), accountCountry, loginCountry, banned: false, banReason: '' });
     } catch (storageError) {
       console.error('Profile storage unavailable; continuing login:', storageError.message);
     }

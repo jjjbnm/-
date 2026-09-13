@@ -23,6 +23,7 @@ async function saveProfile(username, profile) {
   if (!response.ok) throw new Error('profile_storage_error');
 }
 async function getProfile(username) { const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL; const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN; if (!url || !token) return null; const r = await fetch(`${url}/get/${encodeURIComponent(`retzef:profile:${username.toLowerCase()}`)}`, { headers: { Authorization: `Bearer ${token}` } }); const d = await r.json(); return d.result ? (typeof d.result === 'string' ? JSON.parse(d.result) : d.result) : null; }
+async function getJoinRequest(username) { const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL; const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN; if (!url || !token) return null; const r = await fetch(`${url}/lrange/retzef%3Ajoin%3Arequests/0/199`, { headers: { Authorization: `Bearer ${token}` } }); const d = await r.json(); return (d.result || []).map(x => { try { return typeof x === 'string' ? JSON.parse(x) : x; } catch (_) { return null; } }).find(x => x && String(x.username || '').toLowerCase() === String(username || '').toLowerCase()) || null; }
 
 module.exports = async (req, res) => {
   const { code, error: tiktokError } = req.query;
@@ -65,6 +66,8 @@ module.exports = async (req, res) => {
     const username = user.username || displayName || user.open_id || '';
     const existingProfile = await getProfile(username);
     if (existingProfile?.banned === true) return res.redirect(302, `/?tiktok_error=${encodeURIComponent('account_banned')}&ban_reason=${encodeURIComponent(existingProfile.banReason || 'החשבון נחסם')}`);
+    const joinRequest = await getJoinRequest(username);
+    if (joinRequest && joinRequest.status !== 'approved') return res.redirect(302, `/?tiktok_error=${encodeURIComponent(joinRequest.status === 'denied' ? 'join_denied' : 'join_pending')}&ban_reason=${encodeURIComponent(joinRequest.reason || 'יש להמתין לאישור הבאן המקורי')}`);
     // TikTok Login Kit does not normally expose the account's country or IP.
     // Keep any optional country field only if TikTok ever returns one, and record
     // the country of the IP used during this login separately.

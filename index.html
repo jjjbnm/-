@@ -1433,7 +1433,7 @@
       }
     } else if (params.get('tiktok_error')) {
       const statusEl2 = document.getElementById('tiktokAuthStatus');
-      statusEl2.textContent = params.get('tiktok_error') === 'account_banned' ? '🚫 החשבון נחסם. ' + (params.get('ban_reason') || 'אין אפשרות להתחבר או לצפות בתוכן המוגן.') : 'ההתחברות נכשלה (' + params.get('tiktok_error') + '), נסו שוב.';
+      const loginError=params.get('tiktok_error'); statusEl2.textContent = loginError === 'account_banned' ? '🚫 החשבון נחסם. ' + (params.get('ban_reason') || 'אין אפשרות להתחבר או לצפות בתוכן המוגן.') : loginError === 'join_pending' ? '⏳ החשבון ממתין לאישור הבאן המקורי.' : loginError === 'join_denied' ? '🚫 בקשת ההצטרפות נדחתה. ' + (params.get('ban_reason') || '') : 'ההתחברות נכשלה (' + loginError + '), נסו שוב.';
       statusEl2.style.display = 'block';
     }
     if (params.has('tiktok_ok') || params.has('tiktok_error') || params.has('username') || params.has('avatar') || params.has('role')) {

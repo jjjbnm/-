@@ -5,15 +5,22 @@ const cfg = () => ({ url: process.env.KV_REST_API_URL || process.env.UPSTASH_RED
 async function redis(command, ...args) { const { url, token } = cfg(); if (!url || !token) throw new Error('storage_not_configured'); const r = await fetch(`${url}/${command}/${args.map(encodeURIComponent).join('/')}`, { headers: { Authorization: `Bearer ${token}` } }); const d = await r.json(); if (!r.ok || d.error) throw new Error(d.error || 'storage_error'); return d.result; }
 async function profile(username) { const raw = await redis('get', `retzef:profile:${username}`); return raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null; }
 function key(a, b) { return `retzef:chat:${[a, b].sort().join(':')}`; }
+function voiceAllowed(a, b) { const ageA = Number(a.age || 0), ageB = Number(b.age || 0); const safeA = a.safeContacts || {}, safeB = b.safeContacts || {}; return (ageA >= 13 && ageB >= 13) || ['safe','family'].includes(safeA[b.username]) || ['safe','family'].includes(safeB[a.username]); }
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store'); const me = cookie(req, 'retzef_profile_id'); if (!me) return res.status(401).json({ error: 'tiktok_login_required' });
   try {
     const input = req.method === 'POST' ? body(req) : req.query; const other = String(input.username || '').replace(/^@/, '').toLowerCase();
+    if (req.method === 'GET' && String(input.callInbox || '') === '1') { const rows = await redis('lrange', `retzef:call:${me}`, '0', '49'); return res.status(200).json({ events: (rows || []).reverse().map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) }); }
     if (req.method === 'GET' && String(input.inbox || '') === '1') { const rows = await redis('lrange', `retzef:inbox:${me}`, '0', '99'); return res.status(200).json({ messages: (rows || []).reverse().map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean), inbox: true }); }
     if (!other || other === me) return res.status(400).json({ error: 'user_required' });
     const otherProfile = await profile(other); if (!otherProfile) return res.status(404).json({ error: 'user_not_found' });
     const myProfile = await profile(me); if ((myProfile?.blockedUsers || []).includes(other) || (otherProfile.blockedUsers || []).includes(me)) return res.status(403).json({ error: 'user_blocked' });
     const privilegedSender = ['ban.real', 'user613987579196'].includes(me);
+    if (req.method === 'POST' && String(input.callAction || '')) {
+      const callAction = String(input.callAction); if (!voiceAllowed(myProfile, otherProfile)) return res.status(403).json({ error: 'voice_requires_13_or_trusted_contact' });
+      const callId = String(input.callId || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80); if (!callId) return res.status(400).json({ error: 'call_id_required' });
+      const event = JSON.stringify({ callId, action: callAction, from: me, to: other, data: input.data || null, createdAt: new Date().toISOString() }); await redis('lpush', `retzef:call:${other}`, event); await redis('ltrim', `retzef:call:${other}`, '0', '49'); if (['invite','answer','reject','end'].includes(callAction)) try { await sendTo(other, { title: callAction === 'invite' ? 'שיחה קולית נכנסת' : 'עדכון שיחה קולית', body: callAction === 'invite' ? `@${me} מתקשר/ת אליך` : 'פתחו את הצ׳אט לצפייה', url: '/' }); } catch (_) {} return res.status(201).json({ sent: true, event: JSON.parse(event) });
+    }
     if (req.method === 'POST' && input.inbox === true) {
       if (!privilegedSender) return res.status(403).json({ error: 'inbox_read_only' });
       const message = String(input.message || '').trim().slice(0, 2000); if (!message) return res.status(400).json({ error: 'message_required' });

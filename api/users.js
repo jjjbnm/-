@@ -79,6 +79,7 @@ module.exports = async (req, res) => {
     if (action === 'mute' || action === 'unmute') {
       const muted = new Set(Array.isArray(mine.mutedUsers) ? mine.mutedUsers : []); if (action === 'mute') muted.add(target); else muted.delete(target); mine.mutedUsers = [...muted]; await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ muted: action === 'mute', username: target });
     }
+    if (action === 'relationship') { const relationship = ['safe','family',''].includes(String(input.relationship || '')) ? String(input.relationship || '') : null; if (relationship === null) return res.status(400).json({ error: 'invalid_relationship' }); mine.safeContacts = { ...(mine.safeContacts || {}) }; if (relationship) mine.safeContacts[target] = relationship; else delete mine.safeContacts[target]; await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ username: target, relationship: relationship || null }); }
     if (action === 'request') {
       if ((mine.blockedUsers || []).includes(target)) return res.status(403).json({ error: 'user_blocked' });
       const targetProfile = await profile(target); if ((targetProfile.blockedUsers || []).includes(me)) return res.status(403).json({ error: 'user_blocked' });

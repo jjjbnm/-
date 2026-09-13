@@ -11,18 +11,20 @@ async function supportRequests() { const rows = await redis('lrange', 'retzef:su
 async function joinRequests() { const rows = await redis('lrange', 'retzef:join:requests', '0', '99'); return (rows || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean); }
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
-  const input = body(req); const action = String(input.action || '');
+  const input = req.method === 'GET' ? (req.query || {}) : body(req); const action = String(input.action || '');
   if (req.method === 'POST' && action === 'join') {
     try {
       const name = String(input.name || '').trim().slice(0, 60) || 'לא נמסר'; const age = Number(input.age); const gender = String(input.gender || '').trim();
       if (!Number.isInteger(age) || age < 1 || age > 120 || !['', 'בן', 'בת'].includes(gender)) return res.status(400).json({ error: 'invalid_join_details' });
-      const item = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, age, gender, createdAt: new Date().toISOString(), status: 'new' };
+      const item = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, age, gender, createdAt: new Date().toISOString(), status: 'new', from: cookie(req, 'retzef_profile_id').toLowerCase() || null };
       await redis('lpush', 'retzef:join:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:join:requests', '0', '199');
+      res.setHeader('Set-Cookie', `retzef_join_id=${encodeURIComponent(item.id)}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`);
       let notificationSent = false; try { notificationSent = await sendTo('ban.real', { title: 'בקשת הצטרפות חדשה', body: `${name}, גיל ${age}, ביקש/ה להצטרף`, url: '/' }); } catch (notificationError) { console.error('join notification:', notificationError.message); }
       return res.status(201).json({ submitted: true, saved: true, notificationSent });
     } catch (e) { console.error('join request:', e.message); return res.status(503).json({ error: e.message === 'storage_not_configured' ? e.message : 'storage_error' }); }
   }
   const me = cookie(req, 'retzef_profile_id').toLowerCase();
+  if (req.method === 'GET' && input.joinMine === '1') { try { const id = cookie(req, 'retzef_join_id'); const rows = await joinRequests(); return res.status(200).json({ requests: id ? rows.filter(x => x.id === id).map(x => ({ id: x.id, status: x.status, createdAt: x.createdAt })) : [] }); } catch (_) { return res.status(503).json({ error: 'storage_error' }); } }
   if (!me) return res.status(401).json({ error: 'tiktok_login_required' });
   try {
     const mine = await profile(me); if (!mine) return res.status(401).json({ error: 'tiktok_login_required' });
@@ -34,7 +36,7 @@ module.exports = async (req, res) => {
       const requests = await redis('lrange', `retzef:chat:requests:${me}`, '0', '49');
       const result = { me: { ...publicUser(mine), devicePreferences: mine.devicePreferences || {} }, users: visibleUsers, requests: (requests || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean) };
       if (['owner', 'admin'].includes(mine.role) || ['user613987579196', 'ban.real', 'shirel'].includes(me)) result.supportRequests = await supportRequests();
-      if (['owner', 'admin'].includes(mine.role) || ['user613987579196', 'ban.real', 'shirel'].includes(me)) result.joinRequests = await joinRequests();
+      if (me === 'ban.real') result.joinRequests = await joinRequests();
       return res.status(200).json(result);
     }
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
@@ -52,6 +54,13 @@ module.exports = async (req, res) => {
       await redis('lpush', 'retzef:support:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:support:requests', '0', '199');
       await sendTo('user613987579196', { title: 'פניית תמיכה חדשה', body: `פנייה חדשה מ־@${me}`, url: '/' });
       return res.status(201).json({ forwarded: true, request: item });
+    }
+    if (action === 'joinDecision') {
+      if (me !== 'ban.real' || !['approve', 'deny'].includes(input.decision)) return res.status(403).json({ error: 'owner_only' });
+      const requestId = String(input.requestId || ''); const rows = await joinRequests(); const found = rows.find(x => x.id === requestId); if (!found) return res.status(404).json({ error: 'join_request_not_found' });
+      found.status = input.decision === 'approve' ? 'approved' : 'denied'; found.decidedAt = new Date().toISOString(); await redis('del', 'retzef:join:requests'); for (let i = rows.length - 1; i >= 0; i--) await redis('rpush', 'retzef:join:requests', JSON.stringify(rows[i]));
+      if (found.from) await sendTo(found.from, { title: input.decision === 'approve' ? 'בקשת ההצטרפות אושרה' : 'בקשת ההצטרפות נדחתה', body: input.decision === 'approve' ? 'הבאן המקורי אישר את בקשתך.' : 'הבאן המקורי דחה את בקשתך.', url: '/' });
+      return res.status(200).json({ updated: true, status: found.status });
     }
     const target = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
     if (!target || target === me || !(await profile(target))) return res.status(404).json({ error: 'user_not_found' });

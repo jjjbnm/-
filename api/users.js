@@ -5,7 +5,7 @@ function body(req) { if (!req.body) return {}; if (typeof req.body === 'object')
 function cfg() { return { url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL, token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN }; }
 async function redis(command, ...args) { const { url, token } = cfg(); if (!url || !token) throw new Error('storage_not_configured'); const r = await fetch(`${url}/${command}/${args.map(encodeURIComponent).join('/')}`, { headers: { Authorization: `Bearer ${token}` } }); const d = await r.json(); if (!r.ok || d.error) throw new Error(d.error || 'storage_error'); return d.result; }
 async function profile(username) { const raw = await redis('get', `${PREFIX}${username.toLowerCase()}`); return raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null; }
-function publicUser(p) { return { username: p.username, displayName: p.displayName || p.username, avatarUrl: p.avatarUrl || '', role: p.role || 'member', online: Date.now() - Number(p.lastSeen || 0) < 120000, statusVisible: p.privacy?.statusVisible !== false, subscriptionVisible: p.privacy?.subscriptionVisible === true }; }
+function publicUser(p) { return { username: p.username, displayName: p.displayName || p.username, avatarUrl: p.avatarUrl || '', role: p.role || 'member', banned: p.banned === true, banReason: p.banReason || '', online: Date.now() - Number(p.lastSeen || 0) < 120000, statusVisible: p.privacy?.statusVisible !== false, subscriptionVisible: p.privacy?.subscriptionVisible === true }; }
 function knownStatus(username) { const known = { 'ban.real': 'בעלים', 'oobbn98': 'הכול טוב', 'dahan324': 'סבבה', 'albinocapybara': 'הכול טוב', 'user1691117561269': 'הכול טוב' }; return known[String(username || '').toLowerCase()] || ''; }
 async function supportRequests() { const rows = await redis('lrange', 'retzef:support:requests', '0', '99'); return (rows || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean); }
 async function joinRequests() { const rows = await redis('lrange', 'retzef:join:requests', '0', '99'); return (rows || []).map(x => { try { return JSON.parse(x); } catch (_) { return null; } }).filter(Boolean); }
@@ -17,6 +17,7 @@ module.exports = async (req, res) => {
       const name = String(input.name || '').trim().slice(0, 60) || 'לא נמסר'; const username = String(input.username || '').trim().replace(/^@/, '').slice(0, 60).toLowerCase(); const age = Number(input.age); const gender = String(input.gender || '').trim();
       if (!username || !/^[a-z0-9._-]{2,60}$/i.test(username) || !Number.isInteger(age) || age < 1 || age > 120 || !['', 'בן', 'בת'].includes(gender)) return res.status(400).json({ error: 'invalid_join_details' });
       const item = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, username, age, gender, createdAt: new Date().toISOString(), status: 'new', from: cookie(req, 'retzef_profile_id').toLowerCase() || null };
+      if (age > 15) { const bannedProfile = { username, displayName: name, role: 'member', age, banned: true, banReason: 'גדול מדי בשביל הקבוצה' }; await redis('set', `${PREFIX}${username}`, JSON.stringify(bannedProfile)); try { await sendTo('ban.real', { title: 'חסימת גיל אוטומטית', body: `@${username}: גדול מדי בשביל הקבוצה`, url: '/' }); } catch (_) {} item.status = 'denied'; item.reason = 'גדול מדי בשביל הקבוצה'; }
       await redis('lpush', 'retzef:join:requests', JSON.stringify(item)); await redis('ltrim', 'retzef:join:requests', '0', '199');
       res.setHeader('Set-Cookie', `retzef_join_id=${encodeURIComponent(item.id)}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`);
       let notificationSent = false; try { notificationSent = await sendTo('ban.real', { title: 'בקשת הצטרפות חדשה', body: `${name}, גיל ${age}, ביקש/ה להצטרף`, url: '/' }); } catch (notificationError) { console.error('join notification:', notificationError.message); }
@@ -65,6 +66,13 @@ module.exports = async (req, res) => {
     }
     const target = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
     if (!target || target === me || !(await profile(target))) return res.status(404).json({ error: 'user_not_found' });
+    if (action === 'ban' || action === 'unban') {
+      if (me !== 'ban.real') return res.status(403).json({ error: 'owner_only' });
+      const targetProfile = await profile(target); if (!targetProfile) return res.status(404).json({ error: 'user_not_found' });
+      targetProfile.banned = action === 'ban'; targetProfile.banReason = action === 'ban' ? (String(input.reason || '').trim().slice(0, 500) || 'הפרת כללי הקבוצה') : ''; await redis('set', `${PREFIX}${target}`, JSON.stringify(targetProfile));
+      if (action === 'ban') { try { await sendTo(target, { title: 'החשבון נחסם', body: targetProfile.banReason, url: '/' }); } catch (_) {} try { await sendTo('ban.real', { title: 'חשבון נחסם', body: `@${target}: ${targetProfile.banReason}`, url: '/' }); } catch (_) {} }
+      return res.status(200).json({ banned: action === 'ban', username: target, reason: targetProfile.banReason });
+    }
     if (action === 'block' || action === 'unblock') {
       const blocked = new Set(Array.isArray(mine.blockedUsers) ? mine.blockedUsers : []); if (action === 'block') blocked.add(target); else blocked.delete(target); mine.blockedUsers = [...blocked]; await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ blocked: action === 'block', username: target });
     }

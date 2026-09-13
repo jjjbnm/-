@@ -26,6 +26,7 @@ module.exports = async (req, res) => {
     const profileRaw = await kv('get', `retzef:profile:${username.toLowerCase()}`);
     const profile = typeof profileRaw === 'string' ? JSON.parse(profileRaw) : profileRaw;
     if (!profile) return res.status(404).json({ error: 'profile_not_found' });
+    if (profile.banned === true) { res.setHeader('Set-Cookie', 'retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax; Secure'); return res.status(403).json({ error: 'account_banned', reason: profile.banReason || 'החשבון נחסם' }); }
     profile.lastSeen = Date.now();
     await kv('set', `retzef:profile:${username.toLowerCase()}`, JSON.stringify(profile));
     return res.status(200).json({ profile });

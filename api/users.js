@@ -85,22 +85,6 @@ module.exports = async (req, res) => {
       if (found.from) await sendTo(found.from, { title: input.decision === 'approve' ? 'בקשת ההצטרפות אושרה' : 'בקשת ההצטרפות נדחתה', body: input.decision === 'approve' ? 'הבאן המקורי אישר את בקשתך.' : `הבקשה נדחתה: ${reason}`, url: '/' });
       return res.status(200).json({ updated: true, status: found.status });
     }
-    if (action === 'giftCodeCreate') {
-      if (!['owner', 'admin'].includes(String(mine.role || ''))) return res.status(403).json({ error: 'admin_only' });
-      const code = String(input.code || '').trim().toUpperCase();
-      const amount = Math.floor(Number(input.amount));
-      const maxUses = Math.floor(Number(input.maxUses || 1));
-      const expiresAt = input.expiresAt ? new Date(input.expiresAt).toISOString() : '';
-      if (!/^[A-Z0-9_-]{4,32}$/.test(code)) return res.status(400).json({ error: 'invalid_code' });
-      if (!Number.isInteger(amount) || amount < 1 || amount > 100000) return res.status(400).json({ error: 'invalid_amount' });
-      if (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 100000) return res.status(400).json({ error: 'invalid_max_uses' });
-      if (expiresAt && Number.isNaN(Date.parse(expiresAt))) return res.status(400).json({ error: 'invalid_expiry' });
-      const key = `retzef:gift:${code}`;
-      if (await redis('get', key)) return res.status(409).json({ error: 'code_exists' });
-      const gift = { code, amount, maxUses, uses: 0, usedBy: [], expiresAt, createdBy: me, createdAt: new Date().toISOString() };
-      await redis('set', key, JSON.stringify(gift));
-      return res.status(201).json({ gift });
-    }
     if (action === 'giftCodeRedeem') {
       const code = String(input.code || '').trim().toUpperCase();
       if (!/^[A-Z0-9_-]{4,32}$/.test(code)) return res.status(400).json({ error: 'invalid_code' });

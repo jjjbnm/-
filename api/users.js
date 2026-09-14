@@ -85,6 +85,28 @@ module.exports = async (req, res) => {
       if (found.from) await sendTo(found.from, { title: input.decision === 'approve' ? 'בקשת ההצטרפות אושרה' : 'בקשת ההצטרפות נדחתה', body: input.decision === 'approve' ? 'הבאן המקורי אישר את בקשתך.' : `הבקשה נדחתה: ${reason}`, url: '/' });
       return res.status(200).json({ updated: true, status: found.status });
     }
+    if (action === 'walletDonate') {
+      const recipient = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
+      const amount = Math.floor(Number(input.amount));
+      const reason = String(input.reason || 'תרומה').trim().slice(0, 160) || 'תרומה';
+      if (!/^[a-z0-9._-]{2,128}$/.test(recipient) || recipient === me) return res.status(400).json({ error: 'invalid_recipient' });
+      if (!Number.isInteger(amount) || amount < 1 || amount > 100000) return res.status(400).json({ error: 'invalid_amount' });
+      const targetProfile = await profile(recipient);
+      if (!targetProfile || targetProfile.banned === true) return res.status(404).json({ error: 'recipient_not_found' });
+      const senderWallet = walletOf(mine);
+      if (senderWallet.balance < amount) return res.status(400).json({ error: 'insufficient_coins', balance: senderWallet.balance });
+      const recipientWallet = walletOf(targetProfile);
+      const now = new Date().toISOString();
+      senderWallet.balance -= amount;
+      senderWallet.transactions.unshift({ type: 'donate', amount: -amount, reason: `תרומה ל־@${recipient}: ${reason}`, to: recipient, createdAt: now });
+      recipientWallet.balance += amount;
+      recipientWallet.transactions.unshift({ type: 'donation', amount, reason: `תרומה מ־@${me}: ${reason}`, from: me, createdAt: now });
+      mine.wallet = senderWallet; targetProfile.wallet = recipientWallet;
+      await redis('set', `${PREFIX}${me}`, JSON.stringify(mine));
+      await redis('set', `${PREFIX}${recipient}`, JSON.stringify(targetProfile));
+      try { await sendTo(recipient, { title: 'קיבלת תרומה בארנק', body: `קיבלת ${amount} מטבעות מ־@${me}`, url: '/' }); } catch (_) {}
+      return res.status(200).json({ wallet: senderWallet, recipient });
+    }
     if (action === 'walletSpend') { const reason = String(input.reason || 'רכישה באתר').trim().slice(0, 160); if (/^תג/.test(reason)) return res.status(400).json({ error: 'badges_not_available_with_coins' }); const amount = Math.floor(Number(input.amount)); if (!Number.isInteger(amount) || amount < 1 || amount > 100000) return res.status(400).json({ error: 'invalid_amount' }); const wallet = walletOf(mine); if (wallet.balance < amount) return res.status(400).json({ error: 'insufficient_coins', balance: wallet.balance }); wallet.balance -= amount; wallet.transactions.unshift({ type: 'spend', amount: -amount, reason, createdAt: new Date().toISOString() }); mine.wallet = wallet; await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ wallet }); }
     const target = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
     if (!target || target === me || !(await profile(target))) return res.status(404).json({ error: 'user_not_found' });

@@ -9,7 +9,7 @@
 // every event so you can see it in Vercel → Logs, but it cannot push a
 // status update to a specific visitor's browser on its own — the site
 // checks status itself via api/paypal/subscription-status.js (polling),
-// using the subscription ID saved in the visitor's own localStorage.
+// using the subscription ID saved in the user profile database.
 // A real multi-device "the site auto-updates for everyone" requires adding
 // a database (e.g. Vercel KV/Postgres) keyed by subscription ID — this
 // file is written so that's a small addition later, not a rewrite.

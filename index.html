@@ -1431,7 +1431,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     }
   })();
 
-  // === username login gate — stored per-device in localStorage ===
+  // === username login gate ===
   const PREMIUM_NAMES = ['shirel', 'שירל']; // מי שהשם שלו מופיע כאן מקבל תג "פרימיום" ליד השם
   const userGreeting = document.getElementById('userGreeting');
   const ROLE_BADGES = {
@@ -1474,7 +1474,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
         const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
         if(response.ok){
           const data = await response.json();
-          if (data.profile) { updateWalletUI(data.me?.wallet); window.__retzefProfile = data.profile; await retzefStorage.load(); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
+          if (data.profile) { updateWalletUI(data.profile?.wallet); window.__retzefProfile = data.profile; await retzefStorage.load(); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
           return data.profile || null;
         }
         if(response.status===401||response.status===403||response.status===404)return null;

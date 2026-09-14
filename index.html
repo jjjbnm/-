@@ -1307,7 +1307,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   const ACCOUNT_STORAGE_KEY='retzef_tiktok_accounts';
   function getSavedAccounts(){try{return JSON.parse(localStorage.getItem(ACCOUNT_STORAGE_KEY)||'[]').filter(a=>a&&a.username);}catch(_){return [];}}
   function rememberAccount(profile){if(!profile?.username)return;const account={username:String(profile.username).replace(/^@/,'').toLowerCase(),displayName:profile.displayName||profile.username,avatarUrl:profile.avatarUrl||'',role:profile.role||'member'};const accounts=getSavedAccounts().filter(a=>a.username!==account.username);localStorage.setItem(ACCOUNT_STORAGE_KEY,JSON.stringify([account,...accounts].slice(0,10)));}
-  function switchAccount(username){document.cookie='retzef_profile_id='+encodeURIComponent(username)+'; Path=/; Max-Age=31536000; Secure; SameSite=Lax';location.reload();}
+  function switchAccount(username){const clean=String(username||'').replace(/^@/,'').trim().toLowerCase();if(!clean)return;document.cookie='retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax';document.cookie='retzef_profile_id='+encodeURIComponent(clean)+'; Path=/; Max-Age=31536000; Secure; SameSite=Lax';window.__retzefProfile=null;profileMenu.classList.remove('open');quickModal.classList.remove('open');window.location.replace('/?account_switch='+Date.now());}
   function openAccountManager(){
     profileMenu.classList.remove('open');
     const accounts=getSavedAccounts();

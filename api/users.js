@@ -37,7 +37,6 @@ module.exports = async (req, res) => {
     if (req.method === 'POST' && action === 'clientState') {
       const next = input.state && typeof input.state === 'object' ? input.state : {};
       const safe = {
-        accounts: Array.isArray(next.accounts) ? next.accounts.slice(0, 10).map(a => ({ username: String(a.username || '').toLowerCase().slice(0, 128), displayName: String(a.displayName || '').slice(0, 160), avatarUrl: String(a.avatarUrl || '').slice(0, 1000), role: String(a.role || 'member').slice(0, 32) })) : [],
         subscriptionId: String(next.subscriptionId || '').slice(0, 256),
         subscriptionName: String(next.subscriptionName || '').slice(0, 160),
         lastChatRequest: String(next.lastChatRequest || '').slice(0, 256),

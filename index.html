@@ -22,6 +22,7 @@
   "description": "בית התמיכה הרשמי של קבוצת רצף ב-TikTok — חוקים, סטטוסים, מנויים ותשלומים.",
   "sameAs": []
 }
+function updateWalletUI(wallet){const el=document.getElementById('profileWalletBalance');if(el)el.textContent=(wallet&&Number(wallet.balance)||0)+' 🪙';}
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -530,7 +531,7 @@
   </span>
 </div>
 <div id="profileMenu" role="menu" aria-label="תפריט משתמש">
-  <div class="menu-user" id="profileMenuUser">החשבון שלי</div>
+  <div class="menu-user" id="profileMenuUser">החשבון שלי</div><div id="profileWallet" style="margin:8px 13px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#fff7d6,#ffe9a8);color:#5b4300;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span>🪙 מטבעות רצף</span><b id="profileWalletBalance">0</b></div>
   <button type="button" data-profile-target="settings">⚙️ הגדרות חשבון</button>
   <button type="button" id="profileDevicePreferences">📱 Device Preferences</button>
   <div id="profileDevicePreferencesPanel" style="display:none;padding:8px 13px;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);font-size:12px;">
@@ -1485,7 +1486,7 @@
       const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
       if (!response.ok) return null;
       const data = await response.json();
-      if (data.profile) { window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
+      if (data.profile) { updateWalletUI(data.me?.wallet); window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
       return data.profile || null;
     } catch (_) { return null; }
   }

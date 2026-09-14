@@ -1289,6 +1289,9 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 <script>
   // === TikTok config — real OAuth, server confirmed working ===
   const TIKTOK_CLIENT_KEY = "sbawi4iah8tlx0wyst";
+  // All client-side state is persisted in the user's database profile.
+  const retzefStorage={cache:{},ready:false,pending:null,getItem(key){return Object.prototype.hasOwnProperty.call(this.cache,key)?JSON.stringify(this.cache[key]):null;},setItem(key,value){try{this.cache[key]=JSON.parse(value);}catch(_){this.cache[key]=value;}this.persist();},removeItem(key){delete this.cache[key];this.persist();},async load(){try{const r=await fetch('/api/users?clientState=1',{credentials:'include',cache:'no-store'});const d=await r.json();const state=d.clientState||{};this.cache={'retzef_tiktok_accounts':state.accounts||[],'retzef_subscription_id':state.subscriptionId||'','retzef_subscription_name':state.subscriptionName||'','retzef_last_chat_request':state.lastChatRequest||'','retzef_last_chat_message':state.lastChatMessage||'','retzef_last_support_request':state.lastSupportRequest||'','retzef_site_settings':state.settings||{},'retzef_cart_items':state.cart||[]};this.ready=true;if(typeof loadSiteSettings==='function')loadSiteSettings();document.dispatchEvent(new CustomEvent('retzef-storage-ready'));}catch(_){this.ready=false;}},persist(){clearTimeout(this.pending);this.pending=setTimeout(()=>{if(!this.ready||!window.__retzefProfile)return;const c=this.cache;fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'clientState',state:{accounts:c.retzef_tiktok_accounts||[],subscriptionId:c.retzef_subscription_id||'',subscriptionName:c.retzef_subscription_name||'',lastChatRequest:c.retzef_last_chat_request||'',lastChatMessage:c.retzef_last_chat_message||'',lastSupportRequest:c.retzef_last_support_request||'',settings:c.retzef_site_settings||{},cart:c.retzef_cart_items||[]}})}).catch(()=>{});},250)}};
+  const storage=retzefStorage;
   const TIKTOK_GROUP_URL = "https://tiktok.me/group/ZSfhTkvp4/";
   const TIKTOK_REDIRECT_URI = "https://chi-liart-74.vercel.app/api/callback";
 
@@ -1305,8 +1308,8 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   const quickTitle=document.getElementById('profileQuickTitle');
   const quickBody=document.getElementById('profileQuickBody');
   const ACCOUNT_STORAGE_KEY='retzef_tiktok_accounts';
-  function getSavedAccounts(){try{return JSON.parse(localStorage.getItem(ACCOUNT_STORAGE_KEY)||'[]').filter(a=>a&&a.username);}catch(_){return [];}}
-  function rememberAccount(profile){if(!profile?.username)return;const account={username:String(profile.username).replace(/^@/,'').toLowerCase(),displayName:profile.displayName||profile.username,avatarUrl:profile.avatarUrl||'',role:profile.role||'member'};const accounts=getSavedAccounts().filter(a=>a.username!==account.username);localStorage.setItem(ACCOUNT_STORAGE_KEY,JSON.stringify([account,...accounts].slice(0,10)));}
+  function getSavedAccounts(){try{return JSON.parse(storage.getItem(ACCOUNT_STORAGE_KEY)||'[]').filter(a=>a&&a.username);}catch(_){return [];}}
+  function rememberAccount(profile){if(!profile?.username)return;const account={username:String(profile.username).replace(/^@/,'').toLowerCase(),displayName:profile.displayName||profile.username,avatarUrl:profile.avatarUrl||'',role:profile.role||'member'};const accounts=getSavedAccounts().filter(a=>a.username!==account.username);storage.setItem(ACCOUNT_STORAGE_KEY,JSON.stringify([account,...accounts].slice(0,10)));}
   async function switchAccount(username){const clean=String(username||'').replace(/^@/,'').trim().toLowerCase();if(!clean)return;const button=document.querySelector(`#savedAccountsList button[data-account-username=\"${CSS.escape(clean)}\"]`);const originalText=button?.textContent||'החלף';let redirected=false;const reset=()=>{if(button&&!redirected){button.disabled=false;button.textContent=originalText;}};if(button){button.disabled=true;button.textContent='מחליף...';}try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);const response=await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'switchAccount',username:clean}),signal:controller.signal});clearTimeout(timeout);const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'switch_account_failed');redirected=true;window.__retzefProfile=null;profileMenu.classList.remove('open');quickModal.classList.remove('open');window.location.assign('/?account_switch='+Date.now());setTimeout(reset,3000);}catch(error){reset();const message=error.name==='AbortError'?'הבקשה ארכה יותר מדי זמן. בדקו את החיבור ונסו שוב.':error.message==='profile_not_found'?'החשבון עדיין לא נשמר בשרת. התחבר אליו פעם אחת עם TikTok.':'נסו שוב.';alert('לא ניתן להחליף חשבון כרגע: '+message);}}
   function openAccountManager(){
     profileMenu.classList.remove('open');
@@ -1330,7 +1333,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     else if(action==='devicePerformance') { quickBody.innerHTML='<p>בדיקת ביצועים מקומית — המידע לא נשלח לשרת.</p><button type="button" class="quick-action" id="runQuickPerformance">⚡ בדיקת ביצועים</button><div id="quickPerformanceResult" style="white-space:pre-line;margin-top:10px;"></div>'; }
     else if(action==='status') quickBody.innerHTML=`<p><b>${displayName}</b> (@${username})</p><p>תפקיד: ${role}</p><p>סטטוס: ${profile.role==='owner'?'בעלים':'הכול טוב'}</p>`;
     else if(action==='profile') quickBody.innerHTML=`<p>שם תצוגה: <b>${displayName}</b></p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p>`;
-    else quickBody.innerHTML=`<p>${localStorage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האתר.</p>`;
+    else quickBody.innerHTML=`<p>${storage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האתר.</p>`;
     quickModal.classList.add('open');
     const savePrivacy=document.getElementById('savePrivacy'); if(savePrivacy)savePrivacy.addEventListener('click',async()=>{const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'privacy',statusVisible:document.getElementById('privacyStatus').checked,subscriptionVisible:document.getElementById('privacySubscription').checked})});savePrivacy.textContent=r.ok?'נשמר ✅':'שמירה נכשלה';}); const dark=document.getElementById('quickDarkMode'); if(dark)dark.addEventListener('click',()=>document.getElementById('darkModeToggle')?.click()); const full=document.getElementById('openFullSettings'); if(full)full.addEventListener('click',()=>{quickModal.classList.remove('open');if(typeof window.activateTab==='function')window.activateTab('settings');}); const savedDevice=getDevicePreferences(); const arm=document.getElementById('accountReduceMotion'); const abn=document.getElementById('accountBrowserNotifications'); if(arm)arm.checked=savedDevice.reduceMotion===true; if(abn)abn.checked=savedDevice.notifications===true; const saveAccountDevice=document.getElementById('saveAccountDevicePreferences'); if(saveAccountDevice)saveAccountDevice.addEventListener('click',async()=>{const reduceMotion=arm.checked;const notifications=abn.checked;await saveDevicePreferencesToDatabase(reduceMotion,notifications);document.documentElement.dataset.reduceMotion=reduceMotion?'true':'false';if(notifications&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();saveAccountDevice.textContent='נשמר ✅';}); const runAccountPerformance=document.getElementById('runAccountPerformance'); if(runAccountPerformance)runAccountPerformance.addEventListener('click',async()=>{const lines=['חיבור לאינטרנט: '+(navigator.onLine?'✅ מחובר':'❌ לא מחובר'),'JavaScript: ✅ פעיל','מסך: '+screen.width+'×'+screen.height,'ליבות מעבד: '+(navigator.hardwareConcurrency||'לא נמסר'),'זיכרון משוער: '+(navigator.deviceMemory?navigator.deviceMemory+'GB':'לא נמסר')];try{const battery=await navigator.getBattery?.();if(battery)lines.push('סוללה: '+Math.round(battery.level*100)+'%'+(battery.charging?' · בטעינה':''));}catch(_){}document.getElementById('accountPerformanceResult').textContent=lines.join('\n');}); const quickDevice=document.getElementById('saveQuickDevicePreferences'); if(quickDevice)quickDevice.addEventListener('click',async()=>{const reduceMotion=document.getElementById('quickReduceMotion').checked;const notifications=document.getElementById('quickBrowserNotifications').checked;await saveDevicePreferencesToDatabase(reduceMotion,notifications);document.documentElement.dataset.reduceMotion=reduceMotion?'true':'false';if(notifications&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();quickDevice.textContent='נשמר ✅';}); const quickPerformance=document.getElementById('runQuickPerformance'); if(quickPerformance)quickPerformance.addEventListener('click',async()=>{const lines=['חיבור לאינטרנט: '+(navigator.onLine?'✅ מחובר':'❌ לא מחובר'),'JavaScript: ✅ פעיל','מסך: '+screen.width+'×'+screen.height,'ליבות מעבד: '+(navigator.hardwareConcurrency||'לא נמסר'),'זיכרון משוער: '+(navigator.deviceMemory?navigator.deviceMemory+'GB':'לא נמסר')];try{const battery=await navigator.getBattery?.();if(battery)lines.push('סוללה: '+Math.round(battery.level*100)+'%'+(battery.charging?' · בטעינה':''));}catch(_){}document.getElementById('quickPerformanceResult').textContent=lines.join('\n');});
   }
@@ -1351,24 +1354,24 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     try{const r=await fetch('/api/push');const info=await r.json();if(!info.configured||!info.publicKey)return;const permission=Notification.permission==='granted'? 'granted':await Notification.requestPermission();if(permission!=='granted')return;const reg=await navigator.serviceWorker.register('/push-sw.js');let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:Uint8Array.from(atob(info.publicKey.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))});await fetch('/api/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'subscribe',subscription:sub.toJSON()})});}catch(e){console.warn('Web Push unavailable',e);}
   }
 
-  let lastRequestSignature=localStorage.getItem('retzef_last_chat_request')||'';
-  let lastMessageSignature=localStorage.getItem('retzef_last_chat_message')||'';
+  let lastRequestSignature=storage.getItem('retzef_last_chat_request')||'';
+  let lastMessageSignature=storage.getItem('retzef_last_chat_message')||'';
   function notifyChatMessage(message){
     const from=message?.from||'משתמש'; const signature=String(from)+'|'+String(message?.createdAt||'');
-    if(signature===lastMessageSignature)return; lastMessageSignature=signature; localStorage.setItem('retzef_last_chat_message',signature);
+    if(signature===lastMessageSignature)return; lastMessageSignature=signature; storage.setItem('retzef_last_chat_message',signature);
     const toast=document.getElementById('hubNotification'); document.getElementById('hubNotificationText').textContent='💬 הודעה חדשה מ־@'+from; toast.classList.add('open');
     if('Notification' in window && Notification.permission==='granted') new Notification('הודעה חדשה בצ׳אט', {body:'@'+from+' שלח/ה הודעה חדשה'});
     setTimeout(()=>toast.classList.remove('open'),8000);
   }
   function notifyChatRequest(request){
     const from=request?.from||'משתמש'; const signature=String(from)+'|'+String(request?.createdAt||'');
-    if(signature===lastRequestSignature)return; lastRequestSignature=signature; localStorage.setItem('retzef_last_chat_request',signature);
+    if(signature===lastRequestSignature)return; lastRequestSignature=signature; storage.setItem('retzef_last_chat_request',signature);
     const toast=document.getElementById('hubNotification'); document.getElementById('hubNotificationText').textContent='📩 בקשת צ׳אט חדשה מ־@'+from; toast.classList.add('open');
     if('Notification' in window && Notification.permission==='granted') new Notification('בקשת צ׳אט חדשה', {body:'@'+from+' רוצה להתחיל צ׳אט איתך'});
     setTimeout(()=>toast.classList.remove('open'),8000);
   }
   document.getElementById('hubNotificationOpen').addEventListener('click',()=>{document.getElementById('hubNotification').classList.remove('open');openHub();});
-  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);for(const u of (d.users||[]).filter(x=>x.chatApproved)){const mr=await fetch('/api/chat?username='+encodeURIComponent(u.username));if(!mr.ok)continue;const md=await mr.json();const last=(md.messages||[]).slice(-1)[0];if(last&&last.from!==String(window.__retzefProfile.username||'').toLowerCase())notifyChatMessage(last);}if(['owner','admin'].includes(String(window.__retzefProfile.role||''))){const sr=await fetch('/api/users');if(sr.ok){const sd=await sr.json();const latest=sd.supportRequests?.[0];const signature=latest?String(latest.id):'';const previous=localStorage.getItem('retzef_last_support_request')||'';if(latest&&signature!==previous){localStorage.setItem('retzef_last_support_request',signature);const toast=document.getElementById('hubNotification');document.getElementById('hubNotificationText').textContent='📩 פנייה חדשה למערכת התמיכה מ־@'+latest.from;toast.classList.add('open');if('Notification' in window&&Notification.permission==='granted')new Notification('פניית תמיכה חדשה',{body:'מ־@'+latest.from});setTimeout(()=>toast.classList.remove('open'),10000);}}}}catch(_){} }
+  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);for(const u of (d.users||[]).filter(x=>x.chatApproved)){const mr=await fetch('/api/chat?username='+encodeURIComponent(u.username));if(!mr.ok)continue;const md=await mr.json();const last=(md.messages||[]).slice(-1)[0];if(last&&last.from!==String(window.__retzefProfile.username||'').toLowerCase())notifyChatMessage(last);}if(['owner','admin'].includes(String(window.__retzefProfile.role||''))){const sr=await fetch('/api/users');if(sr.ok){const sd=await sr.json();const latest=sd.supportRequests?.[0];const signature=latest?String(latest.id):'';const previous=storage.getItem('retzef_last_support_request')||'';if(latest&&signature!==previous){storage.setItem('retzef_last_support_request',signature);const toast=document.getElementById('hubNotification');document.getElementById('hubNotificationText').textContent='📩 פנייה חדשה למערכת התמיכה מ־@'+latest.from;toast.classList.add('open');if('Notification' in window&&Notification.permission==='granted')new Notification('פניית תמיכה חדשה',{body:'מ־@'+latest.from});setTimeout(()=>toast.classList.remove('open'),10000);}}}}catch(_){} }
   setInterval(pollChatRequests,20000);
 
   function hubText(el,text){el.textContent=text;}
@@ -1488,7 +1491,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
         const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
         if(response.ok){
           const data = await response.json();
-          if (data.profile) { updateWalletUI(data.me?.wallet); window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
+          if (data.profile) { updateWalletUI(data.me?.wallet); window.__retzefProfile = data.profile; await retzefStorage.load(); rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
           return data.profile || null;
         }
         if(response.status===401||response.status===403||response.status===404)return null;
@@ -1676,8 +1679,8 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     blur: '18px',
   };
   const SETTINGS_STORAGE_KEY = 'retzef_site_settings';
-  function readSiteSettings(){ try { return JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY)||'null') || {}; } catch (_) { return {}; } }
-  function saveSiteSettings(){ const root=document.documentElement; const active=document.querySelector('.swatch.active'); const state={theme:root.getAttribute('data-theme')||DEFAULTS.theme,accent:root.style.getPropertyValue('--accent')||DEFAULTS.accent,accent2:root.style.getPropertyValue('--accent2')||DEFAULTS.accent2,bg:root.style.getPropertyValue('--bg')||DEFAULTS.bg,bg2:root.style.getPropertyValue('--bg2')||DEFAULTS.bg2,glass:root.style.getPropertyValue('--glass')||DEFAULTS.glass,text:root.style.getPropertyValue('--text')||DEFAULTS.text,blur:document.getElementById('blurSlider').value+'px',fontSize:document.getElementById('fontSizeSlider').value,language:currentLang,swatchA:active?.dataset.a||''}; localStorage.setItem(SETTINGS_STORAGE_KEY,JSON.stringify(state)); }
+  function readSiteSettings(){ try { return JSON.parse(storage.getItem(SETTINGS_STORAGE_KEY)||'null') || {}; } catch (_) { return {}; } }
+  function saveSiteSettings(){ const root=document.documentElement; const active=document.querySelector('.swatch.active'); const state={theme:root.getAttribute('data-theme')||DEFAULTS.theme,accent:root.style.getPropertyValue('--accent')||DEFAULTS.accent,accent2:root.style.getPropertyValue('--accent2')||DEFAULTS.accent2,bg:root.style.getPropertyValue('--bg')||DEFAULTS.bg,bg2:root.style.getPropertyValue('--bg2')||DEFAULTS.bg2,glass:root.style.getPropertyValue('--glass')||DEFAULTS.glass,text:root.style.getPropertyValue('--text')||DEFAULTS.text,blur:document.getElementById('blurSlider').value+'px',fontSize:document.getElementById('fontSizeSlider').value,language:currentLang,swatchA:active?.dataset.a||''}; storage.setItem(SETTINGS_STORAGE_KEY,JSON.stringify(state)); }
   function loadSiteSettings(){ const saved=readSiteSettings(); const root=document.documentElement; root.setAttribute('data-theme',saved.theme||DEFAULTS.theme); root.style.setProperty('--accent',saved.accent||DEFAULTS.accent); root.style.setProperty('--accent2',saved.accent2||DEFAULTS.accent2); root.style.setProperty('--bg',saved.bg||DEFAULTS.bg); root.style.setProperty('--bg2',saved.bg2||DEFAULTS.bg2); root.style.setProperty('--glass',saved.glass||DEFAULTS.glass); root.style.setProperty('--text',saved.text||DEFAULTS.text); root.style.setProperty('--glass-blur',saved.blur||DEFAULTS.blur); const blur=parseInt(saved.blur||DEFAULTS.blur,10)||18; const font=parseInt(saved.fontSize||'100',10)||100; document.getElementById('blurSlider').value=blur; document.getElementById('fontSizeSlider').value=font; document.body.style.zoom=font/100; darkToggle.classList.toggle('on',(saved.theme||DEFAULTS.theme)==='dark'); document.getElementById('bgColorPicker').value=saved.bg||DEFAULTS.bg; document.getElementById('glassColorPicker').value=saved.bg2||DEFAULTS.bg2; document.getElementById('textColorPicker').value=saved.text||DEFAULTS.text; document.getElementById('btnColorPicker').value=saved.accent||DEFAULTS.accent; document.querySelectorAll('.swatch').forEach(sw=>sw.classList.toggle('active',saved.swatchA?sw.dataset.a===saved.swatchA:sw.dataset.a===DEFAULTS.accent)); if(saved.language) setLanguage(saved.language); }
   document.getElementById('resetSettingsBtn').addEventListener('click', function(){
     const root = document.documentElement;
@@ -1701,7 +1704,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     document.body.style.zoom = 1;
     document.getElementById('fontSizeSlider').value = 100;
     setLanguage('he');
-    localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    storage.removeItem(SETTINGS_STORAGE_KEY);
     saveSiteSettings();
   });
 
@@ -2003,8 +2006,8 @@ function openPaypalModal(itemName, price){
         onApprove: function (data) {
           // שומר את מזהה המנוי במכשיר הזה בלבד — אין כאן בסיס נתונים,
           // אז זה מה שמאפשר לאתר לבדוק סטטוס בהמשך (ראו checkSubStatusBtn).
-          localStorage.setItem('retzef_subscription_id', data.subscriptionID);
-          localStorage.setItem('retzef_subscription_name', itemName);
+          storage.setItem('retzef_subscription_id', data.subscriptionID);
+          storage.setItem('retzef_subscription_name', itemName);
           subButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ נרשמת בהצלחה ל-"${itemName}"! החיוב הבא יתבצע אוטומטית.</p>`;
           updateMySubStatus();
         },
@@ -2106,14 +2109,14 @@ function openPaypalModal(itemName, price){
     let cart = [];
 
     try {
-      const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+      const saved = JSON.parse(storage.getItem(CART_STORAGE_KEY) || '[]');
       if (Array.isArray(saved)) cart = saved;
     } catch (error) {
       cart = [];
     }
 
     function saveCart() {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      storage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
     }
 
     function renderCart() {
@@ -2188,6 +2191,7 @@ function openPaypalModal(itemName, price){
     });
 
     renderCart();
+    document.addEventListener('retzef-storage-ready', renderCart);
   }());
 </script>
 <script>

@@ -41,6 +41,26 @@ module.exports = async (req, res) => {
   if (!me) return res.status(401).json({ error: 'tiktok_login_required' });
   try {
     const mine = await profile(me); if (!mine) return res.status(401).json({ error: 'tiktok_login_required' });
+    if (req.method === 'GET' && input.clientState === '1') {
+      const state = mine.clientState && typeof mine.clientState === 'object' ? mine.clientState : {};
+      return res.status(200).json({ clientState: state });
+    }
+    if (req.method === 'POST' && action === 'clientState') {
+      const next = input.state && typeof input.state === 'object' ? input.state : {};
+      const safe = {
+        accounts: Array.isArray(next.accounts) ? next.accounts.slice(0, 10).map(a => ({ username: String(a.username || '').toLowerCase().slice(0, 128), displayName: String(a.displayName || '').slice(0, 160), avatarUrl: String(a.avatarUrl || '').slice(0, 1000), role: String(a.role || 'member').slice(0, 32) })) : [],
+        subscriptionId: String(next.subscriptionId || '').slice(0, 256),
+        subscriptionName: String(next.subscriptionName || '').slice(0, 160),
+        lastChatRequest: String(next.lastChatRequest || '').slice(0, 256),
+        lastChatMessage: String(next.lastChatMessage || '').slice(0, 256),
+        lastSupportRequest: String(next.lastSupportRequest || '').slice(0, 256),
+        settings: next.settings && typeof next.settings === 'object' ? next.settings : {},
+        cart: Array.isArray(next.cart) ? next.cart.slice(0, 50).map(x => ({ name: String(x.name || '').slice(0, 160), price: Number(x.price) || 0 })) : []
+      };
+      mine.clientState = safe;
+      await redis('set', `${PREFIX}${me}`, JSON.stringify(mine));
+      return res.status(200).json({ clientState: safe });
+    }
     if (req.method === 'GET') {
       const scan = await redis('scan', '0', 'match', `${PREFIX}*`, 'count', '100');
       const keys = Array.isArray(scan) && Array.isArray(scan[1]) ? scan[1] : [];

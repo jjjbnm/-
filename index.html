@@ -1317,7 +1317,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     if(!accounts.length) list.innerHTML='<p style="color:var(--muted);">אין עדיין חשבונות שמורים.</p>';
     accounts.forEach(account=>{const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:9px;margin:8px 0;padding:8px;border:1px solid var(--glass-border);border-radius:12px;';const name=document.createElement('span');name.style.flex='1';name.textContent=(account.displayName||account.username)+' · @'+account.username;const button=document.createElement('button');button.type='button';button.className='quick-action';button.textContent=String(window.__retzefProfile?.username||'').toLowerCase()===account.username?'מחובר ✅':'החלף';button.disabled=button.textContent==='מחובר ✅';button.onclick=()=>switchAccount(account.username);row.append(name,button);list.appendChild(row);});
     quickModal.classList.add('open');
-    document.getElementById('addTikTokAccount').addEventListener('click',()=>{quickModal.classList.remove('open');openConsentModal(true);});
+    document.getElementById('addTikTokAccount').addEventListener('click',()=>{quickModal.classList.remove('open');closeConsentModal();startTikTokLogin(true);});
   }
   function openProfileAction(action){
     const profile=window.__retzefProfile||{};
@@ -1400,11 +1400,12 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   document.getElementById('joinForm').addEventListener('submit',async e=>{e.preventDefault();const result=document.getElementById('joinResult');const button=e.target.querySelector('button[type="submit"]');button.disabled=true;result.textContent='שולח ושומר את הבקשה...';try{const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join',name:document.getElementById('joinName').value.trim(),username:document.getElementById('joinUsername').value.trim(),age:Number(document.getElementById('joinAge').value),gender:document.getElementById('joinGender').value})});const d=await r.json();if(!r.ok||d.saved!==true)throw new Error(d.error||'join_failed');result.textContent='✅ הבקשה נשלחה ונשמרה במסד הנתונים. הבאן המקורי יקבל אותה לבדיקה.';e.target.reset();try{const mine=await fetch('/api/users?joinMine=1').then(x=>x.json());if(mine.requests?.[0]?.status&&mine.requests[0].status!=='new')result.textContent+= ' מצב: '+(mine.requests[0].status==='approved'?'אושרה':'נדחתה');}catch(_){}}catch(_){result.textContent='❌ לא ניתן לשמור ולשלוח כרגע. נסו שוב.';}button.disabled=false;});
 
   let forceTikTokAccountChooser=false;
-  document.getElementById('consentYes').addEventListener('click', function(){
-    closeConsentModal();
-    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${TIKTOK_CLIENT_KEY}&scope=user.info.basic,user.info.profile&response_type=code&redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&state=retzef&disable_auto_auth=${forceTikTokAccountChooser?'1':'0'}`;
-    window.location.href = authUrl;
-  });
+  function startTikTokLogin(forceChooser){
+    forceTikTokAccountChooser=forceChooser===true;
+    const params=new URLSearchParams({client_key:TIKTOK_CLIENT_KEY,scope:'user.info.basic,user.info.profile',response_type:'code',redirect_uri:TIKTOK_REDIRECT_URI,state:forceTikTokAccountChooser?'retzef_add_account':'retzef',disable_auto_auth:forceTikTokAccountChooser?'1':'0'});
+    window.location.assign('https://www.tiktok.com/v2/auth/authorize/?'+params.toString());
+  }
+  document.getElementById('consentYes').addEventListener('click', function(){closeConsentModal();startTikTokLogin(forceTikTokAccountChooser);});
   document.getElementById('consentNo').addEventListener('click', closeConsentModal);
   consentModal.addEventListener('click', function(e){ if (e.target === consentModal) closeConsentModal(); });
 

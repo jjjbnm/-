@@ -1462,13 +1462,17 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     const roleText = profile.role === 'owner' ? ' 👑 בעלים' : profile.role === 'admin' ? ' 🔨 מנהל מערכת תמיכה' : (known ? ` ${known.emoji} ${known.label}` : '');
     userGreeting.innerHTML = `שלום, ${displayName} <span dir="ltr">(@${username})</span>${roleText}`;
     userGreeting.style.display = 'block';
+    const menuUser = document.getElementById('profileMenuUser');
+    if (menuUser) menuUser.textContent = `@${username} · ${displayName}`;
+    const status = document.getElementById('tiktokAuthStatus');
+    if (status) { status.textContent = `מחובר בתור @${username}${roleText} ✅`; status.style.display = 'block'; }
+    const img = document.getElementById('profileAvatarImg');
+    const wrap = document.getElementById('profileAvatar');
     if (profile.avatarUrl) {
-      const img = document.getElementById('profileAvatarImg');
-      const wrap = document.getElementById('profileAvatar');
       img.src = profile.avatarUrl;
       wrap.classList.add('logged-in');
-      wrap.title = `${displayName} (@${profile.username})`;
     }
+    wrap.title = `${displayName} (@${profile.username})`;
   }
   async function loadServerProfile(){
     for(let attempt=0;attempt<3;attempt++){

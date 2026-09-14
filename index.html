@@ -1474,7 +1474,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
         const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
         if(response.ok){
           const data = await response.json();
-          if (data.profile) { updateWalletUI(data.profile?.wallet); window.__retzefProfile = data.profile; await retzefStorage.load(); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
+          if (data.profile) { window.__retzefProfile = data.profile; updateWalletUI(data.profile?.wallet); try { const walletResponse = await fetch('/api/users', { credentials: 'include', cache: 'no-store' }); if (walletResponse.ok) { const walletData = await walletResponse.json(); updateWalletUI(walletData.me?.wallet); } } catch (_) {} await retzefStorage.load(); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
           return data.profile || null;
         }
         if(response.status===401||response.status===403||response.status===404)return null;

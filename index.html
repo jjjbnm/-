@@ -1473,6 +1473,15 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
       wrap.classList.add('logged-in');
     }
     wrap.title = `${displayName} (@${profile.username})`;
+    const loginButton = document.getElementById('tiktokLoginBtn');
+    if (loginButton) {
+      loginButton.disabled = true;
+      loginButton.classList.add('logged-in-state');
+      loginButton.innerHTML = `✅ מחובר כ־@${username}`;
+      loginButton.setAttribute('aria-label', `מחובר כ־@${username}`);
+    }
+    const menu = document.getElementById('profileMenu');
+    if (menu) menu.setAttribute('data-authenticated', 'true');
   }
   async function loadServerProfile(){
     for(let attempt=0;attempt<3;attempt++){

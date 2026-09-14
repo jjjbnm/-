@@ -1483,13 +1483,19 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     }
   }
   async function loadServerProfile(){
-    try {
-      const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
-      if (!response.ok) return null;
-      const data = await response.json();
-      if (data.profile) { updateWalletUI(data.me?.wallet); window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
-      return data.profile || null;
-    } catch (_) { return null; }
+    for(let attempt=0;attempt<3;attempt++){
+      try {
+        const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
+        if(response.ok){
+          const data = await response.json();
+          if (data.profile) { updateWalletUI(data.me?.wallet); window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
+          return data.profile || null;
+        }
+        if(response.status===401||response.status===403||response.status===404)return null;
+      } catch (_) {}
+      if(attempt<2)await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));
+    }
+    return null;
   }
   loadServerProfile();
 

@@ -29,6 +29,8 @@ module.exports = async (req, res) => {
     if (profile.banned === true) { res.setHeader('Set-Cookie', 'retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax; Secure'); return res.status(403).json({ error: 'account_banned', reason: profile.banReason || 'החשבון נחסם' }); }
     profile.lastSeen = Date.now();
     await kv('set', `retzef:profile:${username.toLowerCase()}`, JSON.stringify(profile));
+    // Refresh the persistent session cookie on every successful page load.
+    res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(username.toLowerCase())}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`);
     return res.status(200).json({ profile });
   } catch (error) {
     console.error('profile API error:', error.message);

@@ -113,7 +113,7 @@ module.exports = async (req, res) => {
       if (!gift) return res.status(404).json({ error: 'code_not_found' });
       if (gift.expiresAt && Date.parse(gift.expiresAt) < Date.now()) return res.status(400).json({ error: 'code_expired' });
       if (Number(gift.maxUses) > 0 && Number(gift.uses || 0) >= Number(gift.maxUses)) return res.status(400).json({ error: 'code_used_up' });
-      if (Array.isArray(gift.usedBy) && gift.usedBy.includes(me)) return res.status(400).json({ error: 'already_redeemed' });
+      // Gift codes are reusable: the same account may redeem this code repeatedly.
       const wallet = walletOf(mine); const now = new Date().toISOString();
       wallet.balance += Math.floor(Number(gift.amount) || 0);
       wallet.transactions.unshift({ type: 'gift', amount: Math.floor(Number(gift.amount) || 0), reason: `קוד מתנה ${code}`, code, createdAt: now });

@@ -1294,11 +1294,11 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 
   document.getElementById('tiktokGroupLink').href = TIKTOK_GROUP_URL;
 
-  document.getElementById('tiktokLoginBtn').addEventListener('click', openConsentModal);
+  document.getElementById('tiktokLoginBtn').addEventListener('click', ()=>openConsentModal(true));
   const profileMenu=document.getElementById('profileMenu');
   const profileMenuUser=document.getElementById('profileMenuUser');
   document.getElementById('profileAvatar').addEventListener('click', function(){
-    if(window.__retzefProfile){ profileMenuUser.textContent='מחובר/ת בתור @'+(window.__retzefProfile.username||'משתמש'); profileMenu.classList.toggle('open'); }
+    if(window.__retzefProfile){ openAccountManager(); }
     else openConsentModal();
   });
   const quickModal=document.getElementById('profileQuickModal');

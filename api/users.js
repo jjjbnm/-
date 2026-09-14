@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
       const code = String(input.code || '').trim().toUpperCase();
       if (!/^[A-Z0-9_-]{4,32}$/.test(code)) return res.status(400).json({ error: 'invalid_code' });
       const key = `retzef:gift:${code}`;
-      const raw = await redis('get', key); const gift = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null;
+      const raw = await redis('get', key); let gift = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null;
       if (!gift && code === 'DHD1000') { gift = { code, amount: 1000, maxUses: -1, uses: 0, usedBy: [], expiresAt: '', createdBy: 'system', createdAt: new Date().toISOString() }; await redis('set', key, JSON.stringify(gift)); }
       if (gift && code === 'DHD1000' && Number(gift.maxUses) === 1) { gift.maxUses = -1; await redis('set', key, JSON.stringify(gift)); }
       if (!gift) return res.status(404).json({ error: 'code_not_found' });

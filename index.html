@@ -583,7 +583,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
       <h3 id="paypalItemName" style="margin-bottom:2px;"></h3>
       <p id="paypalItemPrice" style="font-family:'Rubik'; font-weight:800; font-size:22px; color:var(--accent); margin-bottom:18px;"></p>
     </div>
-    <div id="paypalButtonContainer"></div>
+    <div id="coinPaymentBox" style="margin:0 0 14px;padding:14px;border:1px solid var(--glass-border);border-radius:14px;background:rgba(255,211,77,.12);text-align:center"><div style="font-weight:800;margin-bottom:4px">🪙 תשלום במטבעות רצף</div><div id="coinPaymentBalance" style="font-size:13px;color:var(--muted);margin-bottom:10px">יתרה: טוען...</div><div style="display:flex;gap:8px;justify-content:center"><button type="button" id="coinBuyBtn" class="btn btn-primary" style="font-size:13px;padding:9px 16px">קנה במטבעות</button><button type="button" id="coinBackBtn" class="btn btn-ghost glass" style="font-size:13px;padding:9px 16px">ביטול / אחורה</button></div><div id="coinPaymentMessage" style="font-size:12px;margin-top:8px"></div></div><div id="paypalButtonContainer"></div>
     <div id="applePayButtonContainer" style="margin-top:10px;"></div>
     <div id="googlePayButtonContainer" style="margin-top:10px;"></div>
     <p style="font-size:11.5px; color:var(--muted); margin-top:14px; text-align:center;">התשלום מאובטח דרך PayPal.</p>
@@ -1751,8 +1751,10 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   document.getElementById('paypalModalClose').addEventListener('click', closePaypalModal);
   paypalModal.addEventListener('click', e => { if(e.target === paypalModal) closePaypalModal(); });
 
-  function openPaypalModal(itemName, price){
+  async function loadCoinPayment(itemName, price){const balanceEl=document.getElementById('coinPaymentBalance'),msg=document.getElementById('coinPaymentMessage'),buy=document.getElementById('coinBuyBtn'),back=document.getElementById('coinBackBtn');if(!balanceEl||!buy)return;const isTag=/^תג/.test(String(itemName).trim());buy.disabled=isTag;buy.textContent=isTag?'תגים לא זמינים במטבעות':'קנה במטבעות';if(isTag){balanceEl.textContent='תגים אפשר לקנות רק דרך PayPal.';msg.textContent='';}try{const r=await fetch('/api/users',{credentials:'include',cache:'no-store'});const d=await r.json();const balance=Number(d.me?.wallet?.balance||0);balanceEl.textContent='יתרה: '+balance+' 🪙 · מחיר: '+Math.ceil(Number(price)||0)+' 🪙';buy.onclick=async()=>{if(isTag)return;const amount=Math.ceil(Number(price)||0);if(balance<amount){msg.textContent='❌ הרכישה בוטלה — אין מספיק מטבעות.';return;}buy.disabled=true;const spent=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'walletSpend',amount,reason:itemName})});const result=await spent.json();if(spent.ok){msg.textContent='✅ הרכישה בוצעה בהצלחה.';balanceEl.textContent='יתרה: '+Number(result.wallet.balance||0)+' 🪙';}else{msg.textContent= result.error==='insufficient_coins'?'❌ הרכישה בוטלה — אין מספיק מטבעות.':'❌ הרכישה בוטלה.';}buy.disabled=false;};back.onclick=()=>{document.getElementById('paypalModal')?.classList.remove('open');};}catch(_){balanceEl.textContent='לא ניתן לטעון יתרה';msg.textContent='❌ הרכישה בוטלה — צריך להתחבר עם TikTok.';buy.disabled=true;}}
+function openPaypalModal(itemName, price){
     paypalItemName.textContent = itemName;
+    loadCoinPayment(itemName, price);
     paypalItemPrice.textContent = `₪${price}`;
     paypalButtonContainer.innerHTML = '';
     paypalModal.classList.add('open');

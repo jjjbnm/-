@@ -25,6 +25,13 @@ module.exports = async (req, res) => {
       return res.status(201).json({ submitted: true, saved: true, notificationSent });
     } catch (e) { console.error('join request:', e.message); return res.status(503).json({ error: e.message === 'storage_not_configured' ? e.message : 'storage_error' }); }
   }
+  if (req.method === 'POST' && action === 'logout') {
+    res.setHeader('Set-Cookie', [
+      'retzef_profile_id=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure',
+      'retzef_join_id=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure'
+    ]);
+    return res.status(200).json({ loggedOut: true });
+  }
   const me = cookie(req, 'retzef_profile_id').toLowerCase();
   if (req.method === 'GET' && input.joinMine === '1') { try { const id = cookie(req, 'retzef_join_id'); const rows = await joinRequests(); return res.status(200).json({ requests: id ? rows.filter(x => x.id === id).map(x => ({ id: x.id, status: x.status, reason: x.reason || '', createdAt: x.createdAt })) : [] }); } catch (_) { return res.status(503).json({ error: 'storage_error' }); } }
   if (!me) return res.status(401).json({ error: 'tiktok_login_required' });

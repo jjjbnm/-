@@ -531,8 +531,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   </span>
 </div>
 <div id="profileMenu" role="menu" aria-label="תפריט משתמש">
-  <div class="menu-user" id="profileMenuUser">החשבון שלי</div><button type="button" id="profileWallet" data-profile-target="wallet" style="width:calc(100% - 26px);margin:8px 13px;padding:10px 12px;border:0;border-radius:12px;background:linear-gradient(135deg,#fff7d6,#ffe9a8);color:#5b4300;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer"><span>🪙 הארנק שלי</span><b id="profileWalletBalance">0</b></button>
-  <button type="button" data-profile-target="walletActivity">📊 פעילויות בארנק</button>
+  <div class="menu-user" id="profileMenuUser">החשבון שלי</div><div id="profileWallet" style="margin:8px 13px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#fff7d6,#ffe9a8);color:#5b4300;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span>🪙 מטבעות רצף</span><b id="profileWalletBalance">0</b></div>
   <button type="button" data-profile-target="settings">⚙️ הגדרות חשבון</button>
   <button type="button" id="profileDevicePreferences">📱 Device Preferences</button>
   <div id="profileDevicePreferencesPanel" style="display:none;padding:8px 13px;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);font-size:12px;">
@@ -545,8 +544,8 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   <button type="button" data-profile-target="status">🟢 הסטטוס שלי</button>
   <button type="button" data-profile-target="subs">💳 מנויים</button>
   <button type="button" data-profile-target="shop">🛍️ חנות</button>
-  <button type="button" data-profile-target="boards">📢 מודעות</button>
   <button type="button" data-profile-target="profile">👤 פרטי משתמש</button>
+  <button type="button" id="profileAccounts">🔄 החלפת חשבון</button>
   <button type="button" id="profileUsers">👥 משתמשים וצ׳אט</button>
   <button type="button" id="profileLogout">🚪 התנתקות</button>
 </div>
@@ -1289,38 +1288,48 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 <script>
   // === TikTok config — real OAuth, server confirmed working ===
   const TIKTOK_CLIENT_KEY = "sbawi4iah8tlx0wyst";
-  // All client-side state is persisted in the user's database profile.
-  const retzefStorage={cache:{},ready:false,pending:null,getItem(key){return Object.prototype.hasOwnProperty.call(this.cache,key)?JSON.stringify(this.cache[key]):null;},setItem(key,value){try{this.cache[key]=JSON.parse(value);}catch(_){this.cache[key]=value;}this.persist();},removeItem(key){delete this.cache[key];this.persist();},async load(){try{const r=await fetch('/api/users?clientState=1',{credentials:'include',cache:'no-store'});const d=await r.json();const state=d.clientState||{};this.cache={'retzef_subscription_id':state.subscriptionId||'','retzef_subscription_name':state.subscriptionName||'','retzef_last_chat_request':state.lastChatRequest||'','retzef_last_chat_message':state.lastChatMessage||'','retzef_last_support_request':state.lastSupportRequest||'','retzef_site_settings':state.settings||{},'retzef_cart_items':state.cart||[]};this.ready=true;if(typeof loadSiteSettings==='function')loadSiteSettings();document.dispatchEvent(new CustomEvent('retzef-storage-ready'));}catch(_){this.ready=false;}},persist(){clearTimeout(this.pending);this.pending=setTimeout(()=>{if(!this.ready||!window.__retzefProfile)return;const c=this.cache;fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'clientState',state:{subscriptionId:c.retzef_subscription_id||'',subscriptionName:c.retzef_subscription_name||'',lastChatRequest:c.retzef_last_chat_request||'',lastChatMessage:c.retzef_last_chat_message||'',lastSupportRequest:c.retzef_last_support_request||'',settings:c.retzef_site_settings||{},cart:c.retzef_cart_items||[]}})}).catch(()=>{});},250)}};
-  const storage=retzefStorage;
   const TIKTOK_GROUP_URL = "https://tiktok.me/group/ZSfhTkvp4/";
   const TIKTOK_REDIRECT_URI = "https://chi-liart-74.vercel.app/api/callback";
 
   document.getElementById('tiktokGroupLink').href = TIKTOK_GROUP_URL;
 
-  document.getElementById('tiktokLoginBtn').addEventListener('click', ()=>openConsentModal(true));
+  document.getElementById('tiktokLoginBtn').addEventListener('click', openConsentModal);
   const profileMenu=document.getElementById('profileMenu');
   const profileMenuUser=document.getElementById('profileMenuUser');
   document.getElementById('profileAvatar').addEventListener('click', function(){
-    if(window.__retzefProfile){ profileMenu.classList.toggle('open'); }
+    if(window.__retzefProfile){ profileMenuUser.textContent='מחובר/ת בתור @'+(window.__retzefProfile.username||'משתמש'); profileMenu.classList.toggle('open'); }
     else openConsentModal();
   });
   const quickModal=document.getElementById('profileQuickModal');
   const quickTitle=document.getElementById('profileQuickTitle');
   const quickBody=document.getElementById('profileQuickBody');
+  const ACCOUNT_STORAGE_KEY='retzef_tiktok_accounts';
+  function getSavedAccounts(){try{return JSON.parse(localStorage.getItem(ACCOUNT_STORAGE_KEY)||'[]').filter(a=>a&&a.username);}catch(_){return [];}}
+  function rememberAccount(profile){if(!profile?.username)return;const account={username:String(profile.username).replace(/^@/,'').toLowerCase(),displayName:profile.displayName||profile.username,avatarUrl:profile.avatarUrl||'',role:profile.role||'member'};const accounts=getSavedAccounts().filter(a=>a.username!==account.username);localStorage.setItem(ACCOUNT_STORAGE_KEY,JSON.stringify([account,...accounts].slice(0,10)));}
+  async function switchAccount(username){const clean=String(username||'').replace(/^@/,'').trim().toLowerCase();if(!clean)return;const button=Array.from(document.querySelectorAll('#savedAccountsList button')).find(b=>b.textContent==='החלף'&&b.closest('div')?.textContent?.toLowerCase().includes('@'+clean));if(button){button.disabled=true;button.textContent='מחליף...';}try{const response=await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'switchAccount',username:clean})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'switch_account_failed');window.__retzefProfile=null;profileMenu.classList.remove('open');quickModal.classList.remove('open');window.location.replace('/?account_switch='+Date.now());}catch(error){if(button){button.disabled=false;button.textContent='החלף';}alert('לא ניתן להחליף חשבון כרגע: '+(error.message==='profile_not_found'?'החשבון עדיין לא נשמר בשרת. התחבר אליו פעם אחת עם TikTok.':'נסו שוב.'));}}
+  function openAccountManager(){
+    profileMenu.classList.remove('open');
+    const accounts=getSavedAccounts();
+    quickTitle.textContent='🔄 חשבונות TikTok';
+    quickBody.innerHTML='<p>אפשר לשמור כמה חשבונות במכשיר הזה ולהחליף ביניהם.</p><div id="savedAccountsList"></div><button type="button" class="quick-action" id="addTikTokAccount">➕ הוספת חשבון TikTok</button><p style="font-size:12px;color:var(--muted);">האתר לא שומר סיסמאות או קודי TikTok. ההחלפה משתמשת בחשבונות שכבר התחברו במכשיר.</p>';
+    const list=document.getElementById('savedAccountsList');
+    if(!accounts.length) list.innerHTML='<p style="color:var(--muted);">אין עדיין חשבונות שמורים.</p>';
+    accounts.forEach(account=>{const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:9px;margin:8px 0;padding:8px;border:1px solid var(--glass-border);border-radius:12px;';const name=document.createElement('span');name.style.flex='1';name.textContent=(account.displayName||account.username)+' · @'+account.username;const button=document.createElement('button');button.type='button';button.className='quick-action';button.textContent=String(window.__retzefProfile?.username||'').toLowerCase()===account.username?'מחובר ✅':'החלף';button.disabled=button.textContent==='מחובר ✅';button.onclick=()=>switchAccount(account.username);row.append(name,button);list.appendChild(row);});
+    quickModal.classList.add('open');
+    document.getElementById('addTikTokAccount').addEventListener('click',()=>{quickModal.classList.remove('open');closeConsentModal();startTikTokLogin(true);});
+  }
   function openProfileAction(action){
     const profile=window.__retzefProfile||{};
     const username=profile.username||'לא מחובר';
     const displayName=profile.displayName||username;
     const role=profile.role==='owner'?'בעלים 👑':profile.role==='admin'?'מנהל/ת 👩‍💼':'חבר/ה';
-    quickTitle.textContent=action==='wallet'?'🪙 הארנק שלי':action==='walletActivity'?'📊 פעילויות בארנק':action==='settings'?'⚙️ הגדרות חשבון':action==='devicePreferences'?'📱 Device Preferences':action==='devicePerformance'?'⚡ Device Performance':action==='status'?'🟢 הסטטוס שלי':action==='profile'?'👤 פרטי משתמש':'💳 המנוי שלי';
-    if(action==='walletActivity') { quickBody.innerHTML='<p>טוען את הפעילויות...</p>'; fetch('/api/users',{credentials:'include',cache:'no-store'}).then(r=>r.json()).then(data=>{const wallet=data.me?.wallet||{};const transactions=Array.isArray(wallet.transactions)?wallet.transactions.slice(0,50):[];quickBody.innerHTML='<div style=\"text-align:center;padding:12px 0\"><div style=\"font-size:34px\">📊</div><h3 style=\"margin:4px 0\">פעילויות בארנק</h3><p style=\"color:var(--muted)\">כל ההפקדות, התרומות והרכישות</p></div><div style=\"margin-top:8px\">'+(transactions.length?transactions.map(t=>'<div style=\"display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--glass-border)\"><span>'+String(t.reason||'פעולה')+'</span><b style=\"color:'+(Number(t.amount)<0?'#dc2626':'#16a34a')+'\">'+(Number(t.amount)>0?'+':'')+Number(t.amount||0)+' 🪙</b></div>').join(''):'<p>אין עדיין פעילות בארנק.</p>')+'</div>';}).catch(()=>{quickBody.innerHTML='<p>לא ניתן לטעון את הפעילויות כרגע.</p>';}); }
-    if(action==='wallet') { quickBody.innerHTML='<p>טוען את נתוני הארנק...</p>'; fetch('/api/users',{credentials:'include',cache:'no-store'}).then(r=>r.json()).then(data=>{const wallet=data.me?.wallet||{};const transactions=Array.isArray(wallet.transactions)?wallet.transactions.slice(0,20):[];quickBody.innerHTML='<div style="text-align:center;padding:12px 0"><div style="font-size:34px">🪙</div><div id="walletModalBalance" style="font-size:28px;font-weight:800;color:var(--accent)">'+Number(wallet.balance||0)+' מטבעות</div><p>יתרת הארנק שלך</p></div><div style="border:1px solid var(--glass-border);border-radius:12px;padding:10px;margin:10px 0"><b>🎟️ קוד מתנה</b><input id="giftCodeInput" maxlength="32" placeholder="הזן קוד מתנה" style="width:100%;margin-top:8px;padding:9px;border:1px solid var(--glass-border);border-radius:8px;background:var(--bg2);color:var(--text);text-transform:uppercase"><button type="button" class="quick-action" id="redeemGiftBtn">מימוש קוד</button><p id="giftMessage" style="margin-top:8px"></p></div><div style="border:1px solid var(--glass-border);border-radius:12px;padding:10px;margin:10px 0"><b>🎁 תרומה למשתמש</b><input id="donateUsername" placeholder="שם משתמש או @username" style="width:100%;margin-top:8px;padding:9px;border:1px solid var(--glass-border);border-radius:8px;background:var(--bg2);color:var(--text)"><input id="donateAmount" type="number" min="1" placeholder="מספר מטבעות" style="width:100%;margin-top:8px;padding:9px;border:1px solid var(--glass-border);border-radius:8px;background:var(--bg2);color:var(--text)"><input id="donateReason" maxlength="160" placeholder="סיבה (לא חובה)" style="width:100%;margin-top:8px;padding:9px;border:1px solid var(--glass-border);border-radius:8px;background:var(--bg2);color:var(--text)"><button type="button" class="quick-action" id="donateCoinsBtn">שליחת תרומה</button><p id="donateMessage" style="margin-top:8px"></p></div></div>';const giftBtn=document.getElementById('redeemGiftBtn');giftBtn.onclick=async()=>{const msg=document.getElementById('giftMessage');giftBtn.disabled=true;msg.textContent='בודק קוד...';try{const r=await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'giftCodeRedeem',code:document.getElementById('giftCodeInput').value})});const result=await r.json();if(!r.ok)throw new Error(result.error||'gift_failed');msg.textContent='✅ קיבלת '+Number(result.amount||0)+' מטבעות!';document.getElementById('walletModalBalance').textContent=Number(result.wallet.balance||0)+' מטבעות';document.getElementById('profileWalletBalance').textContent=Number(result.wallet.balance||0)+' 🪙';document.getElementById('giftCodeInput').value='';}catch(e){msg.textContent=e.message==='code_not_found'?'❌ הקוד לא נמצא.':e.message==='code_expired'?'❌ הקוד פג תוקף.':e.message==='code_used_up'?'❌ הקוד כבר נוצל במלואו.':e.message==='already_redeemed'?'❌ כבר מימשת את הקוד הזה.':'❌ לא ניתן לממש את הקוד.';}giftBtn.disabled=false;};const btn=document.getElementById('donateCoinsBtn');btn.onclick=async()=>{const msg=document.getElementById('donateMessage');btn.disabled=true;msg.textContent='שולח...';try{const r=await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'walletDonate',username:document.getElementById('donateUsername').value,amount:document.getElementById('donateAmount').value,reason:document.getElementById('donateReason').value})});const result=await r.json();if(!r.ok)throw new Error(result.error||'donation_failed');msg.textContent='✅ התרומה נשלחה בהצלחה.';document.getElementById('walletModalBalance').textContent=Number(result.wallet.balance||0)+' מטבעות';document.getElementById('profileWalletBalance').textContent=Number(result.wallet.balance||0)+' 🪙';}catch(e){msg.textContent=e.message==='insufficient_coins'?'❌ אין מספיק מטבעות.':e.message==='recipient_not_found'?'❌ המשתמש לא נמצא.':e.message==='invalid_recipient'?'❌ שם משתמש לא תקין או שזה החשבון שלך.':'❌ לא ניתן לשלוח את התרומה.';}btn.disabled=false;};}).catch(()=>{quickBody.innerHTML='<p>לא ניתן לטעון את הארנק כרגע. נסה שוב.</p>';}); }
+    quickTitle.textContent=action==='settings'?'⚙️ הגדרות חשבון':action==='devicePreferences'?'📱 Device Preferences':action==='devicePerformance'?'⚡ Device Performance':action==='status'?'🟢 הסטטוס שלי':action==='profile'?'👤 פרטי משתמש':'💳 המנוי שלי';
     if(action==='settings') { const normalizedUsername=String(username).replace(/^@/,'').toLowerCase(); const ages={'ban.real':'10','oobbn98':'12','dahan324':'11','albinocapybara':'12','user1691117561269':'13'}; const birthdays={'albinocapybara':'5 בפברואר 2014'}; quickBody.innerHTML=`<p><b>חשבון TikTok</b></p><p>שם תצוגה: ${displayName}</p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p><p>גיל: ${ages[normalizedUsername]||profile.age||'לא נמסר על ידי TikTok'}</p>${birthdays[normalizedUsername]?`<p>תאריך יום הולדת: ${birthdays[normalizedUsername]}</p>`:''}<p>התחברות: ${window.__retzefProfile?'מחובר ✅':'לא מחובר'}</p><hr><p><b>פרטיות</b></p><label><input type="checkbox" id="privacyStatus" ${profile.privacy?.statusVisible!==false?'checked':''}> לאפשר לראות את הסטטוס שלי</label><br><label><input type="checkbox" id="privacySubscription" ${profile.privacy?.subscriptionVisible===true?'checked':''}> לאפשר לראות את המנוי שלי</label><button type="button" class="quick-action" id="savePrivacy">שמירת הגדרות פרטיות</button><button type="button" class="quick-action" id="quickDarkMode">🌗 החלפת מצב כהה/בהיר</button><button type="button" class="quick-action" id="openFullSettings">⚙️ פתיחת כל הגדרות האתר</button><details id="accountDeviceDetails" style="margin-top:10px;text-align:right;border-top:1px solid var(--glass-border);padding-top:8px;"><summary style="cursor:pointer;font-weight:700;padding:8px;">⌄ הגדרות מכשיר</summary><div style="padding:8px 4px;"><b>📱 Device Preferences</b><label style="display:block;margin:8px 0;"><input type="checkbox" id="accountReduceMotion"> הפחתת אנימציות</label><label style="display:block;margin:8px 0;"><input type="checkbox" id="accountBrowserNotifications"> התראות בדפדפן</label><button type="button" class="quick-action" id="saveAccountDevicePreferences">שמירת העדפות מכשיר</button><hr><b>⚡ Device Performance</b><button type="button" class="quick-action" id="runAccountPerformance">בדיקת ביצועים</button><div id="accountPerformanceResult" style="white-space:pre-line;font-size:12px;margin-top:8px;"></div></div></details>`; }
     else if(action==='devicePreferences') { const saved=getDevicePreferences(); quickBody.innerHTML=`<p>העדפות אלה נשמרות במכשיר הזה.</p><label><input type="checkbox" id="quickReduceMotion" ${saved.reduceMotion?'checked':''}> הפחתת אנימציות</label><br><label><input type="checkbox" id="quickBrowserNotifications" ${saved.notifications?'checked':''}> התראות בדפדפן</label><button type="button" class="quick-action" id="saveQuickDevicePreferences">שמירת העדפות מכשיר</button>`; }
     else if(action==='devicePerformance') { quickBody.innerHTML='<p>בדיקת ביצועים מקומית — המידע לא נשלח לשרת.</p><button type="button" class="quick-action" id="runQuickPerformance">⚡ בדיקת ביצועים</button><div id="quickPerformanceResult" style="white-space:pre-line;margin-top:10px;"></div>'; }
     else if(action==='status') quickBody.innerHTML=`<p><b>${displayName}</b> (@${username})</p><p>תפקיד: ${role}</p><p>סטטוס: ${profile.role==='owner'?'בעלים':'הכול טוב'}</p>`;
     else if(action==='profile') quickBody.innerHTML=`<p>שם תצוגה: <b>${displayName}</b></p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p>`;
-    else quickBody.innerHTML=`<p>${storage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האתר.</p>`;
+    else quickBody.innerHTML=`<p>${localStorage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האתר.</p>`;
     quickModal.classList.add('open');
     const savePrivacy=document.getElementById('savePrivacy'); if(savePrivacy)savePrivacy.addEventListener('click',async()=>{const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'privacy',statusVisible:document.getElementById('privacyStatus').checked,subscriptionVisible:document.getElementById('privacySubscription').checked})});savePrivacy.textContent=r.ok?'נשמר ✅':'שמירה נכשלה';}); const dark=document.getElementById('quickDarkMode'); if(dark)dark.addEventListener('click',()=>document.getElementById('darkModeToggle')?.click()); const full=document.getElementById('openFullSettings'); if(full)full.addEventListener('click',()=>{quickModal.classList.remove('open');if(typeof window.activateTab==='function')window.activateTab('settings');}); const savedDevice=getDevicePreferences(); const arm=document.getElementById('accountReduceMotion'); const abn=document.getElementById('accountBrowserNotifications'); if(arm)arm.checked=savedDevice.reduceMotion===true; if(abn)abn.checked=savedDevice.notifications===true; const saveAccountDevice=document.getElementById('saveAccountDevicePreferences'); if(saveAccountDevice)saveAccountDevice.addEventListener('click',async()=>{const reduceMotion=arm.checked;const notifications=abn.checked;await saveDevicePreferencesToDatabase(reduceMotion,notifications);document.documentElement.dataset.reduceMotion=reduceMotion?'true':'false';if(notifications&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();saveAccountDevice.textContent='נשמר ✅';}); const runAccountPerformance=document.getElementById('runAccountPerformance'); if(runAccountPerformance)runAccountPerformance.addEventListener('click',async()=>{const lines=['חיבור לאינטרנט: '+(navigator.onLine?'✅ מחובר':'❌ לא מחובר'),'JavaScript: ✅ פעיל','מסך: '+screen.width+'×'+screen.height,'ליבות מעבד: '+(navigator.hardwareConcurrency||'לא נמסר'),'זיכרון משוער: '+(navigator.deviceMemory?navigator.deviceMemory+'GB':'לא נמסר')];try{const battery=await navigator.getBattery?.();if(battery)lines.push('סוללה: '+Math.round(battery.level*100)+'%'+(battery.charging?' · בטעינה':''));}catch(_){}document.getElementById('accountPerformanceResult').textContent=lines.join('\n');}); const quickDevice=document.getElementById('saveQuickDevicePreferences'); if(quickDevice)quickDevice.addEventListener('click',async()=>{const reduceMotion=document.getElementById('quickReduceMotion').checked;const notifications=document.getElementById('quickBrowserNotifications').checked;await saveDevicePreferencesToDatabase(reduceMotion,notifications);document.documentElement.dataset.reduceMotion=reduceMotion?'true':'false';if(notifications&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();quickDevice.textContent='נשמר ✅';}); const quickPerformance=document.getElementById('runQuickPerformance'); if(quickPerformance)quickPerformance.addEventListener('click',async()=>{const lines=['חיבור לאינטרנט: '+(navigator.onLine?'✅ מחובר':'❌ לא מחובר'),'JavaScript: ✅ פעיל','מסך: '+screen.width+'×'+screen.height,'ליבות מעבד: '+(navigator.hardwareConcurrency||'לא נמסר'),'זיכרון משוער: '+(navigator.deviceMemory?navigator.deviceMemory+'GB':'לא נמסר')];try{const battery=await navigator.getBattery?.();if(battery)lines.push('סוללה: '+Math.round(battery.level*100)+'%'+(battery.charging?' · בטעינה':''));}catch(_){}document.getElementById('quickPerformanceResult').textContent=lines.join('\n');});
   }
@@ -1328,11 +1337,12 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   document.getElementById('profileQuickClose').addEventListener('click',()=>quickModal.classList.remove('open'));
   document.getElementById('profileQuickUp').addEventListener('click',()=>{quickModal.classList.remove('open');profileMenu.classList.add('open');});
   quickModal.addEventListener('click',e=>{if(e.target===quickModal)quickModal.classList.remove('open');});
+  document.getElementById('profileAccounts').addEventListener('click',openAccountManager);
   document.getElementById('profileDevicePreferences').addEventListener('click',()=>{const panel=document.getElementById('profileDevicePreferencesPanel');const saved=getDevicePreferences();panel.style.display=panel.style.display==='none'?'block':'none';document.getElementById('profileReduceMotion').checked=saved.reduceMotion===true;document.getElementById('profileBrowserNotifications').checked=saved.notifications===true;});
   document.getElementById('saveProfileDevicePreferences').addEventListener('click',async()=>{const reduceMotion=document.getElementById('profileReduceMotion').checked;const notifications=document.getElementById('profileBrowserNotifications').checked;await saveDevicePreferencesToDatabase(reduceMotion,notifications);document.documentElement.dataset.reduceMotion=reduceMotion?'true':'false';if(notifications&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();document.getElementById('saveProfileDevicePreferences').textContent='נשמר ✅';setTimeout(()=>document.getElementById('saveProfileDevicePreferences').textContent='שמירה',1500);});
   document.getElementById('profileDevicePerformance').addEventListener('click',()=>{document.getElementById('profileDevicePerformancePanel').style.display=document.getElementById('profileDevicePerformancePanel').style.display==='none'?'block':'none';});
   document.getElementById('runProfileDevicePerformance').addEventListener('click',async()=>{const lines=['חיבור לאינטרנט: '+(navigator.onLine?'✅ מחובר':'❌ לא מחובר'),'JavaScript: ✅ פעיל','מסך: '+screen.width+'×'+screen.height,'ליבות מעבד: '+(navigator.hardwareConcurrency||'לא נמסר'),'זיכרון משוער: '+(navigator.deviceMemory?navigator.deviceMemory+'GB':'לא נמסר')];try{const battery=await navigator.getBattery?.();if(battery)lines.push('סוללה: '+Math.round(battery.level*100)+'%'+(battery.charging?' · בטעינה':''));}catch(_){}document.getElementById('profileDevicePerformanceResult').textContent=lines.join('\n');});
-  document.getElementById('profileLogout').addEventListener('click',async()=>{const logout=document.getElementById('profileLogout');logout.disabled=true;try{await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout'})});}catch(_){}document.cookie='retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax; Secure';document.cookie='retzef_join_id=; Path=/; Max-Age=0; SameSite=Lax; Secure';window.__retzefProfile=null;retzefStorage.cache={};retzefStorage.ready=false;profileMenu.classList.remove('open');location.reload();});
+  document.getElementById('profileLogout').addEventListener('click',()=>{document.cookie='retzef_profile_id=; Path=/; Max-Age=0; SameSite=Lax';window.__retzefProfile=null;profileMenu.classList.remove('open');location.reload();});
   const hubModal=document.getElementById('userHubModal'), hubUsers=document.getElementById('hubUsers'), hubRequests=document.getElementById('hubRequests'), hubChat=document.getElementById('hubChat'), hubChatTitle=document.getElementById('hubChatTitle'), hubChatMessages=document.getElementById('hubChatMessages'), hubChatInput=document.getElementById('hubChatInput');
   let activeChatUser='';
   async function enableWebPush(){
@@ -1340,24 +1350,24 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     try{const r=await fetch('/api/push');const info=await r.json();if(!info.configured||!info.publicKey)return;const permission=Notification.permission==='granted'? 'granted':await Notification.requestPermission();if(permission!=='granted')return;const reg=await navigator.serviceWorker.register('/push-sw.js');let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:Uint8Array.from(atob(info.publicKey.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))});await fetch('/api/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'subscribe',subscription:sub.toJSON()})});}catch(e){console.warn('Web Push unavailable',e);}
   }
 
-  let lastRequestSignature=storage.getItem('retzef_last_chat_request')||'';
-  let lastMessageSignature=storage.getItem('retzef_last_chat_message')||'';
+  let lastRequestSignature=localStorage.getItem('retzef_last_chat_request')||'';
+  let lastMessageSignature=localStorage.getItem('retzef_last_chat_message')||'';
   function notifyChatMessage(message){
     const from=message?.from||'משתמש'; const signature=String(from)+'|'+String(message?.createdAt||'');
-    if(signature===lastMessageSignature)return; lastMessageSignature=signature; storage.setItem('retzef_last_chat_message',signature);
+    if(signature===lastMessageSignature)return; lastMessageSignature=signature; localStorage.setItem('retzef_last_chat_message',signature);
     const toast=document.getElementById('hubNotification'); document.getElementById('hubNotificationText').textContent='💬 הודעה חדשה מ־@'+from; toast.classList.add('open');
     if('Notification' in window && Notification.permission==='granted') new Notification('הודעה חדשה בצ׳אט', {body:'@'+from+' שלח/ה הודעה חדשה'});
     setTimeout(()=>toast.classList.remove('open'),8000);
   }
   function notifyChatRequest(request){
     const from=request?.from||'משתמש'; const signature=String(from)+'|'+String(request?.createdAt||'');
-    if(signature===lastRequestSignature)return; lastRequestSignature=signature; storage.setItem('retzef_last_chat_request',signature);
+    if(signature===lastRequestSignature)return; lastRequestSignature=signature; localStorage.setItem('retzef_last_chat_request',signature);
     const toast=document.getElementById('hubNotification'); document.getElementById('hubNotificationText').textContent='📩 בקשת צ׳אט חדשה מ־@'+from; toast.classList.add('open');
     if('Notification' in window && Notification.permission==='granted') new Notification('בקשת צ׳אט חדשה', {body:'@'+from+' רוצה להתחיל צ׳אט איתך'});
     setTimeout(()=>toast.classList.remove('open'),8000);
   }
   document.getElementById('hubNotificationOpen').addEventListener('click',()=>{document.getElementById('hubNotification').classList.remove('open');openHub();});
-  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);for(const u of (d.users||[]).filter(x=>x.chatApproved)){const mr=await fetch('/api/chat?username='+encodeURIComponent(u.username));if(!mr.ok)continue;const md=await mr.json();const last=(md.messages||[]).slice(-1)[0];if(last&&last.from!==String(window.__retzefProfile.username||'').toLowerCase())notifyChatMessage(last);}if(['owner','admin'].includes(String(window.__retzefProfile.role||''))){const sr=await fetch('/api/users');if(sr.ok){const sd=await sr.json();const latest=sd.supportRequests?.[0];const signature=latest?String(latest.id):'';const previous=storage.getItem('retzef_last_support_request')||'';if(latest&&signature!==previous){storage.setItem('retzef_last_support_request',signature);const toast=document.getElementById('hubNotification');document.getElementById('hubNotificationText').textContent='📩 פנייה חדשה למערכת התמיכה מ־@'+latest.from;toast.classList.add('open');if('Notification' in window&&Notification.permission==='granted')new Notification('פניית תמיכה חדשה',{body:'מ־@'+latest.from});setTimeout(()=>toast.classList.remove('open'),10000);}}}}catch(_){} }
+  async function pollChatRequests(){if(!window.__retzefProfile)return;try{const r=await fetch('/api/users');if(!r.ok)return;const d=await r.json();if(d.requests?.length)notifyChatRequest(d.requests[0]);for(const u of (d.users||[]).filter(x=>x.chatApproved)){const mr=await fetch('/api/chat?username='+encodeURIComponent(u.username));if(!mr.ok)continue;const md=await mr.json();const last=(md.messages||[]).slice(-1)[0];if(last&&last.from!==String(window.__retzefProfile.username||'').toLowerCase())notifyChatMessage(last);}if(['owner','admin'].includes(String(window.__retzefProfile.role||''))){const sr=await fetch('/api/users');if(sr.ok){const sd=await sr.json();const latest=sd.supportRequests?.[0];const signature=latest?String(latest.id):'';const previous=localStorage.getItem('retzef_last_support_request')||'';if(latest&&signature!==previous){localStorage.setItem('retzef_last_support_request',signature);const toast=document.getElementById('hubNotification');document.getElementById('hubNotificationText').textContent='📩 פנייה חדשה למערכת התמיכה מ־@'+latest.from;toast.classList.add('open');if('Notification' in window&&Notification.permission==='granted')new Notification('פניית תמיכה חדשה',{body:'מ־@'+latest.from});setTimeout(()=>toast.classList.remove('open'),10000);}}}}catch(_){} }
   setInterval(pollChatRequests,20000);
 
   function hubText(el,text){el.textContent=text;}
@@ -1411,6 +1421,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
       const role = params.get('role') || 'member';
       const serverProfile = { username, displayName, avatarUrl, role };
       window.__retzefProfile = serverProfile;
+      rememberAccount(serverProfile);
       const nameModal = document.getElementById('usernameModal');
       if (nameModal) nameModal.classList.remove('open');
       const roleLabel = role === 'owner' ? 'בעלים' : role === 'admin' ? 'מנהל' : 'חבר';
@@ -1433,7 +1444,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     }
   })();
 
-  // === username login gate ===
+  // === username login gate — stored per-device in localStorage ===
   const PREMIUM_NAMES = ['shirel', 'שירל']; // מי שהשם שלו מופיע כאן מקבל תג "פרימיום" ליד השם
   const userGreeting = document.getElementById('userGreeting');
   const ROLE_BADGES = {
@@ -1444,6 +1455,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     'קבוצת רצף תמיכה': { label: 'מנהל מערכת תמיכה', emoji: '🔨' },
     'shirel': { label: 'מנהלת', emoji: '👩‍💼' }
   };
+  const ACCOUNT_STATUSES = {'ban.real':'בעלים','oobbn98':'הכול טוב','dahan324':'סבבה','albinocapybara':'הכול טוב','user1691117561269':'הכול טוב'};
   function showGreeting(name){
     const cleanName = name.trim().replace(/^@/, '');
     const role = ROLE_BADGES[cleanName.toLowerCase()];
@@ -1462,41 +1474,24 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     const roleText = profile.role === 'owner' ? ' 👑 בעלים' : profile.role === 'admin' ? ' 🔨 מנהל מערכת תמיכה' : (known ? ` ${known.emoji} ${known.label}` : '');
     userGreeting.innerHTML = `שלום, ${displayName} <span dir="ltr">(@${username})</span>${roleText}`;
     userGreeting.style.display = 'block';
-    const menuUser = document.getElementById('profileMenuUser');
-    if (menuUser) menuUser.textContent = `@${username} · ${displayName}`;
-    const status = document.getElementById('tiktokAuthStatus');
-    if (status) { status.textContent = `מחובר בתור @${username}${roleText} ✅`; status.style.display = 'block'; }
-    const img = document.getElementById('profileAvatarImg');
-    const wrap = document.getElementById('profileAvatar');
+    const status=document.getElementById('tiktokAuthStatus');
+    if(status){const label=profile.role==='owner'?'בעלים':profile.role==='admin'?'מנהל':'חבר';const accountStatus=profile.status||ACCOUNT_STATUSES[username.toLowerCase()]||'לא נמסר';status.textContent=`מחובר בתור ${displayName} · @${username} · סטטוס: ${accountStatus} ✅`;status.style.display='block';}
     if (profile.avatarUrl) {
+      const img = document.getElementById('profileAvatarImg');
+      const wrap = document.getElementById('profileAvatar');
       img.src = profile.avatarUrl;
       wrap.classList.add('logged-in');
+      wrap.title = `${displayName} (@${profile.username})`;
     }
-    wrap.title = `${displayName} (@${profile.username})`;
-    const loginButton = document.getElementById('tiktokLoginBtn');
-    if (loginButton) {
-      loginButton.disabled = true;
-      loginButton.classList.add('logged-in-state');
-      loginButton.innerHTML = `✅ מחובר כ־@${username}`;
-      loginButton.setAttribute('aria-label', `מחובר כ־@${username}`);
-    }
-    const menu = document.getElementById('profileMenu');
-    if (menu) menu.setAttribute('data-authenticated', 'true');
   }
   async function loadServerProfile(){
-    for(let attempt=0;attempt<3;attempt++){
-      try {
-        const response = await fetch('/api/profile', { credentials: 'include', cache: 'no-store' });
-        if(response.ok){
-          const data = await response.json();
-          if (data.profile) { window.__retzefProfile = data.profile; updateWalletUI(data.profile?.wallet); try { const walletResponse = await fetch('/api/users', { credentials: 'include', cache: 'no-store' }); if (walletResponse.ok) { const walletData = await walletResponse.json(); updateWalletUI(walletData.me?.wallet); } } catch (_) {} await retzefStorage.load(); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
-          return data.profile || null;
-        }
-        if(response.status===401||response.status===403||response.status===404)return null;
-      } catch (_) {}
-      if(attempt<2)await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));
-    }
-    return null;
+    try {
+      const response = await fetch('/api/profile?refresh='+Date.now(), { credentials: 'include', cache: 'no-store' });
+      if (!response.ok) return null;
+      const data = await response.json();
+      if (data.profile) { updateWalletUI(data.me?.wallet); window.__retzefProfile = data.profile; rememberAccount(data.profile); showTikTokGreeting(data.profile); loadAccountSettingsPanel(); loadDevicePreferencesFromDatabase(); setTimeout(enableWebPush, 0); }
+      return data.profile || null;
+    } catch (_) { return null; }
   }
   loadServerProfile();
 
@@ -1677,8 +1672,8 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     blur: '18px',
   };
   const SETTINGS_STORAGE_KEY = 'retzef_site_settings';
-  function readSiteSettings(){ try { return JSON.parse(storage.getItem(SETTINGS_STORAGE_KEY)||'null') || {}; } catch (_) { return {}; } }
-  function saveSiteSettings(){ const root=document.documentElement; const active=document.querySelector('.swatch.active'); const state={theme:root.getAttribute('data-theme')||DEFAULTS.theme,accent:root.style.getPropertyValue('--accent')||DEFAULTS.accent,accent2:root.style.getPropertyValue('--accent2')||DEFAULTS.accent2,bg:root.style.getPropertyValue('--bg')||DEFAULTS.bg,bg2:root.style.getPropertyValue('--bg2')||DEFAULTS.bg2,glass:root.style.getPropertyValue('--glass')||DEFAULTS.glass,text:root.style.getPropertyValue('--text')||DEFAULTS.text,blur:document.getElementById('blurSlider').value+'px',fontSize:document.getElementById('fontSizeSlider').value,language:currentLang,swatchA:active?.dataset.a||''}; storage.setItem(SETTINGS_STORAGE_KEY,JSON.stringify(state)); }
+  function readSiteSettings(){ try { return JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY)||'null') || {}; } catch (_) { return {}; } }
+  function saveSiteSettings(){ const root=document.documentElement; const active=document.querySelector('.swatch.active'); const state={theme:root.getAttribute('data-theme')||DEFAULTS.theme,accent:root.style.getPropertyValue('--accent')||DEFAULTS.accent,accent2:root.style.getPropertyValue('--accent2')||DEFAULTS.accent2,bg:root.style.getPropertyValue('--bg')||DEFAULTS.bg,bg2:root.style.getPropertyValue('--bg2')||DEFAULTS.bg2,glass:root.style.getPropertyValue('--glass')||DEFAULTS.glass,text:root.style.getPropertyValue('--text')||DEFAULTS.text,blur:document.getElementById('blurSlider').value+'px',fontSize:document.getElementById('fontSizeSlider').value,language:currentLang,swatchA:active?.dataset.a||''}; localStorage.setItem(SETTINGS_STORAGE_KEY,JSON.stringify(state)); }
   function loadSiteSettings(){ const saved=readSiteSettings(); const root=document.documentElement; root.setAttribute('data-theme',saved.theme||DEFAULTS.theme); root.style.setProperty('--accent',saved.accent||DEFAULTS.accent); root.style.setProperty('--accent2',saved.accent2||DEFAULTS.accent2); root.style.setProperty('--bg',saved.bg||DEFAULTS.bg); root.style.setProperty('--bg2',saved.bg2||DEFAULTS.bg2); root.style.setProperty('--glass',saved.glass||DEFAULTS.glass); root.style.setProperty('--text',saved.text||DEFAULTS.text); root.style.setProperty('--glass-blur',saved.blur||DEFAULTS.blur); const blur=parseInt(saved.blur||DEFAULTS.blur,10)||18; const font=parseInt(saved.fontSize||'100',10)||100; document.getElementById('blurSlider').value=blur; document.getElementById('fontSizeSlider').value=font; document.body.style.zoom=font/100; darkToggle.classList.toggle('on',(saved.theme||DEFAULTS.theme)==='dark'); document.getElementById('bgColorPicker').value=saved.bg||DEFAULTS.bg; document.getElementById('glassColorPicker').value=saved.bg2||DEFAULTS.bg2; document.getElementById('textColorPicker').value=saved.text||DEFAULTS.text; document.getElementById('btnColorPicker').value=saved.accent||DEFAULTS.accent; document.querySelectorAll('.swatch').forEach(sw=>sw.classList.toggle('active',saved.swatchA?sw.dataset.a===saved.swatchA:sw.dataset.a===DEFAULTS.accent)); if(saved.language) setLanguage(saved.language); }
   document.getElementById('resetSettingsBtn').addEventListener('click', function(){
     const root = document.documentElement;
@@ -1702,7 +1697,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     document.body.style.zoom = 1;
     document.getElementById('fontSizeSlider').value = 100;
     setLanguage('he');
-    storage.removeItem(SETTINGS_STORAGE_KEY);
+    localStorage.removeItem(SETTINGS_STORAGE_KEY);
     saveSiteSettings();
   });
 
@@ -2004,8 +1999,8 @@ function openPaypalModal(itemName, price){
         onApprove: function (data) {
           // שומר את מזהה המנוי במכשיר הזה בלבד — אין כאן בסיס נתונים,
           // אז זה מה שמאפשר לאתר לבדוק סטטוס בהמשך (ראו checkSubStatusBtn).
-          storage.setItem('retzef_subscription_id', data.subscriptionID);
-          storage.setItem('retzef_subscription_name', itemName);
+          localStorage.setItem('retzef_subscription_id', data.subscriptionID);
+          localStorage.setItem('retzef_subscription_name', itemName);
           subButtonContainer.innerHTML = `<p style="color:#15803d; font-weight:700; text-align:center;">✅ נרשמת בהצלחה ל-"${itemName}"! החיוב הבא יתבצע אוטומטית.</p>`;
           updateMySubStatus();
         },
@@ -2107,14 +2102,14 @@ function openPaypalModal(itemName, price){
     let cart = [];
 
     try {
-      const saved = JSON.parse(storage.getItem(CART_STORAGE_KEY) || '[]');
+      const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
       if (Array.isArray(saved)) cart = saved;
     } catch (error) {
       cart = [];
     }
 
     function saveCart() {
-      storage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
     }
 
     function renderCart() {
@@ -2189,7 +2184,6 @@ function openPaypalModal(itemName, price){
     });
 
     renderCart();
-    document.addEventListener('retzef-storage-ready', renderCart);
   }());
 </script>
 <script>
@@ -2285,4 +2279,4 @@ function openPaypalModal(itemName, price){
 <script>
 </script>
 </body>
-</html>
+  </html>

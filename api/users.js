@@ -56,6 +56,17 @@ module.exports = async (req, res) => {
       await redis('set', `${PREFIX}${me}`, JSON.stringify(mine));
       return res.status(200).json({ clientState: safe });
     }
+
+    if (req.method === 'GET' && input.savedAccounts === '1') return res.status(200).json({ accounts: Array.isArray(mine.savedAccounts) ? mine.savedAccounts.slice(0, 10) : [] });
+    if (req.method === 'POST' && action === 'saveAccount') {
+      const account = input.account && typeof input.account === 'object' ? input.account : {};
+      const username = String(account.username || '').replace(/^@/, '').trim().toLowerCase();
+      if (!/^[a-z0-9._-]{2,128}$/.test(username)) return res.status(400).json({ error: 'invalid_username' });
+      const saved = { username, displayName: String(account.displayName || username).slice(0, 120), avatarUrl: String(account.avatarUrl || '').slice(0, 1000), role: String(account.role || 'member').slice(0, 30) };
+      mine.savedAccounts = [saved, ...(Array.isArray(mine.savedAccounts) ? mine.savedAccounts : []).filter(x => String(x.username || '').toLowerCase() !== username)].slice(0, 10);
+      await redis('set', `${PREFIX}${me}`, JSON.stringify(mine));
+      return res.status(200).json({ saved: true, accounts: mine.savedAccounts });
+    }
     if (req.method === 'GET') {
       const scan = await redis('scan', '0', 'match', `${PREFIX}*`, 'count', '100');
       const keys = Array.isArray(scan) && Array.isArray(scan[1]) ? scan[1] : [];

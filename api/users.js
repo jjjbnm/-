@@ -108,8 +108,8 @@ module.exports = async (req, res) => {
       if (!/^[A-Z0-9_-]{4,32}$/.test(code)) return res.status(400).json({ error: 'invalid_code' });
       const key = `retzef:gift:${code}`;
       const raw = await redis('get', key); let gift = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null;
-      if (!gift && code === 'DHD1000') { gift = { code, amount: 1000, maxUses: -1, uses: 0, usedBy: [], expiresAt: '', createdBy: 'system', createdAt: new Date().toISOString() }; await redis('set', key, JSON.stringify(gift)); }
-      if (gift && code === 'DHD1000' && Number(gift.maxUses) === 1) { gift.maxUses = -1; await redis('set', key, JSON.stringify(gift)); }
+      if (!gift && ['DHD1000', 'DHD1001'].includes(code)) { gift = { code, amount: 1000, maxUses: -1, uses: 0, usedBy: [], expiresAt: '', createdBy: 'system', createdAt: new Date().toISOString() }; await redis('set', key, JSON.stringify(gift)); }
+      if (gift && ['DHD1000', 'DHD1001'].includes(code) && Number(gift.maxUses) === 1) { gift.maxUses = -1; await redis('set', key, JSON.stringify(gift)); }
       if (!gift) return res.status(404).json({ error: 'code_not_found' });
       if (gift.expiresAt && Date.parse(gift.expiresAt) < Date.now()) return res.status(400).json({ error: 'code_expired' });
       if (Number(gift.maxUses) > 0 && Number(gift.uses || 0) >= Number(gift.maxUses)) return res.status(400).json({ error: 'code_used_up' });

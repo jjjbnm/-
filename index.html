@@ -1428,6 +1428,8 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
       const avatarUrl = params.get('avatar') || '';
       const role = params.get('role') || 'member';
       const serverProfile = { username, displayName, avatarUrl, role };
+      // Ensure the API session is available on the exact domain after OAuth redirect.
+      if (username) document.cookie = `retzef_profile_id=${encodeURIComponent(username.toLowerCase())}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`;
       window.__retzefProfile = serverProfile;
       rememberAccount(serverProfile);
       const nameModal = document.getElementById('usernameModal');

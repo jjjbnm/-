@@ -496,10 +496,10 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 <noscript>
   <div style="position:fixed;inset:0;z-index:2147483647;background:#f6f7fb;color:#161a26;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;direction:rtl;font-family:Arial,sans-serif;">
     <div style="max-width:430px;background:#fff;border:1px solid #ddd;border-radius:18px;padding:28px;box-shadow:0 12px 40px rgba(0,0,0,.16);">
-      <h1 style="margin:0 0 12px;font-size:24px;">לא ניתן להשתמש באתר</h1>
-      <p style="line-height:1.7;">JavaScript אינו פעיל בדפדפן. האתר דורש JavaScript פעיל כדי לעבוד.</p>
+      <h1 style="margin:0 0 12px;font-size:24px;">לא ניתן להשתמש באפליקציה</h1>
+      <p style="line-height:1.7;">JavaScript אינו פעיל בדפדפן. האפליקציה דורשת JavaScript פעיל כדי לעבוד.</p>
       <code style="display:block;margin:16px 0;padding:10px;border-radius:8px;background:#f1f1f4;direction:ltr;">RETZEF_JS_DISABLED</code>
-      <p style="font-size:13px;color:#656b80;">הפעילו JavaScript בהגדרות הדפדפן ורעננו את האתר.</p>
+      <p style="font-size:13px;color:#656b80;">הפעילו JavaScript בהגדרות הדפדפן ורעננו את האפליקציה.</p>
       <button type="button" onclick="location.reload()" style="display:inline-block;margin-top:12px;padding:11px 16px;border:0;border-radius:10px;background:#3b63e0;color:#fff;font-weight:700;">נסה שוב</button>
       <a href="https://www.tiktok.com/@user613987579196?_r=1&_t=ZS-99fpXDPPMO2" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;padding:11px 16px;border-radius:10px;background:#3b63e0;color:#fff;text-decoration:none;font-weight:700;">פנייה לתמיכה</a>
     </div>
@@ -536,18 +536,18 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     text.textContent=message; code.textContent=errorCode; overlay.style.display='flex'; document.body.dataset.accessBlocked='true';
   }
   async function checkRegion(){
-    if(!navigator.onLine){ block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האתר זמין רק עם חיבור פעיל.'); return; }
+    if(!navigator.onLine){ block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האפליקציה זמינה רק עם חיבור פעיל.'); return; }
     try{
       const response=await fetch('/api/access-check',{cache:'no-store'});
       const data=await response.json().catch(()=>({}));
-      if(response.status===403 && data.error==='vpn_detected'){ block('RETZEF_VPN_DETECTED','זוהה VPN, Proxy או רשת מארחת. כבו את ה-VPN ונסו שוב.'); return; } if(response.status===403 || data.error==='region_not_allowed'){ block('RETZEF_REGION_NOT_ALLOWED','האתר זמין למבקרים מישראל בלבד.'); return; }
+      if(response.status===403 && data.error==='vpn_detected'){ block('RETZEF_VPN_DETECTED','זוהה VPN, Proxy או רשת מארחת. כבו את ה-VPN ונסו שוב.'); return; } if(response.status===403 || data.error==='region_not_allowed'){ block('RETZEF_REGION_NOT_ALLOWED','האפליקציה זמינה למבקרים מישראל בלבד.'); return; }
       if(!response.ok || data.allowed!==true){ block('RETZEF_REGION_CHECK_FAILED','לא ניתן לאמת את אזור החיבור. נסו שוב מאוחר יותר.'); }
     }catch(e){ block('RETZEF_REGION_CHECK_FAILED','לא ניתן לאמת את אזור החיבור. נסו שוב מאוחר יותר.'); }
   }
   checkRegion();
 })();
 </script>
-<div id="retzef-access-error" role="alert" aria-live="assertive"><div class="error-box"><h1>לא ניתן להיכנס לאתר</h1><p id="retzef-access-error-text">נדרשת גישה לאינטרנט כדי להשתמש באתר.</p><code id="retzef-access-error-code">RETZEF_OFFLINE</code><p>בדקו את החיבור ונסו שוב.</p><div class="error-actions"><button type="button" onclick="location.reload()">נסה שוב</button><button type="button" class="support" onclick="window.contactSupport(document.getElementById('retzef-access-error-code').textContent,document.getElementById('retzef-access-error-text').textContent)">פנייה לתמיכה והעתקת השגיאה</button></div></div></div>
+<div id="retzef-access-error" role="alert" aria-live="assertive"><div class="error-box"><h1>לא ניתן להיכנס לאפליקציה</h1><p id="retzef-access-error-text">נדרשת גישה לאינטרנט כדי להשתמש באפליקציה.</p><code id="retzef-access-error-code">RETZEF_OFFLINE</code><p>בדקו את החיבור ונסו שוב.</p><div class="error-actions"><button type="button" onclick="location.reload()">נסה שוב</button><button type="button" class="support" onclick="window.contactSupport(document.getElementById('retzef-access-error-code').textContent,document.getElementById('retzef-access-error-text').textContent)">פנייה לתמיכה והעתקת השגיאה</button></div></div></div>
 
 <script>
   window.contactSupport = function(errorName, errorMessage){
@@ -609,7 +609,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     <div class="modal-icon">
       <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
     </div>
-    <h3>האתר מבקש גישה</h3>
+    <h3>האפליקציה מבקשת גישה</h3>
     <p>לתמונת הפרופיל והשם שלך ב-TikTok, ולבדוק אם אתה חבר רגיל, מנהל או בעלים בקבוצה.</p>
     <div class="modal-actions">
       <button type="button" id="consentYes" class="btn btn-primary">כן</button>
@@ -837,7 +837,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
           <option>מנויים ותשלומים</option>
           <option>חנות</option>
           <option>תמיכה ועזרה</option>
-          <option>שינוי באתר</option>
+          <option>שינוי באפליקציה</option>
           <option>סקר לקהילה</option>
           <option>תחרות ופעילות</option>
           <option>דחוף</option></select></label>
@@ -1253,7 +1253,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   <section id="about" class="tab-panel">
     <span class="eyebrow" data-i18n="about_eyebrow">מידע כללי</span>
     <h2 class="sec-title" data-i18n="about_title">אודות וגרסה</h2>
-    <p class="sec-sub" data-i18n="about_sub">כל מה שקשור לאתר עצמו — לא לקבוצה.</p>
+    <p class="sec-sub" data-i18n="about_sub">כל מה שקשור לאפליקציה עצמה — לא לקבוצה.</p>
 
     <div class="settings-card glass">
       <h3>ℹ️ על האפליקציה</h3>
@@ -1375,7 +1375,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     const role=profile.role==='owner'?'בעלים 👑':profile.role==='admin'?'מנהל/ת 👩‍💼':'חבר/ה';
     quickTitle.textContent=action==='wallet'?'🪙 מטבעות רצף':action==='settings'?'⚙️ הגדרות חשבון':action==='devicePreferences'?'📱 Device Preferences':action==='devicePerformance'?'⚡ Device Performance':action==='status'?'🟢 הסטטוס שלי':action==='profile'?'👤 פרטי משתמש':'💳 המנוי שלי';
     if(action==='wallet') { if(profile.username) document.cookie = `retzef_profile_id=${encodeURIComponent(String(profile.username).replace(/^@/,'').toLowerCase())}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`; const balance=Number(profile.wallet?.balance||0); quickBody.innerHTML=`<div style="text-align:center;padding:12px 0"><div style="font-size:44px">🪙</div><h3>מטבעות רצף</h3><p id="walletQuickBalance" style="font-size:24px;font-weight:800;color:#a16207">${balance.toLocaleString()} מטבעות</p><p>היתרה שלך נשמרת במסד הנתונים.</p><hr><h4>🎁 מימוש קוד</h4><div style="display:flex;gap:6px"><input id="walletGiftCode" placeholder="הקלד קוד" maxlength="32" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--glass-border);direction:ltr"><button type="button" id="walletRedeemBtn" class="quick-action">מימוש</button></div><p id="walletGiftMessage" style="font-size:13px"></p><hr><h4>🔄 טרייד / העברת מטבעות</h4><input id="walletTradeUser" placeholder="שם משתמש לקבלה" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--glass-border);margin-bottom:6px"><input id="walletTradeAmount" type="number" min="1" placeholder="כמות מטבעות" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--glass-border);margin-bottom:6px"><button type="button" id="walletTradeBtn" class="quick-action">שלח מטבעות</button><p id="walletTradeMessage" style="font-size:13px"></p></div>`; }
-    else if(action==='settings') { const normalizedUsername=String(username).replace(/^@/,'').toLowerCase(); const ages={'ban.real':'10','oobbn98':'12','dahan324':'11','albinocapybara':'12','user1691117561269':'13'}; const birthdays={'albinocapybara':'5 בפברואר 2014'}; quickBody.innerHTML=`<p><b>חשבון TikTok</b></p><p>שם תצוגה: ${displayName}</p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p><p>גיל: ${ages[normalizedUsername]||profile.age||'לא נמסר על ידי TikTok'}</p>${birthdays[normalizedUsername]?`<p>תאריך יום הולדת: ${birthdays[normalizedUsername]}</p>`:''}<p>התחברות: ${window.__retzefProfile?'מחובר ✅':'לא מחובר'}</p><hr><p><b>פרטיות</b></p><label><input type="checkbox" id="privacyStatus" ${profile.privacy?.statusVisible!==false?'checked':''}> לאפשר לראות את הסטטוס שלי</label><br><label><input type="checkbox" id="privacySubscription" ${profile.privacy?.subscriptionVisible===true?'checked':''}> לאפשר לראות את המנוי שלי</label><button type="button" class="quick-action" id="savePrivacy">שמירת הגדרות פרטיות</button><button type="button" class="quick-action" id="quickDarkMode">🌗 החלפת מצב כהה/בהיר</button><button type="button" class="quick-action" id="openFullSettings">⚙️ פתיחת כל הגדרות האתר</button><details id="accountDeviceDetails" style="margin-top:10px;text-align:right;border-top:1px solid var(--glass-border);padding-top:8px;"><summary style="cursor:pointer;font-weight:700;padding:8px;">⌄ הגדרות מכשיר</summary><div style="padding:8px 4px;"><b>📱 Device Preferences</b><label style="display:block;margin:8px 0;"><input type="checkbox" id="accountReduceMotion"> הפחתת אנימציות</label><label style="display:block;margin:8px 0;"><input type="checkbox" id="accountBrowserNotifications"> התראות בדפדפן</label><button type="button" class="quick-action" id="saveAccountDevicePreferences">שמירת העדפות מכשיר</button><hr><b>⚡ Device Performance</b><button type="button" class="quick-action" id="runAccountPerformance">בדיקת ביצועים</button><div id="accountPerformanceResult" style="white-space:pre-line;font-size:12px;margin-top:8px;"></div></div></details>`; }
+    else if(action==='settings') { const normalizedUsername=String(username).replace(/^@/,'').toLowerCase(); const ages={'ban.real':'10','oobbn98':'12','dahan324':'11','albinocapybara':'12','user1691117561269':'13'}; const birthdays={'albinocapybara':'5 בפברואר 2014'}; quickBody.innerHTML=`<p><b>חשבון TikTok</b></p><p>שם תצוגה: ${displayName}</p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p><p>גיל: ${ages[normalizedUsername]||profile.age||'לא נמסר על ידי TikTok'}</p>${birthdays[normalizedUsername]?`<p>תאריך יום הולדת: ${birthdays[normalizedUsername]}</p>`:''}<p>התחברות: ${window.__retzefProfile?'מחובר ✅':'לא מחובר'}</p><hr><p><b>פרטיות</b></p><label><input type="checkbox" id="privacyStatus" ${profile.privacy?.statusVisible!==false?'checked':''}> לאפשר לראות את הסטטוס שלי</label><br><label><input type="checkbox" id="privacySubscription" ${profile.privacy?.subscriptionVisible===true?'checked':''}> לאפשר לראות את המנוי שלי</label><button type="button" class="quick-action" id="savePrivacy">שמירת הגדרות פרטיות</button><button type="button" class="quick-action" id="quickDarkMode">🌗 החלפת מצב כהה/בהיר</button><button type="button" class="quick-action" id="openFullSettings">⚙️ פתיחת כל הגדרות האפליקציה</button><details id="accountDeviceDetails" style="margin-top:10px;text-align:right;border-top:1px solid var(--glass-border);padding-top:8px;"><summary style="cursor:pointer;font-weight:700;padding:8px;">⌄ הגדרות מכשיר</summary><div style="padding:8px 4px;"><b>📱 Device Preferences</b><label style="display:block;margin:8px 0;"><input type="checkbox" id="accountReduceMotion"> הפחתת אנימציות</label><label style="display:block;margin:8px 0;"><input type="checkbox" id="accountBrowserNotifications"> התראות בדפדפן</label><button type="button" class="quick-action" id="saveAccountDevicePreferences">שמירת העדפות מכשיר</button><hr><b>⚡ Device Performance</b><button type="button" class="quick-action" id="runAccountPerformance">בדיקת ביצועים</button><div id="accountPerformanceResult" style="white-space:pre-line;font-size:12px;margin-top:8px;"></div></div></details>`; }
     else if(action==='devicePreferences') { const saved=getDevicePreferences(); quickBody.innerHTML=`<p>העדפות אלה נשמרות במכשיר הזה.</p><label><input type="checkbox" id="quickReduceMotion" ${saved.reduceMotion?'checked':''}> הפחתת אנימציות</label><br><label><input type="checkbox" id="quickBrowserNotifications" ${saved.notifications?'checked':''}> התראות בדפדפן</label><button type="button" class="quick-action" id="saveQuickDevicePreferences">שמירת העדפות מכשיר</button>`; }
     else if(action==='devicePerformance') { quickBody.innerHTML='<p>בדיקת ביצועים מקומית — המידע לא נשלח לשרת.</p><button type="button" class="quick-action" id="runQuickPerformance">⚡ בדיקת ביצועים</button><div id="quickPerformanceResult" style="white-space:pre-line;margin-top:10px;"></div>'; }
     else if(action==='status') quickBody.innerHTML=`<p><b>${displayName}</b> (@${username})</p><p>תפקיד: ${role}</p><p>סטטוס: ${profile.role==='owner'?'בעלים':'הכול טוב'}</p>`;
@@ -1840,7 +1840,7 @@ function openPaypalModal(itemName, price){
     if (typeof paypal === 'undefined') {
       if (window.__paypalSdkFailed) {
         console.error('PayPal SDK script failed to load entirely (network/blocker). client-id used:', clientIdInUrl);
-        showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">כפתורי PayPal לא נטענו — לרוב זה חוסם פרסומות/פרטיות בדפדפן שחוסם סקריפטים מ-paypal.com, או בעיית רשת. נסו דפדפן אחר או כבו את החוסם לאתר הזה.</p>');
+        showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">כפתורי PayPal לא נטענו — לרוב זה חוסם פרסומות/פרטיות בדפדפן שחוסם סקריפטים מ-paypal.com, או בעיית רשת. נסו דפדפן אחר או כבו את החוסם לאפליקציה הזו.</p>');
       } else {
         console.warn('PayPal SDK not yet loaded when button was clicked (window.paypal undefined, no error/load event fired yet). client-id used:', clientIdInUrl);
         showManualFallback('<p style="color:#b91c1c; font-size:13.5px;">PayPal עדיין לא נטען. נסו לרענן את הדף ולנסות שוב בעוד כמה שניות.</p>');

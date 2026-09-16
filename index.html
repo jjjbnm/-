@@ -627,7 +627,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 
 
 <div class="modal-overlay" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
-  <div class="modal-card"><button type="button" class="modal-close" id="joinClose" aria-label="סגירה">✕</button><h3 id="joinTitle">הצטרפות דרך האפליקציה</h3><p>מלאו את הפרטים. גיל ושם משתמש נדרשים לשליחה.</p><form id="joinForm"><label>שם <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><input id="joinName" maxlength="60" placeholder="אפשר להשאיר ריק"></label><label>שם משתמש <span style="color:#b91c1c;">*</span><input id="joinUsername" maxlength="60" pattern="[A-Za-z0-9._-]{2,60}" placeholder="username" required></label><label>גיל <span style="color:#b91c1c;">*</span><input id="joinAge" type="number" min="1" max="120" required></label><label>בן או בת <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><select id="joinGender"><option value="">לא נמסר</option><option value="בן">בן</option><option value="בת">בת</option></select></label><button type="submit" class="btn btn-tiktok">שליחת בקשת הצטרפות</button><div id="joinResult" style="margin-top:10px;font-size:13px;"></div></form></div>
+  <div class="modal-card"><button type="button" class="modal-close" id="joinClose" aria-label="סגירה">✕</button><h3 id="joinTitle">הצטרפות דרך האתר</h3><p>מלאו את הפרטים. גיל ושם משתמש נדרשים לשליחה.</p><form id="joinForm"><label>שם <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><input id="joinName" maxlength="60" placeholder="אפשר להשאיר ריק"></label><label>שם משתמש <span style="color:#b91c1c;">*</span><input id="joinUsername" maxlength="60" pattern="[A-Za-z0-9._-]{2,60}" placeholder="username" required></label><label>גיל <span style="color:#b91c1c;">*</span><input id="joinAge" type="number" min="1" max="120" required></label><label>בן או בת <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><select id="joinGender"><option value="">לא נמסר</option><option value="בן">בן</option><option value="בת">בת</option></select></label><button type="submit" class="btn btn-tiktok">שליחת בקשת הצטרפות</button><div id="joinResult" style="margin-top:10px;font-size:13px;"></div></form></div>
 </div>
 
 
@@ -675,7 +675,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
         <span data-i18n="hero_login_btn">התחברות עם TikTok</span>
       </button>
-      <button type="button" id="joinWebsiteBtn" class="btn btn-ghost glass">הצטרפות דרך האפליקציה</button>
+      <button type="button" id="joinWebsiteBtn" class="btn btn-ghost glass">הצטרפות דרך האתר</button>
       <a href="#" data-target="contact" class="btn btn-ghost glass tab-jump" data-i18n="hero_tiktok_page_btn">עמוד TikTok של רצף</a>
       <a href="#" data-target="status" class="btn btn-ghost glass tab-jump" data-i18n="hero_check_status_btn">בדיקת סטטוס</a>
     </div>

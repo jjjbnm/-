@@ -512,6 +512,13 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   const entry=document.getElementById('retzefEntryChoice');
   const tikTok=document.getElementById('retzefEntryTikTok');
   const guest=document.getElementById('retzefEntryGuest');
+  const isInstalledApp=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if(!isInstalledApp){
+    if(splash) splash.remove();
+    if(entry) entry.remove();
+    document.body.classList.remove('entry-screen-active');
+    return;
+  }
   function closeScreens(){ if(splash){splash.classList.add('is-hidden');setTimeout(()=>splash.remove(),380);} if(entry)entry.classList.remove('is-visible'); document.body.classList.remove('entry-screen-active'); }
   function showChoice(){
     if(new URLSearchParams(location.search).get('tiktok_ok')==='1') return closeScreens();

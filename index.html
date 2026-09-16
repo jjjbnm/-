@@ -2168,6 +2168,48 @@ function openPaypalModal(itemName, price){
   }());
 </script>
 <script>
+  // === Banned members list ===
+  (function () {
+    const toggle = document.getElementById('bannedToggleBtn');
+    const panel = document.getElementById('bannedList');
+    const names = document.getElementById('bannedNames');
+    const empty = document.getElementById('bannedEmpty');
+    if (!toggle || !panel || !names || !empty) return;
+    let loaded = false;
+    toggle.addEventListener('click', async function () {
+      const opening = panel.style.display === 'none' || !panel.style.display;
+      if (!opening) { panel.style.display = 'none'; return; }
+      panel.style.display = 'block';
+      if (loaded) return;
+      names.innerHTML = '<li style="color:var(--muted);">טוען את הרשימה...</li>';
+      empty.style.display = 'none';
+      try {
+        const response = await fetch('/api/users', { credentials: 'include', cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'banned_list_failed');
+        const banned = (Array.isArray(data.users) ? data.users : []).filter(user => user && user.banned === true);
+        names.innerHTML = '';
+        if (!banned.length) { empty.style.display = 'block'; loaded = true; return; }
+        banned.forEach(user => {
+          const item = document.createElement('li');
+          item.className = 'glass';
+          item.style.cssText = 'padding:10px 12px; display:flex; justify-content:space-between; gap:10px; align-items:center;';
+          const label = document.createElement('span');
+          label.textContent = (user.displayName || user.username || 'משתמש') + ' · @' + (user.username || '');
+          const reason = document.createElement('small');
+          reason.style.color = '#b91c1c';
+          reason.textContent = user.banReason || 'הפרת כללי הקבוצה';
+          item.append(label, reason);
+          names.appendChild(item);
+        });
+        loaded = true;
+      } catch (_) {
+        names.innerHTML = '<li style="color:#b91c1c;">❌ לא ניתן לטעון את רשימת החסומים כרגע.</li>';
+      }
+    });
+  }());
+</script>
+<script>
   // === Shopping cart ===
   (function () {
     const CART_STORAGE_KEY = 'retzef_cart_items';

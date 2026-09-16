@@ -1349,7 +1349,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 
   document.getElementById('tiktokGroupLink').href = TIKTOK_GROUP_URL;
 
-  document.getElementById('tiktokLoginBtn').addEventListener('click', openConsentModal);
+  document.getElementById('tiktokLoginBtn').addEventListener('click', function(){ startTikTokLogin(false); });
   const profileMenu=document.getElementById('profileMenu');
   const profileMenuUser=document.getElementById('profileMenuUser');
   document.getElementById('profileAvatar').addEventListener('click', function(){

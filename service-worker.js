@@ -1,4 +1,4 @@
-const CACHE_NAME = 'retzef-pwa-v2-entry-screen';
+const CACHE_NAME = 'retzef-pwa-v3-apps-tab';
 const APP_SHELL = [
   '/',
   '/index.html',

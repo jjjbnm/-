@@ -306,6 +306,12 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   .contact-card p{color:var(--muted); font-size:14px; margin-bottom:24px;}
 
   .fine{color:var(--muted); font-size:12.5px; margin-top:30px; text-align:center; padding-bottom:20px;}
+  .apps-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:24px}
+  .app-card{padding:22px;text-align:center;border:1px solid var(--glass-border);border-radius:20px;background:var(--bg2);box-shadow:0 12px 30px rgba(20,23,40,.08)}
+  .app-card img{width:76px;height:76px;border-radius:20px;object-fit:cover;box-shadow:0 8px 20px rgba(20,23,40,.14);margin-bottom:12px}
+  .app-card h3{font-size:20px;margin-bottom:7px}.app-card p{font-size:13px;color:var(--muted);min-height:40px;margin-bottom:16px}
+  .app-card .btn{width:100%;justify-content:center}.apps-note{margin-top:18px;padding:14px 16px;border-radius:14px;background:var(--glass);color:var(--muted);font-size:13px;text-align:center}
+  @media(max-width:640px){.apps-grid{grid-template-columns:1fr}}
 
   /* profile avatar — top corner */
   .profile-avatar{
@@ -694,6 +700,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     <button class="tab-btn" data-target="team" data-i18n="nav_team">👥 בעלים ומנהלים</button>
     <button class="tab-btn" data-target="scope" data-i18n="nav_scope">🎂 גיל ותנאים</button>
     <button class="tab-btn protected-tab" data-target="shop" data-i18n="nav_shop">🛍️ חנות</button>
+    <button class="tab-btn" data-target="apps">📱 אפליקציות</button>
     <button class="tab-btn" data-target="settings" data-i18n="nav_settings">⚙️ הגדרות</button>
     <button class="tab-btn" data-target="about" data-i18n="nav_about">ℹ️ אודות וגרסה</button>
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">📩 יצירת קשר</button>
@@ -732,6 +739,27 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     </div>
   </section>
 
+  <!-- APPS -->
+  <section id="apps" class="tab-panel">
+    <span class="eyebrow">מרכז האפליקציות</span>
+    <h2 class="sec-title">📱 אפליקציות</h2>
+    <p class="sec-sub">התקינו את אפליקציות רצף במסך הבית וקבלו גישה מהירה לכל השירותים.</p>
+    <div class="apps-grid">
+      <article class="app-card">
+        <img src="https://retzef-pwa-public-helpme9284772-7829s-projects.vercel.app/icons/icon-512.png" alt="לוגו רצף" loading="lazy">
+        <h3>רצף</h3>
+        <p>בית התמיכה, הסטטוס, החוקים והעדכונים של קהילת רצף.</p>
+        <a class="btn btn-primary" href="https://retzef-pwa-public-helpme9284772-7829s-projects.vercel.app/" target="_blank" rel="noopener">פתחו והתקינו</a>
+      </article>
+      <article class="app-card">
+        <img src="/icons/icon-512.png" alt="לוגו הארנק שלי רצף" loading="lazy">
+        <h3>הארנק שלי</h3>
+        <p>מטבעות, טרייד, קודים ויתרת הארנק של משתמשי רצף.</p>
+        <a class="btn btn-primary" href="https://retzef-wallet-live-helpme9284772-7829s-projects.vercel.app/" target="_blank" rel="noopener">פתחו והתקינו</a>
+      </article>
+    </div>
+    <div class="apps-note">פתחו את האפליקציה הרצויה, התחברו אם צריך, ואז בחרו בדפדפן <b>התקן אפליקציה</b> או <b>הוסף למסך הבית</b>.</div>
+  </section>
   <!-- STATUS LADDER -->
   <section id="status" class="tab-panel">
     <span class="eyebrow" data-i18n="status_eyebrow">מערכת סטטוס</span>

@@ -27,14 +27,16 @@ async function getJoinRequest(username) { const url = process.env.KV_REST_API_UR
 
 module.exports = async (req, res) => {
   const { code, error: tiktokError } = req.query;
-  if (tiktokError) return res.redirect(302, `/?tiktok_error=${encodeURIComponent(tiktokError)}`);
-  if (!code) return res.redirect(302, '/?tiktok_error=missing_code');
+  const returnBase = String(req.query.state || '') === 'wallet' ? 'https://retzef-wallet-live-helpme9284772-7829s-projects.vercel.app' : '';
+  const returnUrl = (path) => returnBase + path;
+  if (tiktokError) return res.redirect(302, returnUrl(`/?tiktok_error=${encodeURIComponent(tiktokError)}`));
+  if (!code) return res.redirect(302, returnUrl('/?tiktok_error=missing_code'));
 
   const CLIENT_KEY = process.env.TIKTOK_CLIENT_KEY;
   const CLIENT_SECRET = process.env.TIKTOK_CLIENT_SECRET;
   const REDIRECT_URI = process.env.TIKTOK_REDIRECT_URI;
   if (!CLIENT_KEY || !CLIENT_SECRET || !REDIRECT_URI) {
-    return res.redirect(302, '/?tiktok_error=server_not_configured');
+    return res.redirect(302, returnUrl('/?tiktok_error=server_not_configured'));
   }
 
   try {
@@ -50,7 +52,7 @@ module.exports = async (req, res) => {
       }),
     });
     const tokenData = await tokenRes.json();
-    if (!tokenData.access_token) return res.redirect(302, '/?tiktok_error=token_exchange_failed');
+    if (!tokenData.access_token) return res.redirect(302, returnUrl('/?tiktok_error=token_exchange_failed'));
 
     const userRes = await fetch(
       'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,username',
@@ -60,14 +62,14 @@ module.exports = async (req, res) => {
     const user = userData?.data?.user || {};
     if (userData?.error?.code && userData.error.code !== 'ok') {
       console.error('TikTok user info error:', userData);
-      return res.redirect(302, `/?tiktok_error=${encodeURIComponent(userData.error.code)}`);
+      return res.redirect(302, returnUrl(`/?tiktok_error=${encodeURIComponent(userData.error.code)}`));
     }
     const displayName = user.display_name || user.username || '';
     const username = user.username || displayName || user.open_id || '';
     const existingProfile = await getProfile(username);
-    if (existingProfile?.banned === true) return res.redirect(302, `/?tiktok_error=${encodeURIComponent('account_banned')}&ban_reason=${encodeURIComponent(existingProfile.banReason || 'החשבון נחסם')}`);
+    if (existingProfile?.banned === true) return res.redirect(302, returnUrl(`/?tiktok_error=${encodeURIComponent('account_banned')}&ban_reason=${encodeURIComponent(existingProfile.banReason || 'החשבון נחסם')}`));
     const joinRequest = await getJoinRequest(username);
-    if (joinRequest && joinRequest.status !== 'approved') return res.redirect(302, `/?tiktok_error=${encodeURIComponent(joinRequest.status === 'denied' ? 'join_denied' : 'join_pending')}&ban_reason=${encodeURIComponent(joinRequest.reason || 'יש להמתין לאישור הבאן המקורי')}`);
+    if (joinRequest && joinRequest.status !== 'approved') return res.redirect(302, returnUrl(`/?tiktok_error=${encodeURIComponent(joinRequest.status === 'denied' ? 'join_denied' : 'join_pending')}&ban_reason=${encodeURIComponent(joinRequest.reason || 'יש להמתין לאישור הבאן המקורי')}`));
     // TikTok Login Kit does not normally expose the account's country or IP.
     // Keep any optional country field only if TikTok ever returns one, and record
     // the country of the IP used during this login separately.
@@ -86,9 +88,9 @@ module.exports = async (req, res) => {
       console.error('Profile storage unavailable; continuing login:', storageError.message);
     }
     res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(username)}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`);
-    return res.redirect(302, `/?${params.toString()}`);
+    return res.redirect(302, returnUrl(`/?${params.toString()}`));
   } catch (err) {
     console.error('TikTok callback error:', err);
-    return res.redirect(302, '/?tiktok_error=server_error');
+    return res.redirect(302, returnUrl('/?tiktok_error=server_error'));
   }
 };

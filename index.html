@@ -491,7 +491,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 </head>
 <body>
 <div id="retzefSplash" aria-label="טוען את רצף"><div class="retzef-splash-inner"><img class="retzef-splash-logo" src="/icons/icon-512.png" alt="לוגו רצף"><div class="retzef-loading-track" aria-label="טוען"><div class="retzef-loading-bar"></div></div></div></div>
-<div id="retzefEntryChoice" role="dialog" aria-modal="true" aria-labelledby="retzefEntryTitle"><div class="retzef-entry-card"><img src="/icons/icon-512.png" alt="לוגו רצף"><h1 id="retzefEntryTitle">ברוכים הבאים לרצף</h1><p>בחרו איך להיכנס לאתר</p><div class="retzef-entry-actions"><button type="button" id="retzefEntryTikTok">התחברות עם TikTok</button><button type="button" id="retzefEntryGuest">המשך כאורח</button></div></div></div>
+<div id="retzefEntryChoice" role="dialog" aria-modal="true" aria-labelledby="retzefEntryTitle"><div class="retzef-entry-card"><img src="/icons/icon-512.png" alt="לוגו רצף"><h1 id="retzefEntryTitle">ברוכים הבאים לרצף</h1><p>בחרו איך להיכנס לאפליקציה</p><div class="retzef-entry-actions"><button type="button" id="retzefEntryTikTok">התחברות עם TikTok</button><button type="button" id="retzefEntryGuest">המשך כאורח</button></div></div></div>
 
 <noscript>
   <div style="position:fixed;inset:0;z-index:2147483647;background:#f6f7fb;color:#161a26;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;direction:rtl;font-family:Arial,sans-serif;">
@@ -522,7 +522,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   document.body.classList.add('entry-screen-active');
   setTimeout(showChoice,1100);
   window.__retzefCloseEntryScreens=closeScreens;
-  if(tikTok) tikTok.addEventListener('click',()=>{closeScreens();const button=document.getElementById('tiktokLoginBtn');if(button)button.click();});
+  if(tikTok) tikTok.addEventListener('click',()=>{closeScreens();if(typeof startTikTokLogin==='function'){startTikTokLogin(false);}else{const button=document.getElementById('tiktokLoginBtn');if(button)button.click();}});
   if(guest) guest.addEventListener('click',closeScreens);
 })();
 </script>

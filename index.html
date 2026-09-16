@@ -620,7 +620,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 
 
 <div class="modal-overlay" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
-  <div class="modal-card"><button type="button" class="modal-close" id="joinClose" aria-label="סגירה">✕</button><h3 id="joinTitle">הצטרפות דרך האתר</h3><p>מלאו את הפרטים. גיל ושם משתמש נדרשים לשליחה.</p><form id="joinForm"><label>שם <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><input id="joinName" maxlength="60" placeholder="אפשר להשאיר ריק"></label><label>שם משתמש <span style="color:#b91c1c;">*</span><input id="joinUsername" maxlength="60" pattern="[A-Za-z0-9._-]{2,60}" placeholder="username" required></label><label>גיל <span style="color:#b91c1c;">*</span><input id="joinAge" type="number" min="1" max="120" required></label><label>בן או בת <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><select id="joinGender"><option value="">לא נמסר</option><option value="בן">בן</option><option value="בת">בת</option></select></label><button type="submit" class="btn btn-tiktok">שליחת בקשת הצטרפות</button><div id="joinResult" style="margin-top:10px;font-size:13px;"></div></form></div>
+  <div class="modal-card"><button type="button" class="modal-close" id="joinClose" aria-label="סגירה">✕</button><h3 id="joinTitle">הצטרפות דרך האפליקציה</h3><p>מלאו את הפרטים. גיל ושם משתמש נדרשים לשליחה.</p><form id="joinForm"><label>שם <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><input id="joinName" maxlength="60" placeholder="אפשר להשאיר ריק"></label><label>שם משתמש <span style="color:#b91c1c;">*</span><input id="joinUsername" maxlength="60" pattern="[A-Za-z0-9._-]{2,60}" placeholder="username" required></label><label>גיל <span style="color:#b91c1c;">*</span><input id="joinAge" type="number" min="1" max="120" required></label><label>בן או בת <span style="color:var(--muted);font-size:12px;">(אופציונלי)</span><select id="joinGender"><option value="">לא נמסר</option><option value="בן">בן</option><option value="בת">בת</option></select></label><button type="submit" class="btn btn-tiktok">שליחת בקשת הצטרפות</button><div id="joinResult" style="margin-top:10px;font-size:13px;"></div></form></div>
 </div>
 
 
@@ -668,7 +668,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
         <span data-i18n="hero_login_btn">התחברות עם TikTok</span>
       </button>
-      <button type="button" id="joinWebsiteBtn" class="btn btn-ghost glass">הצטרפות דרך האתר</button>
+      <button type="button" id="joinWebsiteBtn" class="btn btn-ghost glass">הצטרפות דרך האפליקציה</button>
       <a href="#" data-target="contact" class="btn btn-ghost glass tab-jump" data-i18n="hero_tiktok_page_btn">עמוד TikTok של רצף</a>
       <a href="#" data-target="status" class="btn btn-ghost glass tab-jump" data-i18n="hero_check_status_btn">בדיקת סטטוס</a>
     </div>
@@ -720,7 +720,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 
     <div class="settings-card glass">
       <h3>🆘 מצאתם בעיה?</h3>
-      <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">אם משהו לא עובד באתר או בקבוצה, אפשר לפנות ישירות.</p>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">אם משהו לא עובד באפליקציה או בקבוצה, אפשר לפנות ישירות.</p>
       <a href="https://www.tiktok.com/@user613987579196?_r=1&_t=ZS-99MugNRg5zk" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">✉️ עלי לפנות לתמיכה</a>
     </div>
   </section>
@@ -1149,7 +1149,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
   <section id="settings" class="tab-panel">
     <span class="eyebrow" data-i18n="settings_eyebrow">התאמה אישית</span>
     <h2 class="sec-title" data-i18n="settings_title">הגדרות</h2>
-    <p class="sec-sub">שנה את המראה של האתר — הצבעים, מצב כהה/בהיר, ועוצמת אפקט הזכוכית.</p>
+    <p class="sec-sub">שנה את המראה של האפליקציה — הצבעים, מצב כהה/בהיר, ועוצמת אפקט הזכוכית.</p>
 
     <div class="settings-card glass" id="accountSettingsCard">
       <h3>⚙️ הגדרות חשבון</h3>
@@ -1256,9 +1256,9 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     <p class="sec-sub" data-i18n="about_sub">כל מה שקשור לאתר עצמו — לא לקבוצה.</p>
 
     <div class="settings-card glass">
-      <h3>ℹ️ על האתר</h3>
+      <h3>ℹ️ על האפליקציה</h3>
       <p style="font-size:13.5px; color:var(--muted); line-height:1.7;">
-        בית התמיכה הרשמי של קהילת רצף ב-TikTok — חוקים, סטטוס, מנויים, חנות, לוחות מודעות, התחברות ותשלומים במקום אחד. האתר פועל ב-Vercel ומחובר ל-GitHub.
+        בית התמיכה הרשמי של קהילת רצף ב-TikTok — חוקים, סטטוס, מנויים, חנות, לוחות מודעות, התחברות ותשלומים במקום אחד. האפליקציה פועלת ב-Vercel ומחובר ל-GitHub.
       </p>
     </div>
 
@@ -1361,7 +1361,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     profileMenu.classList.remove('open');
     const accounts=await loadSavedAccounts();
     quickTitle.textContent='🔄 חשבונות TikTok';
-    quickBody.innerHTML='<p>אפשר לשמור כמה חשבונות במכשיר הזה ולהחליף ביניהם.</p><div id="savedAccountsList"></div><button type="button" class="quick-action" id="addTikTokAccount">➕ הוספת חשבון TikTok</button><p style="font-size:12px;color:var(--muted);">האתר לא שומר סיסמאות או קודי TikTok. ההחלפה משתמשת בחשבונות שכבר התחברו במכשיר.</p>';
+    quickBody.innerHTML='<p>אפשר לשמור כמה חשבונות במכשיר הזה ולהחליף ביניהם.</p><div id="savedAccountsList"></div><button type="button" class="quick-action" id="addTikTokAccount">➕ הוספת חשבון TikTok</button><p style="font-size:12px;color:var(--muted);">האפליקציה לא שומרת סיסמאות או קודי TikTok. ההחלפה משתמשת בחשבונות שכבר התחברו במכשיר.</p>';
     const list=document.getElementById('savedAccountsList');
     if(!accounts.length) list.innerHTML='<p style="color:var(--muted);">אין עדיין חשבונות שמורים.</p>';
     accounts.forEach(account=>{const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:9px;margin:8px 0;padding:8px;border:1px solid var(--glass-border);border-radius:12px;';const name=document.createElement('span');name.style.flex='1';name.textContent=(account.displayName||account.username)+' · @'+account.username;const button=document.createElement('button');button.type='button';button.className='quick-action';button.textContent=String(window.__retzefProfile?.username||'').toLowerCase()===account.username?'מחובר ✅':'החלף';button.disabled=button.textContent==='מחובר ✅';button.onclick=()=>switchAccount(account.username);row.append(name,button);list.appendChild(row);});
@@ -1380,7 +1380,7 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
     else if(action==='devicePerformance') { quickBody.innerHTML='<p>בדיקת ביצועים מקומית — המידע לא נשלח לשרת.</p><button type="button" class="quick-action" id="runQuickPerformance">⚡ בדיקת ביצועים</button><div id="quickPerformanceResult" style="white-space:pre-line;margin-top:10px;"></div>'; }
     else if(action==='status') quickBody.innerHTML=`<p><b>${displayName}</b> (@${username})</p><p>תפקיד: ${role}</p><p>סטטוס: ${profile.role==='owner'?'בעלים':'הכול טוב'}</p>`;
     else if(action==='profile') quickBody.innerHTML=`<p>שם תצוגה: <b>${displayName}</b></p><p dir="ltr">Username: @${username}</p><p>תפקיד: ${role}</p>`;
-    else quickBody.innerHTML=`<p>${localStorage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האתר.</p>`;
+    else quickBody.innerHTML=`<p>${localStorage.getItem('retzef_subscription_name')||'אין כרגע מנוי שמור בחשבון.'}</p><p>אפשר לבדוק ולנהל מנויים דרך האפליקציה.</p>`;
     if(action==='wallet') {
       const redeemBtn=document.getElementById('walletRedeemBtn'); const redeemMsg=document.getElementById('walletGiftMessage');
       redeemBtn.onclick=async()=>{const code=document.getElementById('walletGiftCode').value.trim(); if(!code){redeemMsg.textContent='❌ יש להזין קוד.';return;} redeemBtn.disabled=true; try{const r=await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({action:'giftCodeRedeem',code})}); const raw=await r.text(); let d={}; try{d=JSON.parse(raw||'{}')}catch(_){} if(r.ok&&d.wallet){window.__retzefProfile=window.__retzefProfile||{};window.__retzefProfile.wallet=d.wallet; updateWalletUI(d.wallet); document.getElementById('walletQuickBalance').textContent=Number(d.wallet.balance||0).toLocaleString()+' מטבעות'; redeemMsg.textContent='✅ הקוד מומש והמטבעות נוספו.';} else redeemMsg.textContent=d.error==='already_redeemed'?'❌ כבר מימשת את הקוד.':d.error==='code_not_found'?'❌ הקוד לא נמצא.':d.error==='tiktok_login_required'?'🔐 צריך להתחבר מחדש.':'❌ לא ניתן לממש את הקוד ('+r.status+').';}catch(_){redeemMsg.textContent='❌ שגיאת חיבור.';} redeemBtn.disabled=false;};
@@ -2320,12 +2320,12 @@ function openPaypalModal(itemName, price){
     document.body.dataset.accessBlocked='true';
   }
   function checkConnection(){
-    if(!navigator.onLine) block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האתר דורש חיבור פעיל.');
+    if(!navigator.onLine) block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האפליקציה דורשת חיבור פעיל.');
   }
-  window.addEventListener('offline',()=>block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האתר דורש חיבור פעיל.'));
+  window.addEventListener('offline',()=>block('RETZEF_OFFLINE','אין חיבור לאינטרנט. האפליקציה דורשת חיבור פעיל.'));
   window.addEventListener('online',()=>location.reload());
-  window.addEventListener('error',()=>{ if(navigator.onLine) block('RETZEF_LOAD_ERROR','אירעה שגיאה בטעינת האתר.'); });
-  window.addEventListener('unhandledrejection',()=>{ if(navigator.onLine) block('RETZEF_RUNTIME_ERROR','אירעה שגיאה טכנית באתר.'); });
+  window.addEventListener('error',()=>{ if(navigator.onLine) block('RETZEF_LOAD_ERROR','אירעה שגיאה בטעינת האפליקציה.'); });
+  window.addEventListener('unhandledrejection',()=>{ if(navigator.onLine) block('RETZEF_RUNTIME_ERROR','אירעה שגיאה טכנית באפליקציה.'); });
   checkConnection();
 })();
 </script>

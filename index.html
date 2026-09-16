@@ -1681,9 +1681,24 @@ function updateWalletUI(wallet){const el=document.getElementById('profileWalletB
 
   const darkToggle = document.getElementById('darkModeToggle');
   darkToggle.addEventListener('click', function(){
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    darkToggle.classList.toggle('on', !isDark);
+    const root = document.documentElement;
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const nextTheme = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', nextTheme);
+    if(nextTheme === 'dark'){
+      root.style.setProperty('--bg', '#0a0c12');
+      root.style.setProperty('--bg2', '#11141d');
+      root.style.setProperty('--glass', 'rgba(255,255,255,0.045)');
+      root.style.setProperty('--text', '#eef0f5');
+      root.style.setProperty('--muted', '#9aa1b4');
+    }else{
+      root.style.setProperty('--bg', DEFAULTS.bg);
+      root.style.setProperty('--bg2', DEFAULTS.bg2);
+      root.style.setProperty('--glass', DEFAULTS.glass);
+      root.style.setProperty('--text', DEFAULTS.text);
+      root.style.setProperty('--muted', '#656b80');
+    }
+    darkToggle.classList.toggle('on', nextTheme === 'dark');
     saveSiteSettings();
   });
 

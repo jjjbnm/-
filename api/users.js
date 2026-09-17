@@ -145,7 +145,29 @@ module.exports = async (req, res) => {
       try { await sendTo(recipient, { title: 'קיבלת תרומה בארנק', body: `קיבלת ${amount} מטבעות מ־@${me}`, url: '/' }); } catch (_) {}
       return res.status(200).json({ wallet: senderWallet, recipient });
     }
-    if (action === 'walletSpend') { const reason = String(input.reason || 'רכישה באפליקציה').trim().slice(0, 160); if (/^תג/.test(reason)) return res.status(400).json({ error: 'badges_not_available_with_coins' }); const amount = Math.floor(Number(input.amount)); if (!Number.isInteger(amount) || amount < 1 || amount > 100000) return res.status(400).json({ error: 'invalid_amount' }); const wallet = walletOf(mine); if (wallet.balance < amount) return res.status(400).json({ error: 'insufficient_coins', balance: wallet.balance }); wallet.balance -= amount; wallet.transactions.unshift({ type: 'spend', amount: -amount, reason, createdAt: new Date().toISOString() }); mine.wallet = wallet; await redis('set', `${PREFIX}${me}`, JSON.stringify(mine)); return res.status(200).json({ wallet }); }
+    if (action === 'walletSpend') {
+      const reason = String(input.reason || 'רכישה באפליקציה').trim().slice(0, 160);
+      if (/^תג/.test(reason)) return res.status(400).json({ error: 'badges_not_available_with_coins' });
+      const amount = Math.floor(Number(input.amount));
+      if (!Number.isInteger(amount) || amount < 1 || amount > 100000) return res.status(400).json({ error: 'invalid_amount' });
+      const wallet = walletOf(mine);
+      if (wallet.balance < amount) return res.status(400).json({ error: 'insufficient_coins', balance: wallet.balance });
+      wallet.balance -= amount;
+      wallet.transactions.unshift({ type: 'spend', amount: -amount, reason, createdAt: new Date().toISOString() });
+      mine.wallet = wallet;
+      let subscription = null;
+      if (/רצף פלוס|מנוי סרטון/.test(reason)) {
+        const durationMs = /חודש/.test(reason) ? 30*86400000 : /שבוע/.test(reason) ? 7*86400000 : /3 ימים/.test(reason) ? 3*86400000 : 30*86400000;
+        const expiresAt = Date.now() + durationMs;
+        subscription = reason.replace(/\s*\(מתחדש\)$/, '').trim();
+        mine.subscription = subscription;
+        mine.subscriptionName = subscription;
+        mine.subscriptionExpiresAt = expiresAt;
+        mine.subscriptionSource = 'coins';
+      }
+      await redis('set', `${PREFIX}${me}`, JSON.stringify(mine));
+      return res.status(200).json({ wallet, subscription, subscriptionName: mine.subscriptionName || '', subscriptionExpiresAt: mine.subscriptionExpiresAt || null });
+    }
     const target = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
     if (!target || target === me || !(await profile(target))) return res.status(404).json({ error: 'user_not_found' });
     if (action === 'ban' || action === 'unban') {

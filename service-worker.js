@@ -1,4 +1,4 @@
-const CACHE_NAME = 'retzef-pwa-v5-credits';
+const CACHE_NAME = 'retzef-pwa-v6-coin-subscriptions';
 const APP_SHELL = [
   '/',
   '/index.html',

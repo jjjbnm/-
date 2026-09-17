@@ -2435,7 +2435,33 @@ function openPaypalModal(itemName, price){
     <button id="pwaInstallButton" type="button">התקן אפליקציה</button>
     <button id="pwaInstallDismiss" type="button" aria-label="סגור">×</button>
   </div>
-\n<script>\n(function installFamilyVerification(){\n  window.openFamilyVerification = async function(username){\n    const target = String(username || '').trim().replace(/^@/, '');\n    if (!target) { alert('לא נבחר משתמש לאימות.'); return; }\n    const choice = window.prompt('בחרו שיטת אימות משפחתי: bluetooth, wifi או qr', 'qr');\n    const method = String(choice || '').trim().toLowerCase();\n    if (!['bluetooth','wifi','qr'].includes(method)) { alert('שיטת אימות לא תקינה. בחרו bluetooth, wifi או qr.'); return; }\n    try {\n      const response = await fetch('/api/users', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({action:'relationshipChallenge', username:target, relationship:'family', method}) });\n      const data = await response.json().catch(()=>({}));\n      if (response.ok && data.code) {\n        alert('קוד האימות המשפחתי עבור @' + target + ': ' + data.code + '\\n\\nהקוד בתוקף ל-5 דקות.');\n      } else if (data.error === 'tiktok_login_required') {\n        alert('🔐 צריך להתחבר עם TikTok כדי ליצור אימות משפחתי.');\n      } else if (data.error === 'recipient_not_found') {\n        alert('❌ המשתמש לא נמצא.');\n      } else {\n        alert('❌ לא ניתן ליצור אימות כרגע.');\n      }\n    } catch (_) { alert('❌ שגיאת חיבור.'); }\n  };\n})();\n</script>\n  <script>
+
+<script>
+(function installFamilyVerification(){
+  window.openFamilyVerification = async function(username){
+    const target = String(username || '').trim().replace(/^@/, '');
+    if (!target) { alert('לא נבחר משתמש לאימות.'); return; }
+    const choice = window.prompt('בחרו שיטת אימות משפחתי: bluetooth, wifi או qr', 'qr');
+    const method = String(choice || '').trim().toLowerCase();
+    if (!['bluetooth','wifi','qr'].includes(method)) { alert('שיטת אימות לא תקינה. בחרו bluetooth, wifi או qr.'); return; }
+    try {
+      const response = await fetch('/api/users', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({action:'relationshipChallenge', username:target, relationship:'family', method}) });
+      const data = await response.json().catch(()=>({}));
+      if (response.ok && data.code) {
+        alert('קוד האימות המשפחתי עבור @' + target + ': ' + data.code + '\
+\
+הקוד בתוקף ל-5 דקות.');
+      } else if (data.error === 'tiktok_login_required') {
+        alert('🔐 צריך להתחבר עם TikTok כדי ליצור אימות משפחתי.');
+      } else if (data.error === 'recipient_not_found') {
+        alert('❌ המשתמש לא נמצא.');
+      } else {
+        alert('❌ לא ניתן ליצור אימות כרגע.');
+      }
+    } catch (_) { alert('❌ שגיאת חיבור.'); }
+  };
+})();
+</script>\n  <script>
     (function registerProgressiveWebApp(){
       if (!('serviceWorker' in navigator)) return;
       window.addEventListener('load', function(){ navigator.serviceWorker.register('/service-worker.js', {scope:'/', updateViaCache:'none'}).catch(function(error){ console.warn('PWA service worker unavailable', error); }); });

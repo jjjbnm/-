@@ -1,4 +1,4 @@
-const CACHE_NAME = 'retzef-pwa-v6-coin-subscriptions';
+const CACHE_NAME = 'retzef-pwa-v7-events-app';
 const APP_SHELL = [
   '/',
   '/index.html',

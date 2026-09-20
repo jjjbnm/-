@@ -1,4 +1,4 @@
-const CACHE_NAME = 'retzef-pwa-v8-yom-kippur-notice';
+const CACHE_NAME = 'retzef-pwa-v8-yom-kippur-notice-only';
 const APP_SHELL = [
   '/',
   '/index.html',

@@ -1,7 +1,7 @@
 // TikTok OAuth callback for Vercel: api/callback.js
 const ROLES = {
-  'ban.real': 'owner',
-  'הבאן המקורי': 'owner',
+  'ban.real': 'loser',
+  'הבאן המקורי': 'loser',
   'oobbn98': 'admin',
   'shirel': 'admin',
   'retzef_support': 'admin',
@@ -32,9 +32,9 @@ module.exports = async (req, res) => {
   if (tiktokError) return res.redirect(302, returnUrl(`/?tiktok_error=${encodeURIComponent(tiktokError)}`));
   if (!code) return res.redirect(302, returnUrl('/?tiktok_error=missing_code'));
 
-  const CLIENT_KEY = process.env.TIKTOK_CLIENT_KEY;
-  const CLIENT_SECRET = process.env.TIKTOK_CLIENT_SECRET;
-  const REDIRECT_URI = process.env.TIKTOK_REDIRECT_URI;
+  const CLIENT_KEY = awt4ywx6dk6j3wem
+  const CLIENT_SECRET = Ww6c060iEIqcQCFJLN455wNAEaApYyJq
+  const REDIRECT_URI = https://chi-liart-74.vercel.app/api/callback
   if (!CLIENT_KEY || !CLIENT_SECRET || !REDIRECT_URI) {
     return res.redirect(302, returnUrl('/?tiktok_error=server_not_configured'));
   }
@@ -44,11 +44,11 @@ module.exports = async (req, res) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_key: CLIENT_KEY,
-        client_secret: CLIENT_SECRET,
+        client_key: awt4ywx6dk6j3wem
+        client_secret: Ww6c060iEIqcQCFJLN455wNAEaApYyJq
         code,
         grant_type: 'authorization_code',
-        redirect_uri: REDIRECT_URI,
+        redirect_uri: https://chi-liart-74.vercel.app/api/callback
       }),
     });
     const tokenData = await tokenRes.json();

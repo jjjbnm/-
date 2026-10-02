@@ -91,7 +91,7 @@ module.exports = async (req, res) => {
     } catch (storageError) {
       console.error('Profile storage unavailable; continuing login:', storageError.message);
     }
-    res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(username)}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`);
+    if (String(query.state || '') !== 'retzef_add_account') res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(username)}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`);
     return res.redirect(302, returnUrl(`/?${params.toString()}`));
   } catch (err) {
     console.error('TikTok callback error:', err);

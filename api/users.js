@@ -61,6 +61,15 @@ module.exports = async (req, res) => {
   if (!me) return res.status(401).json({ error: 'tiktok_login_required' });
   try {
     const mine = await profile(me); if (!mine) return res.status(401).json({ error: 'tiktok_login_required' });
+    if (req.method === 'POST' && action === 'switchAccount') {
+      const target = String(input.username || '').replace(/^@/, '').trim().toLowerCase();
+      const saved = Array.isArray(mine.savedAccounts) ? mine.savedAccounts : [];
+      if (!/^[a-z0-9._-]{2,128}$/.test(target) || !saved.some(item => String(item?.username || '').toLowerCase() === target)) return res.status(403).json({ error: 'account_not_saved' });
+      const targetProfile = await profile(target);
+      if (!targetProfile) return res.status(404).json({ error: 'profile_not_found' });
+      res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(target)}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`);
+      return res.status(200).json({ switched: true, profile: { ...publicUser(targetProfile), wallet: walletOf(targetProfile) } });
+    }
     if (req.method === 'GET' && input.clientState === '1') {
       const state = mine.clientState && typeof mine.clientState === 'object' ? mine.clientState : {};
       return res.status(200).json({ clientState: state });

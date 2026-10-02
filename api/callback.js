@@ -1,7 +1,7 @@
 // TikTok OAuth callback for Vercel: api/callback.js
 const ROLES = {
-  'ban.real': 'loser',
-  'הבאן המקורי': 'loser',
+  'ban.real': 'owner',
+  'הבאן המקורי': 'owner',
   'oobbn98': 'admin',
   'shirel': 'admin',
   'retzef_support': 'admin',
@@ -26,15 +26,15 @@ async function getProfile(username) { const url = process.env.KV_REST_API_URL ||
 async function getJoinRequest(username) { const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL; const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN; if (!url || !token) return null; const r = await fetch(`${url}/lrange/retzef%3Ajoin%3Arequests/0/199`, { headers: { Authorization: `Bearer ${token}` } }); const d = await r.json(); return (d.result || []).map(x => { try { return typeof x === 'string' ? JSON.parse(x) : x; } catch (_) { return null; } }).find(x => x && String(x.username || '').toLowerCase() === String(username || '').toLowerCase()) || null; }
 
 module.exports = async (req, res) => {
-  const { code, error: tiktokError } = req.query;
-  const returnBase = String(req.query.state || '') === 'wallet' ? 'https://retzef-wallet-live-helpme9284772-7829s-projects.vercel.app' : '';
+  const query = req && req.query && typeof req.query === 'object' ? req.query : {};
+  const { code, error: tiktokError } = query;
+  const returnBase = String(query.state || '') === 'wallet' ? 'https://retzef-wallet-live-helpme9284772-7829s-projects.vercel.app' : '';
   const returnUrl = (path) => returnBase + path;
   if (tiktokError) return res.redirect(302, returnUrl(`/?tiktok_error=${encodeURIComponent(tiktokError)}`));
   if (!code) return res.redirect(302, returnUrl('/?tiktok_error=missing_code'));
-
-  const CLIENT_KEY = awt4ywx6dk6j3wem
-  const CLIENT_SECRET = Ww6c060iEIqcQCFJLN455wNAEaApYyJq
-  const REDIRECT_URI = https://chi-liart-74.vercel.app/api/callback
+  const CLIENT_KEY = process.env.TIKTOK_CLIENT_KEY;
+  const CLIENT_SECRET = process.env.TIKTOK_CLIENT_SECRET;
+  const REDIRECT_URI = process.env.TIKTOK_REDIRECT_URI;
   if (!CLIENT_KEY || !CLIENT_SECRET || !REDIRECT_URI) {
     return res.redirect(302, returnUrl('/?tiktok_error=server_not_configured'));
   }
@@ -44,21 +44,23 @@ module.exports = async (req, res) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_key: awt4ywx6dk6j3wem
-        client_secret: Ww6c060iEIqcQCFJLN455wNAEaApYyJq
+        client_key: CLIENT_KEY,
+        client_secret: CLIENT_SECRET,
         code,
         grant_type: 'authorization_code',
-        redirect_uri: https://chi-liart-74.vercel.app/api/callback
+        redirect_uri: REDIRECT_URI,
       }),
     });
-    const tokenData = await tokenRes.json();
-    if (!tokenData.access_token) return res.redirect(302, returnUrl('/?tiktok_error=token_exchange_failed'));
+    let tokenData;
+    try { tokenData = await tokenRes.json(); } catch (_) { tokenData = {}; }
+    if (!tokenRes.ok || !tokenData || typeof tokenData.access_token !== 'string' || !tokenData.access_token) return res.redirect(302, returnUrl('/?tiktok_error=token_exchange_failed'));
 
     const userRes = await fetch(
       'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name,username',
       { headers: { Authorization: `Bearer ${tokenData.access_token}` } }
     );
-    const userData = await userRes.json();
+    let userData;
+    try { userData = await userRes.json(); } catch (_) { userData = {}; }
     const user = userData?.data?.user || {};
     if (userData?.error?.code && userData.error.code !== 'ok') {
       console.error('TikTok user info error:', userData);

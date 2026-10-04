@@ -32,7 +32,8 @@ async function getJoinRequest(username) { const url = process.env.KV_REST_API_UR
 module.exports = async (req, res) => {
   const query = req && req.query && typeof req.query === 'object' ? req.query : {};
   const { code, error: tiktokError } = query;
-  const returnBase = String(query.state || '') === 'wallet' ? 'https://retzef-wallet-live-helpme9284772-7829s-projects.vercel.app' : '';
+  const callbackState = String(query.state || '');
+  const returnBase = ['wallet', 'wallet_add_account'].includes(callbackState) ? 'https://retzef-wallet-live-helpme9284772-7829s-projects.vercel.app' : '';
   const returnUrl = (path) => returnBase + path;
   if (tiktokError) return res.redirect(302, returnUrl(`/?tiktok_error=${encodeURIComponent(tiktokError)}`));
   if (!code) return res.redirect(302, returnUrl('/?tiktok_error=missing_code'));
@@ -74,7 +75,7 @@ module.exports = async (req, res) => {
     const rawUsername = user.username || displayName || user.open_id || '';
     const username = String(rawUsername).trim();
     if (!username) return res.redirect(302, '/?tiktok_error=missing_username');
-    const addAccountFlow = String(query.state || '') === 'retzef_add_account';
+    const addAccountFlow = ['retzef_add_account', 'wallet_add_account'].includes(String(query.state || ''));
     const previousUsername = addAccountFlow ? '' : getCookie(req, 'retzef_profile_id');
     const indexed = await getProfileByTikTokId(user.open_id);
     const existingProfile = indexed?.profile || (previousUsername ? await getProfile(previousUsername) : null) || await getProfile(username);

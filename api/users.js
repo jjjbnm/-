@@ -197,6 +197,7 @@ module.exports = async (req, res) => {
     }
     if (action === 'walletSpend') {
       const reason = String(input.reason || 'רכישה באפליקציה').trim().slice(0, 160);
+      if (/^מנוי סרטון/.test(reason)) return res.status(410).json({ error: 'product_unavailable', message: 'מנויי הסרטון אינם זמינים.' });
       if (/^תג/.test(reason)) return res.status(400).json({ error: 'badges_not_available_with_coins' });
       const amount = Math.floor(Number(input.amount));
       if (!Number.isInteger(amount) || amount < 1 || amount > 100000) return res.status(400).json({ error: 'invalid_amount' });
@@ -206,7 +207,7 @@ module.exports = async (req, res) => {
       wallet.transactions.unshift({ type: 'spend', amount: -amount, reason, createdAt: new Date().toISOString() });
       mine.wallet = wallet;
       let subscription = null;
-      if (/רצף פלוס|מנוי סרטון/.test(reason)) {
+      if (/רצף פלוס/.test(reason)) {
         const durationMs = /חודש/.test(reason) ? 30*86400000 : /שבוע/.test(reason) ? 7*86400000 : /3 ימים/.test(reason) ? 3*86400000 : 30*86400000;
         const expiresAt = Date.now() + durationMs;
         subscription = reason.replace(/\s*\(מתחדש\)$/, '').trim();

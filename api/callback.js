@@ -1,6 +1,6 @@
 // TikTok OAuth callback for Vercel: api/callback.js
 const ROLES = {
-  'ban.original:'owner',
+  'ban.original': 'owner',
   'הבאן המקורי': 'owner',
   'oobbn98': 'admin',
   'shirel': 'admin',

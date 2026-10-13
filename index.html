@@ -553,7 +553,7 @@ function updateWalletUI(wallet){const raw=wallet&&wallet.balance;const value=(Nu
 window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(profile&&profile.username)localStorage.setItem('retzef_current_profile',JSON.stringify(profile));}catch(_){}};
 </script>
 
-<script id="retzef-version">window.RETZEF_VERSION='1.6.10';</script>
+<script id="retzef-version">window.RETZEF_VERSION='1.13.15';</script>
 </head>
 <body>
 <div id="retzefLegalGate" role="dialog" aria-modal="true" aria-labelledby="retzefLegalTitle">
@@ -1471,6 +1471,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     <div class="settings-card glass">
       <h3>📝 יומן שינויים</h3>
       <ul data-retzef-changelog style="font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:6px; padding-inline-start:18px;">
+        <li>1.13.15 — מאז עדכון מסמכי התנאים והמדיניות ב־10 באוקטובר: נוספה הודעת עדכון למסמכים למשתמשים שכבר אישרו תנאים ופרטיות; שופרה שליחת פניות התמיכה עם גיבוי FormSubmit; נוסף עוזר AI בתוך הטאב הייעודי; נוספו הגבלת שיחות קוליות לפי גיל והרשאות שיחות לחבר בטוח ולמשפחה; נוספו אימות משפחה באמצעות QR, Bluetooth, Wi‑Fi וקוד זמני; נוספה יתרת מטבעות קבועה בפינה העליונה עם כפתור פלוס; נוספו חבילות מטבעות במחירי מבצע; נוספו קטגוריות סינון בחנות — מטבעות, תגים ואחר; וסרגל הטאבים נשאר קבוע בזמן גלילה.</li>
         <li>1.6.10 — הורחבו שאלות ותשובות ה-FAQ בטאב התמיכה, עם הסברים מלאים על חוקים נוספים, זמני מענה, סמכויות מנהלים, ערעורים ובדיקת באנים.</li>
         <li>1.5.7 — נוסף בטאב התמיכה אזור שאלות נפוצות עם מידע על חוקים נוספים, זמני מענה, סמכויות מנהלים, ערעורים ובדיקת באנים.</li>
         <li>1.2.8 — עדכון גרסה אוטומטי ותיקוני מערכת.</li>

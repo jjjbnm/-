@@ -1,0 +1,26 @@
+name: Retzef MCP draft tests
+
+on:
+  push:
+    branches:
+      - feature/retzef-mcp-oauth-draft
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run MCP draft tests
+        run: >-
+          node --test
+          test/retzef-mcp-security.test.js
+          test/retzef-mcp-core.test.js
+          test/retzef-mcp-token-store.test.js
+          test/retzef-mcp-oauth-codes.test.js
+          test/retzef-mcp-upstash.test.js
+          test/retzef-mcp-session.test.js
+          test/retzef-mcp-oauth-config.test.js

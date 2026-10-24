@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/oauth/register",
+      "destination": "/api/callback?__retzef_route=register"
+    },
+    {
+      "source": "/api/mcp",
+      "destination": "/api/callback?__retzef_route=mcp"
+    },
+    {
+      "source": "/api/oauth/authorize",
+      "destination": "/api/callback?__retzef_route=authorize"
+    },
+    {
+      "source": "/api/oauth/token",
+      "destination": "/api/callback?__retzef_route=token"
+    },
+    {
+      "source": "/.well-known/oauth-authorization-server",
+      "destination": "/api/callback?__retzef_route=authorization-server"
+    },
+    {
+      "source": "/.well-known/oauth-protected-resource",
+      "destination": "/api/callback?__retzef_route=protected-resource"
+    }
+  ]
+}

@@ -22,3 +22,4 @@ jobs:
           test/retzef-mcp-token-store.test.js
           test/retzef-mcp-oauth-codes.test.js
           test/retzef-mcp-upstash.test.js
+          test/retzef-mcp-session.test.js

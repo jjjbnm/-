@@ -1,4 +1,5 @@
 // TikTok OAuth callback for Vercel: api/callback.js
+const { createSession, sessionCookie } = require('../lib/retzef-mcp-session');
 const ROLES = {
   'ban.original': 'owner',
   'הבאן המקורי': 'owner',
@@ -120,14 +121,21 @@ module.exports = async (req, res) => {
       role: resolveRole(username),
       account_added: addAccountFlow ? '1' : '0',
     });
+    let profileSaved = false;
     try {
       await saveProfile(username, { ...(existingProfile || {}), username, displayName, avatarUrl: profileAvatar, role: existingProfile?.role || resolveRole(username), tiktokOpenId: user.open_id || existingProfile?.tiktokOpenId || '', tiktokUnionId: user.union_id || existingProfile?.tiktokUnionId || '', age: Number(joinRequest?.age || existingProfile?.age || 0), accountCountry, loginCountry, banned: false, banReason: '' });
       await saveTikTokIndex(user.open_id, username);
+      profileSaved = true;
       if (oldUsername && String(oldUsername).toLowerCase() !== username.toLowerCase()) await deleteProfile(oldUsername);
     } catch (storageError) {
       console.error('Profile storage unavailable; continuing login:', storageError.message);
     }
-    if (String(query.state || '') !== 'retzef_add_account') res.setHeader('Set-Cookie', `retzef_profile_id=${encodeURIComponent(username)}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`);
+    if (String(query.state || '') !== 'retzef_add_account') {
+      const cookies = [`retzef_profile_id=${encodeURIComponent(username)}; Path=/; Max-Age=31536000; Secure; SameSite=Lax`];
+      // Only issue the signed OAuth session after profile persistence succeeds; missing secret fails closed for MCP.
+      if (profileSaved) { const signed = createSession(username); if (signed) cookies.push(sessionCookie(signed)); }
+      res.setHeader('Set-Cookie', cookies);
+    }
     return res.redirect(302, returnUrl(`/?${params.toString()}`));
   } catch (err) {
     console.error('TikTok callback error:', err);

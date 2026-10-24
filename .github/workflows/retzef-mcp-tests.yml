@@ -1,28 +1,20 @@
-name: Retzef MCP draft tests
+name: Retzef MCP tests
 
 on:
   push:
     branches:
       - feature/retzef-mcp-oauth-draft
-    paths:
-      - "lib/retzef-mcp-*.js"
-      - "test/retzef-mcp-*.test.js"
-      - ".github/workflows/retzef-mcp-tests.yml"
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
-  node-tests:
-    name: Node.js unit tests
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out feature branch
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
       - name: Run Retzef MCP tests
-        run: node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js
+        run: node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js test/retzef-mcp-token-store.test.js

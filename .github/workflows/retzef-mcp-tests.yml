@@ -17,4 +17,4 @@ jobs:
         with:
           node-version: 24
       - name: Run Retzef MCP tests
-        run: node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js test/retzef-mcp-token-store.test.js
+        run: node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js test/retzef-mcp-token-store.test.js test/retzef-mcp-oauth-codes.test.js

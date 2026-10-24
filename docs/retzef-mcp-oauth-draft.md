@@ -1,42 +1,47 @@
-# Retzef MCP OAuth draft — implementation notes
+# Retzef MCP OAuth — feature-branch implementation
 
-Status: isolated draft on `feature/retzef-mcp-oauth-draft`. This is not a working OAuth server and must not be advertised as one.
+Status: implementation draft on `feature/retzef-mcp-oauth-draft`. It is not deployed and must not be advertised as a live OAuth service until preview integration tests pass.
 
-## Included
+## Routes added
 
-- Security primitives for opaque tokens, SHA-256 token digests, strict Bearer parsing, PKCE S256, scope allowlisting, HTTPS redirect validation and bounded expiry.
-- A read-only JSON-RPC MCP core with authenticated profile and TikTok-status tool contracts.
-- A fail-closed access-token validator that looks up only a SHA-256 token digest in an injected Redis-compatible store, then checks subject, expiry, revocation, audience and allowlisted scopes.
-- An isolated authorization-code issuer/redeemer; codes expire after 90 seconds and bind client, exact redirect URI, PKCE challenge, subject, audience and scopes.
-- An Upstash REST adapter for GET, SET with TTL/NX, and atomic one-time code consumption via a single Lua EVAL request.
-- Node unit tests and GitHub Actions tests.
+- `GET/POST /api/oauth/authorize`: verifies the signed Retzef session, checks the stored profile and banned status, validates the OAuth request, renders a consent page, and issues a short-lived authorization code after approval.
+- `POST /api/oauth/token`: redeems authorization codes with PKCE S256 and issues opaque bearer access tokens.
+- `POST /api/mcp`: authenticated JSON-RPC MCP endpoint with read-only tools `retzef_get_my_profile` and `retzef_get_my_tiktok_status`.
+- `/.well-known/oauth-authorization-server` (implemented under `api/.well-known/oauth-authorization-server.js`) and `/.well-known/oauth-protected-resource` (under `api/.well-known/oauth-protected-resource.js`): metadata endpoints.
+- `lib/retzef-mcp-session.js`: HMAC-signed, HttpOnly, Secure, SameSite=Lax session cookie primitive. TikTok callback now issues this cookie only after profile storage succeeds and only when a strong session secret is configured. The old `retzef_profile_id` cookie is retained for site compatibility but is never trusted by MCP OAuth.
 
-## Upstash adapter
+## Required Vercel environment variables
 
-`lib/retzef-mcp-upstash.js` reads `KV_REST_API_URL` / `UPSTASH_REDIS_REST_URL` and `KV_REST_API_TOKEN` / `UPSTASH_REDIS_REST_TOKEN` by default. It only accepts HTTPS URLs and never logs credentials. The `consume(key)` method runs a short Lua script using EVAL to read and delete a one-time code atomically. Do not replace this with separate GET and DEL calls.
+- `RETZEF_SESSION_SECRET`: at least 32 bytes of random secret material. Generate a new unique value; never reuse a public string or commit it.
+- `RETZEF_MCP_CLIENT_ID`: a client identifier for the registered MCP client.
+- `RETZEF_MCP_REDIRECT_URIS`: exact comma-separated HTTPS redirect URI(s) registered for that client. Copy these from the MCP client configuration; do not guess them.
+- `RETZEF_MCP_AUDIENCE`: optional; defaults to `https://chi-liart-74.vercel.app/api/mcp`.
+- Existing `KV_REST_API_URL` and `KV_REST_API_TOKEN` (or the supported Upstash aliases) must be configured.
 
-The adapter is not connected to any public route yet. Unit tests use a mocked fetch; they do not contact the live database.
+Do not set production values or deploy until the exact ChatGPT redirect URI is known and reviewed. No secret values belong in source control.
 
-## Token record contract
+## Security controls
 
-The token store expects a Redis-compatible `get(key)` function. It looks up `retzef:mcp:access:<sha256-hex-of-opaque-token>`. The stored JSON record must contain `subject`, `scopes`, `audience`, `expiresAt` (Unix seconds), and optionally `revoked`. Store only token digests, never raw bearer tokens. The authorization issuer must create this record only after a valid authorization-code + PKCE flow.
+- Authorization code is opaque, hashed at rest, expires after 90 seconds, and is bound to exact client ID, redirect URI, PKCE S256 challenge, subject, audience, scopes and state.
+- Code consumption is atomic through a single Upstash Lua `EVAL` operation. It must not be replaced with separate GET and DEL calls.
+- Access tokens are opaque; only their SHA-256 digest is stored. Access tokens expire after 10 minutes and are bound to an audience and allowlisted scopes.
+- The OAuth authorization route derives identity from the signed session cookie, checks the stored profile and rejects banned accounts. It does not trust browser-supplied usernames or the legacy unsigned username cookie.
+- The consent form uses a one-time CSRF value bound to the session and a five-minute pending request.
+- The MCP endpoint does not accept identity or scopes from tool arguments. It returns only the authenticated user's profile and TikTok connection status.
 
-## Required before connecting to the live site
+## Still required before production
 
-1. Implement and validate a real user login/session for OAuth. Do not trust the client-readable `retzef_profile_id` cookie as authentication; it is an unsigned username, not proof of identity.
-2. Add a browser authorization route with state/CSRF protections, explicit consent, exact registered redirect URI matching, and rate limits. Derive the subject only from a verified server-side session, never request input.
-3. Add code redemption and access-token issuance, with atomic code consumption, short-lived tokens and revocation.
-4. Register trusted OAuth clients and resource audiences; implement authorization-server and protected-resource metadata.
-5. Implement the MCP Streamable HTTP endpoint with bounded JSON-RPC bodies, Origin/Host checks, CORS allowlisting, timeouts and explicit method handling.
-6. Defensively resolve client metadata URLs: HTTPS only, validate DNS answers against loopback/private/link-local/reserved ranges, re-check redirects (prefer disabling redirects), and enforce response/time/size caps to prevent SSRF.
-7. Use preview-only secrets and preview deployments. Never log bearer tokens, authorization codes, client secrets or PKCE verifiers.
-8. Add integration tests for Redis atomicity, replay, wrong audience/scope, expired/revoked tokens, banned users, cross-user access and an actual ChatGPT OAuth handshake.
-9. Only enable production after explicit review and approval.
+1. Configure the exact ChatGPT OAuth redirect URI and test the complete browser handshake against a preview deployment.
+2. Confirm Vercel routing for both `.well-known` endpoints and test the actual OAuth metadata URLs.
+3. Verify the deployment environment has the session secret and Redis variables without printing them.
+4. Add rate limits for authorization and token endpoints, plus operational monitoring without logging credentials.
+5. Add end-to-end tests for real Upstash behavior, code replay, expired/revoked tokens, banned accounts, cross-user access and the actual ChatGPT MCP handshake.
+6. Review MCP transport compatibility with the current ChatGPT client requirements. The endpoint currently implements authenticated JSON-RPC over POST; full Streamable HTTP compatibility and optional transport methods still need integration verification.
+7. Review the allowed Origin policy against actual MCP client behavior before production.
+8. Only merge and deploy after explicit review and approval.
 
-## Security note
+## Run unit tests
 
-These helpers are not a complete OAuth implementation. They do not authenticate the end user, render consent, register clients, mint access tokens, or expose HTTP endpoints. The JSON-RPC core requires a trusted server-side `context.auth`; never accept an auth object supplied by a client. Do not mount it on a public route until the full flow is implemented and tested.
+`node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js test/retzef-mcp-token-store.test.js test/retzef-mcp-oauth-codes.test.js test/retzef-mcp-upstash.test.js test/retzef-mcp-session.test.js test/retzef-mcp-oauth-config.test.js`
 
-## Run tests
-
-`node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js test/retzef-mcp-token-store.test.js test/retzef-mcp-oauth-codes.test.js test/retzef-mcp-upstash.test.js`
+Unit tests use mocks and do not contact the live database or ChatGPT. A green CI run is not proof of a successful live OAuth handshake.

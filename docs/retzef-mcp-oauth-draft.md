@@ -32,3 +32,13 @@ These helpers are not a substitute for a complete OAuth implementation. They do 
 ## Run tests
 
 `node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js test/retzef-mcp-token-store.test.js`
+
+
+## Authorization-code draft (not yet wired to HTTP routes)
+
+Added `lib/retzef-mcp-oauth-codes.js` with an isolated authorization-code issuer and redeemer:
+- Codes are high-entropy, opaque, and stored under a SHA-256 digest only.
+- Authorization codes expire after 90 seconds and are bound to client ID, exact registered HTTPS redirect URI, PKCE S256 challenge, subject, audience, and allowlisted scopes.
+- Redemption requires an injected `redis.consume(key)` operation that atomically reads and deletes the record. Do not implement this as separate GET and DEL operations.
+- The module does not authenticate the end user, render consent, register OAuth clients, mint access tokens, or expose HTTP endpoints. It is not production-ready until a real Redis atomic-consume adapter and the full browser OAuth flow are implemented and tested.
+- Never trust a browser-supplied subject. The eventual authorization route must derive it from a verified server-side session, not the `retzef_profile_id` cookie.

@@ -5,7 +5,8 @@ Status: isolated draft on `feature/retzef-mcp-oauth-draft`. This is not a workin
 ## Included
 
 - Dependency-free security primitives for opaque tokens, SHA-256 token digests, strict Bearer parsing, PKCE S256, scope allowlisting, HTTPS redirect URI checks, and bounded token expiry.
-- Node built-in tests in `test/retzef-mcp-security.test.js`.
+- A standalone read-only JSON-RPC core for MCP initialization, ping, tool discovery, and two authenticated read-only tool contracts.
+- Node built-in tests for the security helpers and JSON-RPC authorization boundaries.
 
 ## Required before connecting this to the live site
 
@@ -21,8 +22,8 @@ Status: isolated draft on `feature/retzef-mcp-oauth-draft`. This is not a workin
 
 ## Security note
 
-The helper module is not a substitute for a complete OAuth implementation. It does not issue or validate access tokens, connect to Redis, authenticate users, or implement MCP transport. Do not mount it on a public route until the complete flow is implemented and tested.
+The helper modules are not a substitute for a complete OAuth implementation. They do not issue or validate access tokens, connect to Redis, authenticate users, or implement the MCP HTTP transport. The JSON-RPC core requires a trusted server-side `context.auth`; never pass a client-supplied auth object. Do not mount it on a public route until the complete flow is implemented and tested.
 
 ## Run the tests
 
-`node --test test/retzef-mcp-security.test.js`
+`node --test test/retzef-mcp-security.test.js test/retzef-mcp-core.test.js`

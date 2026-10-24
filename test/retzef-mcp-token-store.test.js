@@ -20,7 +20,7 @@ const validRecord = {
   subject: 'user-123',
   scopes: ['profile:read'],
   audience: 'https://retzef.example/api/mcp',
-  expiresAt: 1900000000,
+  expiresAt: 1800000300,
   revoked: false
 };
 

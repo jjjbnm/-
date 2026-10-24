@@ -53,6 +53,25 @@ async function handleDiscordCallback(req,res,query){
 }
 
 module.exports = async (req, res) => {
+  const route = String(req?.query?.__retzef_route || '');
+  if (route) {
+    const routes = {
+      mcp: '../lib/retzef-mcp-routes/mcp',
+      authorize: '../lib/retzef-mcp-routes/authorize',
+      token: '../lib/retzef-mcp-routes/token',
+      'authorization-server': '../lib/retzef-mcp-routes/authorization-server',
+      'protected-resource': '../lib/retzef-mcp-routes/protected-resource',
+    };
+    const target = routes[route];
+    if (!target) return res.status(404).json({ error: 'not_found' });
+    try {
+      return await require(target)(req, res);
+    } catch (error) {
+      console.error('Retzef MCP route dispatch failed:', error?.message || 'unknown');
+      if (res.headersSent) return res.end();
+      return res.status(500).json({ error: 'internal_error' });
+    }
+  }
   const query = req && req.query && typeof req.query === 'object' ? req.query : {};
   if (String(query.provider || '') === 'discord') { if (String(query.action || '') === 'privacy') return handleDiscordPrivacy(req, res); if (!query.code) return handleDiscordLogin(req, res); return handleDiscordCallback(req, res, query); }
   const { code, error: tiktokError } = query;

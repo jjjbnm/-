@@ -25,11 +25,11 @@ module.exports = async (req,res) => {
     const raw=await redis.get('retzef:profile:'+username.toLowerCase());
     if(!raw)return null;const p=typeof raw==='string'?JSON.parse(raw):raw;
     if(!p||p.banned===true)return null;
-    return {username:p.username||username,displayName:p.displayName||p.username||username,avatarUrl:p.avatarUrl||'',role:p.role||'member'};
+    return {username:p.username||username,displayName:p.displayName||p.username||username,avatarUrl:p.avatarUrl||'',role:p.role||'member',tiktokConnected:typeof p.tiktokOpenId==='string'&&p.tiktokOpenId.length>0};
   }
   const adapters={
-    getMyProfile:async username=>{const p=await profileFor(username);if(!p)throw new Error('unavailable');return p;},
-    getMyTikTokStatus:async username=>{const p=await profileFor(username);if(!p)throw new Error('unavailable');return {username:p.username,connected:true};}
+    getMyProfile:async username=>{const p=await profileFor(username);if(!p)throw new Error('unavailable');return {username:p.username,displayName:p.displayName,avatarUrl:p.avatarUrl,role:p.role};},
+    getMyTikTokStatus:async username=>{const p=await profileFor(username);if(!p)throw new Error('unavailable');return {username:p.username,connected:p.tiktokConnected};}
   };
   const reply=await handleJsonRpc(body,{auth},adapters);
   if(reply===null)return res.status(202).end();

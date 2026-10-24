@@ -56,6 +56,7 @@ module.exports = async (req, res) => {
   const route = String(req?.query?.__retzef_route || '');
   if (route) {
     const routes = {
+      register: '../lib/retzef-mcp-routes/register-client',
       mcp: '../lib/retzef-mcp-routes/mcp',
       authorize: '../lib/retzef-mcp-routes/authorize',
       token: '../lib/retzef-mcp-routes/token',

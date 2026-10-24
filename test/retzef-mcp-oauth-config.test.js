@@ -1,21 +1,6 @@
 'use strict';
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const { getOAuthConfig, isOriginAllowed, parseFormOrJson, bodyOf } = require('../lib/retzef-mcp-oauth-config');
-const env={RETZEF_MCP_CLIENT_ID:'chatgpt-retzef',RETZEF_MCP_REDIRECT_URIS:'https://client.example/callback,https://client.example/other',RETZEF_MCP_AUDIENCE:'https://chi-liart-74.vercel.app/api/mcp'};
-test('OAuth config requires exact HTTPS redirect list and audience',()=> {
- assert.equal(getOAuthConfig(env).clientId,'chatgpt-retzef');
- assert.equal(getOAuthConfig({RETZEF_MCP_CLIENT_ID:'x',RETZEF_MCP_REDIRECT_URIS:'http://evil.test/cb'}),null);
- assert.equal(getOAuthConfig({}),null);
-});
-test('Origin validation only accepts same HTTPS host',()=> {
- assert.equal(isOriginAllowed({headers:{origin:'https://chi-liart-74.vercel.app',host:'chi-liart-74.vercel.app'}}),true);
- assert.equal(isOriginAllowed({headers:{origin:'https://evil.test',host:'chi-liart-74.vercel.app'}}),false);
-});
-test('form parsing supports urlencoded strings',()=> {
- assert.deepEqual(parseFormOrJson({body:'grant_type=authorization_code&client_id=abc'}),{grant_type:'authorization_code',client_id:'abc'});
-});
-
-test('authorization consent parses browser form submissions',()=> {
- assert.deepEqual(bodyOf({headers:{'content-type':'application/x-www-form-urlencoded'},body:'request_id=abc&csrf=xyz&decision=approve'}),{request_id:'abc',csrf:'xyz',decision:'approve'});
-});
+const test=require('node:test');const assert=require('node:assert/strict');
+const {getOAuthConfig}=require('../lib/retzef-mcp-oauth-config');
+test('uses canonical production audience and issuer by default',()=>assert.deepEqual(getOAuthConfig({}),{audience:'https://chi-liart-74.vercel.app/api/mcp',issuer:'https://chi-liart-74.vercel.app'}));
+test('rejects non-HTTPS issuer or audience',()=>{assert.equal(getOAuthConfig({RETZEF_MCP_ISSUER:'http://example.com'}),null);assert.equal(getOAuthConfig({RETZEF_MCP_AUDIENCE:'http://example.com/mcp'}),null);});
+test('accepts explicit HTTPS values and normalizes issuer slash',()=>assert.deepEqual(getOAuthConfig({RETZEF_MCP_ISSUER:'https://retzef.example/',RETZEF_MCP_AUDIENCE:'https://retzef.example/api/mcp'}),{audience:'https://retzef.example/api/mcp',issuer:'https://retzef.example'}));

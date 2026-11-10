@@ -240,6 +240,29 @@ module.exports = async (req, res) => {
       if (found.from) await sendTo(found.from, { title: input.decision === 'approve' ? 'בקשת ההצטרפות אושרה' : 'בקשת ההצטרפות נדחתה', body: input.decision === 'approve' ? 'הבאן המקורי אישר את בקשתך.' : `הבקשה נדחתה: ${reason}`, url: '/' });
       return res.status(200).json({ updated: true, status: found.status });
     }
+    if (action === 'premiumCodeRedeem') {
+      const code = String(input.code || '').trim().toUpperCase().replace(/\s+/g, '');
+      if (code !== 'FCHGHJSH') return res.status(404).json({ error: 'code_not_found' });
+      if (mine.premium === true && String(mine.premiumCode || '').toUpperCase() === code) {
+        return res.status(200).json({ premium: true, subscription: 'Premium', subscriptionName: 'Premium', alreadyGranted: true });
+      }
+      const claimed = await redis('set', `retzef:premium:redeemed:${code}:${me}`, '1', 'NX', 'EX', '31536000');
+      if (!claimed) return res.status(409).json({ error: 'already_redeemed' });
+      const now = new Date().toISOString();
+      mine.premium = true;
+      mine.premiumCode = code;
+      mine.premiumSource = 'code';
+      mine.premiumGrantedAt = now;
+      mine.subscription = 'Premium';
+      mine.subscriptionName = 'Premium';
+      mine.subscriptionSource = 'code';
+      mine.paymentHistory = Array.isArray(mine.paymentHistory) ? mine.paymentHistory : [];
+      mine.paymentHistory.unshift({ id: `premium-${Date.now().toString(36).toUpperCase()}`, name: 'Premium', method: 'code', amount: 0, currency: 'ILS', code, createdAt: now });
+      mine.paymentHistory = mine.paymentHistory.slice(0, 50);
+      await redis('set', `${PREFIX}${me}`, JSON.stringify(mine));
+      try { await sendTo(me, { title: 'פרימיום הושג', body: 'קיבלת Premium בהצלחה.', url: '/' }); } catch (_) {}
+      return res.status(200).json({ premium: true, subscription: 'Premium', subscriptionName: 'Premium', grantedAt: now });
+    }
     if (action === 'giftCodeRedeem') {
       const code = String(input.code || '').trim().toUpperCase().replace(/\s+/g, '');
       if (!/^[A-Z0-9_-]{4,32}$/.test(code)) return res.status(400).json({ error: 'invalid_code' });

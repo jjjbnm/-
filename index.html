@@ -915,7 +915,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     <button class="tab-btn" data-target="apps">📱 אפליקציות</button>
     <button class="tab-btn" data-target="settings" data-i18n="nav_settings">⚙️ הגדרות</button>
     <button class="tab-btn" data-target="about" data-i18n="nav_about">ℹ️ אודות וגרסה</button>
-    <button class="tab-btn" id="developer-mode-tab-btn" data-target="developer-mode">🛠️ Developer Mode</button>
+    <button class="tab-btn" id="developer-mode-tab-btn" data-target="developerModePanel">🛠️ Developer Mode</button>
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">📩 יצירת קשר</button>
     <button class="tab-btn" data-target="support">🆘 תמיכה</button>
       <button class="tab-btn protected-tab" data-target="boards">📢 מודעות</button>
@@ -3157,6 +3157,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
       const balance=parseCoins(wallet.balance);
       const formatted=balance.toLocaleString('he-IL');
       window.__retzefProfile=data.profile;
+      if(typeof window.refreshDeveloperMode==='function')window.refreshDeveloperMode();
       if(typeof window.updateWalletUI==='function')window.updateWalletUI(wallet);
       document.querySelectorAll('#profileWalletBalance,#walletBalanceHome,#walletQuickBalance').forEach(el=>{el.textContent=el.id==='walletQuickBalance'?formatted+' מטבעות':formatted+' 🪙';});
       valueEl.textContent=formatted;
@@ -3305,7 +3306,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
   function refresh(){const s=read();const luck=document.getElementById('developerLuckStatus');if(luck)luck.textContent=s.luck?'🍀 מכפיל בדיקה פעיל: '+Number(s.luck).toLocaleString()+'×':'אין מכפיל בדיקה פעיל.';const coins=document.getElementById('developerCoinsStatus');if(coins)coins.textContent=s.coins!==undefined?'🪙 יתרת Custom Coins לבדיקה: '+Number(s.coins).toLocaleString():'אין יתרת בדיקה.';const beta=document.getElementById('developerBetaStatus');if(beta)beta.textContent=s.beta?'🧪 תצוגת בטא פעילה: '+s.beta:'מוצגת הגרסה הרגילה.';}
   function show(){if(!activeForCurrent())return;button.style.display='inline-block';const account=document.getElementById('developerModeAccount');if(account)account.textContent='מצב מפתחים פעיל עבור @'+profileName()+' · הענקות מזל ומטבעות נשמרות בשרת; גרסאות בטא הן מקומיות.';refresh();}
   avatar.addEventListener('click',()=>{if(!window.__retzefProfile){clicks=0;return;}clicks++;if(clicks===15&&!activeForCurrent()){localStorage.setItem(key,'1');write({username:profileName()});button.style.display='inline-block';notify('Developer mode activated');}});
-  button.addEventListener('click',()=>{if(typeof window.activateTab==='function')window.activateTab('developer-mode');});
+  button.addEventListener('click',()=>{if(typeof window.activateTab==='function')window.activateTab('developerModePanel');});
   async function developerGrant(payload){const r=await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({action:'developerGrant',...payload})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.message||d.error||'developer_grant_failed');return d;}
   document.getElementById('developerGrantLuck')?.addEventListener('click',async()=>{const btn=document.getElementById('developerGrantLuck');btn.disabled=true;try{const multiplier=Number(document.getElementById('developerLuckSelect')?.value||2);const d=await developerGrant({kind:'luck',multiplier});const s=read();s.username=profileName();s.luck=multiplier;write(s);refresh();if(window.__retzefProfile)window.__retzefProfile.luckMultipliers=d.luckMultipliers||[];notify('מזל '+multiplier.toLocaleString()+'× נוסף לחשבון ל־10 דקות');}catch(e){notify(e.message==='Developer grants are available only to the owner.'?'רק הבעלים יכול להשתמש בהענקות Developer Mode':e.message||'הענקת המזל נכשלה');}finally{btn.disabled=false;}});
   document.getElementById('developerSetCoins')?.addEventListener('click',async()=>{const btn=document.getElementById('developerSetCoins'),n=Math.floor(Number(document.getElementById('developerCoinsInput')?.value));if(!Number.isSafeInteger(n)||n<0||n>1000000000){notify('יש להזין כמות בין 0 ל־1,000,000,000');return;}btn.disabled=true;try{const d=await developerGrant({kind:'coins',amount:n});const s=read();s.username=profileName();s.coins=n;write(s);if(window.__retzefProfile)window.__retzefProfile.wallet=d.wallet;refresh();if(typeof window.updateWalletUI==='function')window.updateWalletUI(d.wallet);notify('יתרת המטבעות האמיתית עודכנה');}catch(e){notify(e.message==='Developer grants are available only to the owner.'?'רק הבעלים יכול להשתמש בהענקות Developer Mode':e.message||'הענקת המטבעות נכשלה');}finally{btn.disabled=false;}});

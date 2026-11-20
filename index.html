@@ -914,6 +914,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     <button class="tab-btn protected-tab" data-target="shop" data-i18n="nav_shop">🛍️ חנות</button>
     <button class="tab-btn" data-target="apps">📱 אפליקציות</button>
     <button class="tab-btn" data-target="settings" data-i18n="nav_settings">⚙️ הגדרות</button>
+    <button class="tab-btn" data-target="connection" data-i18n="nav_connection">🔗 חיבור</button>
     <button class="tab-btn" data-target="about" data-i18n="nav_about">ℹ️ אודות וגרסה</button>
     <button class="tab-btn" id="developer-mode-tab-btn" data-target="developerModePanel">🛠️ Developer Mode</button>
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">📩 יצירת קשר</button>
@@ -1632,6 +1633,13 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     <button type="button" id="resetSettingsBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center;">↺ איפוס לברירת מחדל</button>
   </section>
 
+  <!-- CONNECTION -->
+  <section id="connection" class="tab-panel">
+    <span class="eyebrow" data-i18n="connection_eyebrow">חיבור</span>
+    <h2 class="sec-title" data-i18n="connection_title">חיבור</h2>
+    <p class="sec-sub" data-i18n="connection_sub">כאן יופיעו אפשרויות החיבור.</p>
+  </section>
+
   <!-- ABOUT & VERSION -->
   <section id="about" class="tab-panel">
     <span class="eyebrow" data-i18n="about_eyebrow">מידע כללי</span>
@@ -2145,7 +2153,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
   // === language toggle (EN/HE) — headings & nav translated, detailed body text stays Hebrew ===
   const I18N = {
     nav_home: '🏠 Home', nav_status: '🟢 Status', nav_rules: '📜 Rules', nav_subs: '💳 Subscriptions', nav_team: '👥 Owners & Admins',
-    nav_scope: '🎂 Age & Terms', nav_shop: '🛍️ Shop', nav_settings: '⚙️ Settings', nav_about: 'ℹ️ About', nav_contact: '📩 Contact',
+    nav_scope: '🎂 Age & Terms', nav_shop: '🛍️ Shop', nav_settings: '⚙️ Settings', nav_connection: '🔗 Connection', nav_about: 'ℹ️ About', nav_contact: '📩 Contact',
     hero_badge: 'Retzef Community · TikTok', hero_owner_label: 'Owner',
     hero_subtitle: "The group's official support hub — rules, status, subscriptions and login, in one place.",
     hero_streak_label: 'Streak', hero_days_label: 'days',
@@ -2160,6 +2168,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     scope_eyebrow: 'Who can join', scope_title: 'Age & Terms',
     shop_eyebrow: 'Retzef Shop', shop_title: 'What you can buy', shop_sub: 'Purchases go through the owner/admins. Some items are risky or limited — check the notes.',
     settings_eyebrow: 'Personalization', settings_title: 'Settings',
+    connection_eyebrow: 'Connection', connection_title: 'Connection', connection_sub: 'Connection options will appear here.',
     about_eyebrow: 'General Info', about_title: 'About & Version', about_sub: 'Everything about the site itself — not the group.',
     contact_title: 'Need help?', contact_sub: 'Questions about status, subscriptions, or rules — reach out directly.',
   };

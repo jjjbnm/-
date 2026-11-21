@@ -781,6 +781,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
   <button type="button" data-profile-target="profile">👤 פרופיל</button>
   <button type="button" id="profileAccounts">🔄 החלפת חשבון</button>
   <button type="button" id="profileUsers">👥 משתמשים וצ׳אט</button>
+  <button type="button" data-profile-target="connection" data-i18n="profile_connection">🔗 חיבור</button>
   <button type="button" id="profileLogout">🚪 התנתקות</button>
 </div>
 <div id="profileQuickModal" role="dialog" aria-modal="true" aria-labelledby="profileQuickTitle">
@@ -914,7 +915,6 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     <button class="tab-btn protected-tab" data-target="shop" data-i18n="nav_shop">🛍️ חנות</button>
     <button class="tab-btn" data-target="apps">📱 אפליקציות</button>
     <button class="tab-btn" data-target="settings" data-i18n="nav_settings">⚙️ הגדרות</button>
-    <button class="tab-btn" data-target="connection" data-i18n="nav_connection">🔗 חיבור</button>
     <button class="tab-btn" data-target="about" data-i18n="nav_about">ℹ️ אודות וגרסה</button>
     <button class="tab-btn" id="developer-mode-tab-btn" data-target="developerModePanel">🛠️ Developer Mode</button>
     <button class="tab-btn" data-target="contact" data-i18n="nav_contact">📩 יצירת קשר</button>
@@ -1890,6 +1890,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     setTimeout(()=>box.remove(),15000);
   }
   function openProfileAction(action){
+    if(action==='connection') { if(typeof window.activateTab==='function') window.activateTab('connection'); return; }
     const profile=window.__retzefProfile||{};
     const username=profile.username||'לא מחובר';
     const displayName=profile.displayName||username;
@@ -2153,7 +2154,8 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
   // === language toggle (EN/HE) — headings & nav translated, detailed body text stays Hebrew ===
   const I18N = {
     nav_home: '🏠 Home', nav_status: '🟢 Status', nav_rules: '📜 Rules', nav_subs: '💳 Subscriptions', nav_team: '👥 Owners & Admins',
-    nav_scope: '🎂 Age & Terms', nav_shop: '🛍️ Shop', nav_settings: '⚙️ Settings', nav_connection: '🔗 Connection', nav_about: 'ℹ️ About', nav_contact: '📩 Contact',
+    nav_scope: '🎂 Age & Terms', nav_shop: '🛍️ Shop', nav_settings: '⚙️ Settings', nav_about: 'ℹ️ About', nav_contact: '📩 Contact',
+    profile_connection: '🔗 Connection',
     hero_badge: 'Retzef Community · TikTok', hero_owner_label: 'Owner',
     hero_subtitle: "The group's official support hub — rules, status, subscriptions and login, in one place.",
     hero_streak_label: 'Streak', hero_days_label: 'days',

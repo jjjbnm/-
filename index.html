@@ -1633,13 +1633,6 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     <button type="button" id="resetSettingsBtn" class="btn btn-ghost glass" style="width:100%; justify-content:center;">↺ איפוס לברירת מחדל</button>
   </section>
 
-  <!-- CONNECTION -->
-  <section id="connection" class="tab-panel">
-    <span class="eyebrow" data-i18n="connection_eyebrow">חיבור</span>
-    <h2 class="sec-title" data-i18n="connection_title">חיבור</h2>
-    <p class="sec-sub" data-i18n="connection_sub">כאן יופיעו אפשרויות החיבור.</p>
-  </section>
-
   <!-- ABOUT & VERSION -->
   <section id="about" class="tab-panel">
     <span class="eyebrow" data-i18n="about_eyebrow">מידע כללי</span>
@@ -1890,8 +1883,27 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     setTimeout(()=>box.remove(),15000);
   }
   function openProfileAction(action){
-    if(action==='connection') { if(typeof window.activateTab==='function') window.activateTab('connection'); return; }
     const profile=window.__retzefProfile||{};
+    if(action==='connection') {
+      const isEnglish=document.documentElement.lang==='en';
+      quickTitle.textContent=isEnglish?'🔗 Account connections':'🔗 חיבורי חשבון';
+      quickBody.replaceChildren();
+      const makeConnectionCard=(title,status,buttonText='')=>{
+        const card=document.createElement('div'); card.className='settings-card glass'; card.style.marginBottom='12px';
+        const heading=document.createElement('h4'); heading.textContent=title; heading.style.margin='0 0 6px';
+        const detail=document.createElement('p'); detail.textContent=status; detail.style.margin='0';
+        card.append(heading,detail);
+        if(buttonText){const button=document.createElement('button');button.type='button';button.id='settingsDiscordConnect';button.className='quick-action';button.textContent=buttonText;card.appendChild(button);}
+        return card;
+      };
+      quickBody.appendChild(makeConnectionCard('🎵 TikTok',profile.username?(isEnglish?'Connected as @':'מחובר/ת בתור @')+profile.username:(isEnglish?'Not connected':'לא מחובר')));
+      const discordUsername=profile.discord?.username;
+      quickBody.appendChild(makeConnectionCard('💬 Discord',discordUsername?(isEnglish?'Connected as @':'מחובר/ת בתור @')+discordUsername:(isEnglish?'Not connected':'לא מחובר'),discordUsername?(isEnglish?'Reconnect Discord':'חיבור מחדש ל-Discord'):(isEnglish?'Connect Discord':'חבר את Discord')));
+      const note=document.createElement('p'); note.style.fontSize='12px'; note.textContent=isEnglish?'These connections belong to the account shown in your profile.':'החיבורים משויכים לחשבון שמוצג בפרופיל שלך.';
+      quickBody.appendChild(note);
+      quickModal.classList.add('open');
+      return;
+    }
     const username=profile.username||'לא מחובר';
     const displayName=profile.displayName||username;
     const role=profile.role==='owner'?'בעלים 👑':profile.role==='admin'?'מנהל/ת 👩‍💼':'חבר/ה';
@@ -2170,7 +2182,6 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     scope_eyebrow: 'Who can join', scope_title: 'Age & Terms',
     shop_eyebrow: 'Retzef Shop', shop_title: 'What you can buy', shop_sub: 'Purchases go through the owner/admins. Some items are risky or limited — check the notes.',
     settings_eyebrow: 'Personalization', settings_title: 'Settings',
-    connection_eyebrow: 'Connection', connection_title: 'Connection', connection_sub: 'Connection options will appear here.',
     about_eyebrow: 'General Info', about_title: 'About & Version', about_sub: 'Everything about the site itself — not the group.',
     contact_title: 'Need help?', contact_sub: 'Questions about status, subscriptions, or rules — reach out directly.',
   };

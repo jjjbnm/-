@@ -1583,6 +1583,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
       <div id="viceCityMusicControls" hidden>
         <button type="button" id="viceCityMusicToggle" class="btn btn-ghost glass" style="width:100%;justify-content:center;" aria-expanded="false" aria-controls="viceCityMusicList">🎵 בחירת מוזיקת GTA</button>
         <div id="viceCityMusicList" role="group" aria-label="בחירת נעימת משחק GTA">
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-theme-compilation" data-youtube-id="nrLpdsEE0kI" data-track-title="All Iconic GTA Theme Songs — From GTA III to GTA VI" style="grid-column:1/-1;">▶ אוסף נעימות GTA — הסרטון ששלחת</button>
           <button type="button" class="btn btn-ghost glass" data-gta-track="gta-vi" data-youtube-id="Ip_Kc3EQiOI" data-search="Pusher feat Gesaffelstein from GTA VI official score" data-track-title="Pusher (feat. Gesaffelstein) — GTA VI Original Score">GTA VI · Pusher</button>
           <button type="button" class="btn btn-ghost glass" data-gta-track="gta-v" data-youtube-id="Ibaze-ZF3Vk" data-search="Welcome To Los Santos Oh No GTA V official soundtrack" data-track-title="Welcome To Los Santos (Oh No)">GTA V · Welcome To Los Santos</button>
           <button type="button" class="btn btn-ghost glass" data-gta-track="gta-iv" data-youtube-id="93TW692tQb8" data-search="Soviet Connection Theme from GTA IV Michael Hunter" data-track-title="Soviet Connection (Theme from GTA IV)">GTA IV · Soviet Connection</button>
@@ -1594,7 +1595,7 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
         <p id="viceCityMusicStatus" style="font-size:12px;color:var(--muted);margin-top:8px;" aria-live="polite"></p>
         <div id="viceCityMusicPlayer" hidden></div>
         <a id="viceCityMusicSourceLink" hidden target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;color:#8edfff;font-size:12px;"></a>
-        <p style="font-size:11px;color:var(--muted);margin-top:6px;">הרצועות נפתחות בנגני YouTube או Spotify הרשמיים; הפעלתן ועוצמתן נשלטות בנגן.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">הווידאו מתנגן כאן בתוך האתר. אם אין מקור לרצועה מסוימת, נפתח כאן אוסף הנעימות שסיפקת.</p>
       </div>
       <label for="musicVolumeSlider" style="display:block;margin-top:14px;">עוצמת המוזיקה: <span id="musicVolumeValue">24%</span></label>
       <input type="range" id="musicVolumeSlider" min="0" max="100" value="24" step="1" style="width:100%;">
@@ -3369,31 +3370,23 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     if(!hasViceCityAccess||wallpaperSelect?.value!=='vice-city')return;
     const videoId=String(button.dataset.youtubeId||'').trim();
     const spotifyId=String(button.dataset.spotifyId||'').trim();
-    const provider=videoId?'YouTube':spotifyId?'Spotify':'';
-    const search=String(button.dataset.search||button.textContent||'GTA theme music');
+    const isFallback=!videoId&&!spotifyId;
+    const resolvedVideoId=videoId||(isFallback?'nrLpdsEE0kI':'');
+    const provider=resolvedVideoId?'YouTube':'Spotify';
     const trackTitle=String(button.dataset.trackTitle||button.textContent.trim());
     if(music)music.pause();
-    if(!provider){
-      if(viceCityMusicStatus)viceCityMusicStatus.textContent='פותח חיפוש YouTube עבור '+button.textContent.trim()+'.';
-      const searchUrl='https://www.youtube.com/results?search_query='+encodeURIComponent(search);
-      if(viceCityMusicSourceLink){viceCityMusicSourceLink.href=searchUrl;viceCityMusicSourceLink.textContent='פתיחת תוצאות YouTube';viceCityMusicSourceLink.hidden=false;}
-      window.open(searchUrl,'_blank','noopener,noreferrer');
-      viceCityMusicList.classList.remove('open');
-      viceCityMusicToggle?.setAttribute('aria-expanded','false');
-      return;
-    }
     const iframe=document.createElement('iframe');
-    iframe.src=videoId
-      ?'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(videoId)+'?autoplay=1&playsinline=1&controls=1&rel=0'
+    iframe.src=resolvedVideoId
+      ?'https://www.youtube.com/embed/'+encodeURIComponent(resolvedVideoId)+'?autoplay=1&playsinline=1&controls=1&rel=0'
       :'https://open.spotify.com/embed/track/'+encodeURIComponent(spotifyId)+'?utm_source=generator';
     iframe.title=trackTitle+' — '+provider+' music player';
-    iframe.loading='lazy';
+    iframe.loading='eager';
     iframe.referrerPolicy='strict-origin-when-cross-origin';
     iframe.allow='autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share';
     iframe.allowFullscreen=true;
     if(viceCityMusicPlayer){viceCityMusicPlayer.replaceChildren(iframe);viceCityMusicPlayer.hidden=false;}
-    if(viceCityMusicStatus)viceCityMusicStatus.textContent='נפתח נגן '+provider+': '+trackTitle;
-    if(viceCityMusicSourceLink){viceCityMusicSourceLink.href=videoId?'https://www.youtube.com/watch?v='+encodeURIComponent(videoId):'https://open.spotify.com/track/'+encodeURIComponent(spotifyId);viceCityMusicSourceLink.textContent='פתיחה ישירה ב־'+provider;viceCityMusicSourceLink.hidden=false;}
+    if(viceCityMusicStatus)viceCityMusicStatus.textContent=isFallback?'לא נמצא מקור מוטמע לרצועה זו; מנגן כאן את אוסף הנעימות שסיפקת.':'מנגן בתוך האתר דרך '+provider+': '+trackTitle;
+    if(viceCityMusicSourceLink){viceCityMusicSourceLink.href=resolvedVideoId?'https://www.youtube.com/watch?v='+encodeURIComponent(resolvedVideoId):'https://open.spotify.com/track/'+encodeURIComponent(spotifyId);viceCityMusicSourceLink.textContent='אם הנגן לא עובד: פתיחה ישירה ב־'+provider;viceCityMusicSourceLink.hidden=false;}
     viceCityMusicList.classList.remove('open');
     viceCityMusicToggle?.setAttribute('aria-expanded','false');
   }));

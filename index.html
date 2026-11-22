@@ -574,6 +574,19 @@ function updateWalletUI(wallet){const raw=wallet&&wallet.balance;const value=(Nu
   html[data-wallpaper="christmas"] body:before{content:"❄️   🎄   ❄️   🎁   ❄️";position:fixed;inset:0;z-index:-1;display:flex;align-items:center;justify-content:center;color:rgba(186,230,253,.22);font-size:clamp(34px,8vw,84px);letter-spacing:18px;line-height:2.4;text-align:center;pointer-events:none;transform:rotate(-12deg) scale(1.3)}
   html[data-wallpaper="christmas"] body:after{content:"חג המולד";position:fixed;right:18px;bottom:14px;z-index:0;color:rgba(255,255,255,.12);font-size:clamp(42px,10vw,110px);font-weight:900;pointer-events:none}
   html[data-wallpaper="christmas"] .glass,html[data-wallpaper="christmas"] .settings-card{background:rgba(8,25,42,.78);border-color:rgba(56,189,248,.28)}
+
+  html[data-wallpaper="vice-city"]{--text:#fff;--muted:#f0d7e7;--bg2:#211629;--glass:rgba(16,12,29,.78);--glass-border:rgba(255,105,180,.34)}
+  html[data-wallpaper="vice-city"] body{background-color:#090b1c;background-image:linear-gradient(180deg,rgba(7,8,23,.38),rgba(7,8,23,.72)),url('/assets/vice-city-inspired-wallpaper.jpg');background-position:center;background-size:cover;background-repeat:no-repeat;background-attachment:fixed}
+  html[data-wallpaper="vice-city"] .glass,html[data-wallpaper="vice-city"] .settings-card,html[data-wallpaper="vice-city"] .tab-panel{background:rgba(16,12,29,.78);border-color:rgba(255,105,180,.3)}
+  html[data-wallpaper="vice-city"] body,html[data-wallpaper="vice-city"] .sec-title,html[data-wallpaper="vice-city"] .settings-card h3,html[data-wallpaper="vice-city"] label,html[data-wallpaper="vice-city"] button{color:var(--text)}
+  html[data-wallpaper="vice-city"] p,html[data-wallpaper="vice-city"] small,html[data-wallpaper="vice-city"] .muted{color:var(--muted)}
+  html[data-wallpaper="vice-city"] input,html[data-wallpaper="vice-city"] select,html[data-wallpaper="vice-city"] textarea{color:#fff;background:rgba(22,17,36,.94);border-color:rgba(255,105,180,.38)}
+  #viceCityMusicControls[hidden],#viceCityMusicPlayer[hidden],#viceCityMusicSourceLink[hidden]{display:none!important}
+  #viceCityMusicControls{margin-top:14px}
+  #viceCityMusicList{display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+  #viceCityMusicList.open{display:grid}
+  #viceCityMusicPlayer iframe{display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:12px;margin-top:10px;background:#000}
+  @media(max-width:420px){#viceCityMusicList{grid-template-columns:1fr}}
 </style>
 
 <script id="retzef-profile-cache-bootstrap">
@@ -1564,7 +1577,25 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
       <select id="wallpaperSelect">
         <option value="christmas">חג המולד</option>
         <option value="normal">רגיל</option>
+        <option value="vice-city" id="viceCityWallpaperOption" disabled>Vice City — בהשראת GTA VI (Premium/בעלים)</option>
       </select>
+      <p id="viceCityAccessStatus" style="font-size:12px;color:var(--muted);margin-top:6px;">🔒 הטפט זמין למנויי Premium ולבעלים.</p>
+      <div id="viceCityMusicControls" hidden>
+        <button type="button" id="viceCityMusicToggle" class="btn btn-ghost glass" style="width:100%;justify-content:center;" aria-expanded="false" aria-controls="viceCityMusicList">🎵 בחירת מוזיקת GTA</button>
+        <div id="viceCityMusicList" role="group" aria-label="בחירת נעימת משחק GTA">
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-vi" data-youtube-id="Ip_Kc3EQiOI" data-search="Pusher feat Gesaffelstein from GTA VI official score" data-track-title="Pusher (feat. Gesaffelstein) — GTA VI Original Score">GTA VI · Pusher</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-v" data-youtube-id="Ibaze-ZF3Vk" data-search="Welcome To Los Santos Oh No GTA V official soundtrack" data-track-title="Welcome To Los Santos (Oh No)">GTA V · Welcome To Los Santos</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-iv" data-youtube-id="93TW692tQb8" data-search="Soviet Connection Theme from GTA IV Michael Hunter" data-track-title="Soviet Connection (Theme from GTA IV)">GTA IV · Soviet Connection</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-san-andreas" data-youtube-id="7qfbi3HACV8" data-search="Grand Theft Auto San Andreas Official Theme Song Michael Hunter" data-track-title="Grand Theft Auto: San Andreas (Official Theme Song)">GTA San Andreas · Theme</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-vice-city" data-spotify-id="0ufkz87eb3HoEX2HcKkcBx" data-search="Theme from Vice City Lex Horton" data-track-title="Theme from Vice City">GTA Vice City · Theme</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-iii" data-spotify-id="2zTzKhqjrXKuGe8MLesd1k" data-search="GTA III theme song Craig Conner Stuart Ross" data-track-title="GTA III Theme">GTA III · Theme</button>
+          <button type="button" class="btn btn-ghost glass" id="viceCityMusicReset" style="grid-column:1/-1;">↩ חזרה למוזיקת הרקע של האתר</button>
+        </div>
+        <p id="viceCityMusicStatus" style="font-size:12px;color:var(--muted);margin-top:8px;" aria-live="polite"></p>
+        <div id="viceCityMusicPlayer" hidden></div>
+        <a id="viceCityMusicSourceLink" hidden target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;color:#8edfff;font-size:12px;"></a>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">הרצועות נפתחות בנגני YouTube או Spotify הרשמיים; הפעלתן ועוצמתן נשלטות בנגן.</p>
+      </div>
       <label for="musicVolumeSlider" style="display:block;margin-top:14px;">עוצמת המוזיקה: <span id="musicVolumeValue">24%</span></label>
       <input type="range" id="musicVolumeSlider" min="0" max="100" value="24" step="1" style="width:100%;">
       <div id="mediaSettingsStatus" style="font-size:12px;color:var(--muted);margin-top:8px;" aria-live="polite"></div>
@@ -3242,17 +3273,68 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
 (function(){
   const defaults={wallpaper:'christmas',musicVolume:0.24};
   const wallpaperSelect=document.getElementById('wallpaperSelect');
+  const viceCityOption=document.getElementById('viceCityWallpaperOption');
+  const accessStatus=document.getElementById('viceCityAccessStatus');
+  const viceCityMusicControls=document.getElementById('viceCityMusicControls');
+  const viceCityMusicToggle=document.getElementById('viceCityMusicToggle');
+  const viceCityMusicList=document.getElementById('viceCityMusicList');
+  const viceCityMusicPlayer=document.getElementById('viceCityMusicPlayer');
+  const viceCityMusicStatus=document.getElementById('viceCityMusicStatus');
+  const viceCityMusicSourceLink=document.getElementById('viceCityMusicSourceLink');
+  const viceCityMusicReset=document.getElementById('viceCityMusicReset');
   const volumeSlider=document.getElementById('musicVolumeSlider');
   const volumeValue=document.getElementById('musicVolumeValue');
   const status=document.getElementById('mediaSettingsStatus');
   const music=document.getElementById('retzefBackgroundMusic');
   let clientState={};
+  let hasViceCityAccess=false;
   let saveTimer=0;
   const localGet=(key,fallback)=>{try{return localStorage.getItem(key)||fallback;}catch(_){return fallback;}};
   const localSet=(key,value)=>{try{localStorage.setItem(key,String(value));}catch(_){} };
   const normalizeVolume=value=>{const number=Number(value);return Number.isFinite(number)?Math.max(0,Math.min(1,number)):defaults.musicVolume;};
+  function isPremiumOrOwner(profile){
+    if(!profile||typeof profile!=='object')return false;
+    const username=String(profile.username||'').replace(/^@/,'').toLowerCase();
+    const role=String(profile.role||'').toLowerCase();
+    if(username==='ban.original'||role==='owner')return true;
+    const plan=[profile.subscriptionName,profile.subscription].filter(Boolean).join(' ');
+    if(profile.premium!==true&&!/(premium|פרימיום)/i.test(plan))return false;
+    const rawExpiry=profile.subscriptionExpiresAt;
+    if(rawExpiry===undefined||rawExpiry===null||String(rawExpiry).trim()==='')return true;
+    const numericExpiry=Number(rawExpiry);
+    const expiry=Number.isFinite(numericExpiry)&&numericExpiry>0?numericExpiry:Date.parse(String(rawExpiry));
+    return Number.isFinite(expiry)&&expiry>Date.now();
+  }
+  function clearViceCityPlayer(resumeBackground=false){
+    const hadPlayer=Boolean(viceCityMusicPlayer&&!viceCityMusicPlayer.hidden&&viceCityMusicPlayer.childElementCount);
+    if(viceCityMusicPlayer){viceCityMusicPlayer.replaceChildren();viceCityMusicPlayer.hidden=true;}
+    if(viceCityMusicStatus)viceCityMusicStatus.textContent='';
+    if(viceCityMusicSourceLink){viceCityMusicSourceLink.hidden=true;viceCityMusicSourceLink.removeAttribute('href');viceCityMusicSourceLink.textContent='';}
+    if(resumeBackground&&hadPlayer&&music){const play=music.play();if(play&&typeof play.catch==='function')play.catch(()=>{});}
+  }
+  function updateViceCityMusicVisibility(){
+    const visible=hasViceCityAccess&&wallpaperSelect?.value==='vice-city';
+    if(viceCityMusicControls)viceCityMusicControls.hidden=!visible;
+    if(!visible){clearViceCityPlayer(true);viceCityMusicList?.classList.remove('open');viceCityMusicToggle?.setAttribute('aria-expanded','false');}
+  }
+  function updateAccess(profile){
+    hasViceCityAccess=isPremiumOrOwner(profile);
+    if(viceCityOption)viceCityOption.disabled=!hasViceCityAccess;
+    if(accessStatus){
+      accessStatus.hidden=hasViceCityAccess;
+      accessStatus.textContent=profile?'🔒 הטפט זמין למנויי Premium פעילים ולבעלים.':'🔒 התחברו לחשבון כדי לבדוק זכאות ל־Premium.';
+    }
+    if(!hasViceCityAccess&&wallpaperSelect?.value==='vice-city'){
+      wallpaperSelect.value='christmas';
+      document.documentElement.dataset.wallpaper='christmas';
+      localSet('retzef-wallpaper','christmas');
+      if(clientState.settings&&typeof clientState.settings==='object')clientState.settings.wallpaper='christmas';
+    }
+    updateViceCityMusicVisibility();
+  }
   function apply(settings,saveLocal=true){
-    const wallpaper=settings.wallpaper==='normal'?'normal':'christmas';
+    const requestedWallpaper=String(settings.wallpaper||defaults.wallpaper);
+    const wallpaper=requestedWallpaper==='normal'?'normal':requestedWallpaper==='vice-city'&&hasViceCityAccess?'vice-city':'christmas';
     const volume=normalizeVolume(settings.musicVolume);
     document.documentElement.dataset.wallpaper=wallpaper;
     if(wallpaperSelect)wallpaperSelect.value=wallpaper;
@@ -3260,8 +3342,9 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     if(volumeValue)volumeValue.textContent=Math.round(volume*100)+'%';
     if(music)music.volume=volume;
     if(saveLocal){localSet('retzef-wallpaper',wallpaper);localSet('retzef-music-volume',volume);}
+    updateViceCityMusicVisibility();
   }
-  function currentSettings(){return {...(clientState.settings&&typeof clientState.settings==='object'?clientState.settings:{}),wallpaper:wallpaperSelect?.value==='normal'?'normal':'christmas',musicVolume:normalizeVolume(Number(volumeSlider?.value||24)/100)};}
+  function currentSettings(){const selected=wallpaperSelect?.value;const wallpaper=selected==='normal'?'normal':selected==='vice-city'&&hasViceCityAccess?'vice-city':'christmas';return {...(clientState.settings&&typeof clientState.settings==='object'?clientState.settings:{}),wallpaper,musicVolume:normalizeVolume(Number(volumeSlider?.value||24)/100)};}
   async function save(){
     clientState.settings=currentSettings();
     apply(clientState.settings);
@@ -3273,15 +3356,66 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
       }catch(_){if(status)status.textContent='ההגדרה נשמרה במכשיר';}
     },180);
   }
-  apply({wallpaper:localGet('retzef-wallpaper',defaults.wallpaper),musicVolume:localGet('retzef-music-volume',defaults.musicVolume)} ,false);
-  if(wallpaperSelect)wallpaperSelect.addEventListener('change',save);
+  if(wallpaperSelect)wallpaperSelect.addEventListener('change',()=>{
+    if(wallpaperSelect.value==='vice-city'&&!hasViceCityAccess){wallpaperSelect.value='christmas';if(accessStatus)accessStatus.hidden=false;return;}
+    save();
+  });
   if(volumeSlider)volumeSlider.addEventListener('input',()=>{apply(currentSettings());save();});
+  if(viceCityMusicToggle&&viceCityMusicList)viceCityMusicToggle.addEventListener('click',()=>{
+    const isOpen=viceCityMusicList.classList.toggle('open');
+    viceCityMusicToggle.setAttribute('aria-expanded',String(isOpen));
+  });
+  document.querySelectorAll('#viceCityMusicList [data-gta-track]').forEach(button=>button.addEventListener('click',()=>{
+    if(!hasViceCityAccess||wallpaperSelect?.value!=='vice-city')return;
+    const videoId=String(button.dataset.youtubeId||'').trim();
+    const spotifyId=String(button.dataset.spotifyId||'').trim();
+    const provider=videoId?'YouTube':spotifyId?'Spotify':'';
+    const search=String(button.dataset.search||button.textContent||'GTA theme music');
+    const trackTitle=String(button.dataset.trackTitle||button.textContent.trim());
+    if(music)music.pause();
+    if(!provider){
+      if(viceCityMusicStatus)viceCityMusicStatus.textContent='פותח חיפוש YouTube עבור '+button.textContent.trim()+'.';
+      const searchUrl='https://www.youtube.com/results?search_query='+encodeURIComponent(search);
+      if(viceCityMusicSourceLink){viceCityMusicSourceLink.href=searchUrl;viceCityMusicSourceLink.textContent='פתיחת תוצאות YouTube';viceCityMusicSourceLink.hidden=false;}
+      window.open(searchUrl,'_blank','noopener,noreferrer');
+      viceCityMusicList.classList.remove('open');
+      viceCityMusicToggle?.setAttribute('aria-expanded','false');
+      return;
+    }
+    const iframe=document.createElement('iframe');
+    iframe.src=videoId
+      ?'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(videoId)+'?autoplay=1&playsinline=1&controls=1&rel=0'
+      :'https://open.spotify.com/embed/track/'+encodeURIComponent(spotifyId)+'?utm_source=generator';
+    iframe.title=trackTitle+' — '+provider+' music player';
+    iframe.loading='lazy';
+    iframe.referrerPolicy='strict-origin-when-cross-origin';
+    iframe.allow='autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share';
+    iframe.allowFullscreen=true;
+    if(viceCityMusicPlayer){viceCityMusicPlayer.replaceChildren(iframe);viceCityMusicPlayer.hidden=false;}
+    if(viceCityMusicStatus)viceCityMusicStatus.textContent='נפתח נגן '+provider+': '+trackTitle;
+    if(viceCityMusicSourceLink){viceCityMusicSourceLink.href=videoId?'https://www.youtube.com/watch?v='+encodeURIComponent(videoId):'https://open.spotify.com/track/'+encodeURIComponent(spotifyId);viceCityMusicSourceLink.textContent='פתיחה ישירה ב־'+provider;viceCityMusicSourceLink.hidden=false;}
+    viceCityMusicList.classList.remove('open');
+    viceCityMusicToggle?.setAttribute('aria-expanded','false');
+  }));
+  if(viceCityMusicReset)viceCityMusicReset.addEventListener('click',()=>{clearViceCityPlayer(true);});
   (async()=>{
     try{
-      const response=await fetch('/api/users?clientState=1',{credentials:'include',cache:'no-store'});
-      const data=await response.json();
-      if(response.ok&&data.clientState){clientState=data.clientState;apply({...clientState.settings});}
-    }catch(_){}
+      const [profileResponse,stateResponse]=await Promise.all([
+        fetch('/api/profile',{credentials:'include',cache:'no-store'}).catch(()=>null),
+        fetch('/api/users?clientState=1',{credentials:'include',cache:'no-store'}).catch(()=>null)
+      ]);
+      let profile=null;
+      if(profileResponse?.ok){const data=await profileResponse.json().catch(()=>({}));profile=data.profile||null;if(profile)window.__retzefProfile={...(window.__retzefProfile||{}),...profile};}
+      updateAccess(profile);
+      if(stateResponse?.ok){const data=await stateResponse.json().catch(()=>({}));if(data.clientState)clientState=data.clientState;}
+      const saved=clientState.settings&&typeof clientState.settings==='object'?clientState.settings:{wallpaper:localGet('retzef-wallpaper',defaults.wallpaper),musicVolume:localGet('retzef-music-volume',defaults.musicVolume)};
+      const requestedWallpaper=saved.wallpaper;
+      apply(saved,false);
+      if(requestedWallpaper==='vice-city'&&!hasViceCityAccess)save();
+    }catch(_){
+      updateAccess(null);
+      apply({wallpaper:localGet('retzef-wallpaper',defaults.wallpaper),musicVolume:localGet('retzef-music-volume',defaults.musicVolume)},false);
+    }
   })();
 })();
 </script>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'retzef-pwa-v7-events-app';
+const CACHE_NAME = 'retzef-pwa-v8-gta-music-fix';
 const APP_SHELL = [
   '/',
   '/index.html',

@@ -581,7 +581,7 @@ function updateWalletUI(wallet){const raw=wallet&&wallet.balance;const value=(Nu
   html[data-wallpaper="vice-city"] body,html[data-wallpaper="vice-city"] .sec-title,html[data-wallpaper="vice-city"] .settings-card h3,html[data-wallpaper="vice-city"] label,html[data-wallpaper="vice-city"] button{color:var(--text)}
   html[data-wallpaper="vice-city"] p,html[data-wallpaper="vice-city"] small,html[data-wallpaper="vice-city"] .muted{color:var(--muted)}
   html[data-wallpaper="vice-city"] input,html[data-wallpaper="vice-city"] select,html[data-wallpaper="vice-city"] textarea{color:#fff;background:rgba(22,17,36,.94);border-color:rgba(255,105,180,.38)}
-  #viceCityMusicControls[hidden],#viceCityMusicPlayer[hidden],#viceCityMusicSourceLink[hidden]{display:none!important}
+  #viceCityMusicControls[hidden],#viceCityMusicPlayer[hidden]{display:none!important}
   #viceCityMusicControls{margin-top:14px}
   #viceCityMusicList{display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
   #viceCityMusicList.open{display:grid}
@@ -1581,15 +1581,19 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
       </select>
       <p id="viceCityAccessStatus" style="font-size:12px;color:var(--muted);margin-top:6px;">🔒 הטפט זמין למנויי Premium ולבעלים.</p>
       <div id="viceCityMusicControls" hidden>
-        <button type="button" id="viceCityMusicToggle" class="btn btn-ghost glass" style="width:100%;justify-content:center;" aria-expanded="false" aria-controls="viceCityMusicList">🎵 ניגון אוסף מוזיקת GTA</button>
-        <div id="viceCityMusicList" role="group" aria-label="אוסף נעימות GTA III עד GTA VI">
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-theme-compilation" data-youtube-id="nrLpdsEE0kI" data-track-title="All Iconic GTA Theme Songs — From GTA III to GTA VI" style="grid-column:1/-1;">▶ נגן אוסף נעימות GTA III–VI</button>
+        <button type="button" id="viceCityMusicToggle" class="btn btn-ghost glass" style="width:100%;justify-content:center;" aria-expanded="false" aria-controls="viceCityMusicList">🎵 בחירת מוזיקת GTA</button>
+        <div id="viceCityMusicList" role="group" aria-label="רצועות רשמיות מוטמעות של משחקי GTA">
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-vi" data-youtube-id="hYvK824FQK8" data-track-title="Starting From Zero (feat. Michael McDonald) — GTA VI opening song">▶ GTA VI · Starting From Zero (שיר פתיחה; לא נעימת כותר)</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-v" data-youtube-id="Ibaze-ZF3Vk" data-track-title="Welcome To Los Santos — GTA V official soundtrack">▶ GTA V · Welcome To Los Santos (רצועת פסקול רשמית)</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-iv" data-youtube-id="93TW692tQb8" data-track-title="Soviet Connection (Theme from GTA IV)">▶ GTA IV · Soviet Connection (נעימת הכותר)</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-san-andreas" data-youtube-id="7qfbi3HACV8" data-track-title="Theme from San Andreas — Michael Hunter">▶ GTA San Andreas · Theme from San Andreas</button>
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-vice-city" data-spotify-id="0ufkz87eb3HoEX2HcKkcBx" data-track-title="The Theme From Vice City — official soundtrack recording">▶ GTA Vice City · The Theme From Vice City</button>
+          <button type="button" class="btn btn-ghost glass" disabled aria-disabled="true" title="לא נמצא מקור רשמי מוטמע מאומת לקטע הזה">GTA III · אין מקור רשמי מוטמע מאומת</button>
           <button type="button" class="btn btn-ghost glass" id="viceCityMusicReset" style="grid-column:1/-1;">↩ חזרה למוזיקת הרקע של האתר</button>
         </div>
         <p id="viceCityMusicStatus" style="font-size:12px;color:var(--muted);margin-top:8px;" aria-live="polite"></p>
         <div id="viceCityMusicPlayer" hidden></div>
-        <a id="viceCityMusicSourceLink" hidden target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;color:#8edfff;font-size:12px;"></a>
-        <p style="font-size:11px;color:var(--muted);margin-top:6px;">האוסף כולל GTA VI, GTA V, GTA IV, GTA San Andreas, GTA Vice City ו־GTA III. השתמשו בפקדי הנגן כדי לעבור בין השירים.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">הנגן מוטמע באתר ללא קישור יציאה. GTA VI ו־GTA V הן רצועות רשמיות, אך לא אומתו כנעימות כותר; ל־GTA III לא נמצא מקור רשמי מוטמע.</p>
       </div>
       <label for="musicVolumeSlider" style="display:block;margin-top:14px;">עוצמת המוזיקה: <span id="musicVolumeValue">24%</span></label>
       <input type="range" id="musicVolumeSlider" min="0" max="100" value="24" step="1" style="width:100%;">
@@ -3275,7 +3279,6 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
   const viceCityMusicList=document.getElementById('viceCityMusicList');
   const viceCityMusicPlayer=document.getElementById('viceCityMusicPlayer');
   const viceCityMusicStatus=document.getElementById('viceCityMusicStatus');
-  const viceCityMusicSourceLink=document.getElementById('viceCityMusicSourceLink');
   const viceCityMusicReset=document.getElementById('viceCityMusicReset');
   const volumeSlider=document.getElementById('musicVolumeSlider');
   const volumeValue=document.getElementById('musicVolumeValue');
@@ -3304,7 +3307,6 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     const hadPlayer=Boolean(viceCityMusicPlayer&&!viceCityMusicPlayer.hidden&&viceCityMusicPlayer.childElementCount);
     if(viceCityMusicPlayer){viceCityMusicPlayer.replaceChildren();viceCityMusicPlayer.hidden=true;}
     if(viceCityMusicStatus)viceCityMusicStatus.textContent='';
-    if(viceCityMusicSourceLink){viceCityMusicSourceLink.hidden=true;viceCityMusicSourceLink.removeAttribute('href');viceCityMusicSourceLink.textContent='';}
     if(resumeBackground&&hadPlayer&&music){const play=music.play();if(play&&typeof play.catch==='function')play.catch(()=>{});}
   }
   function updateViceCityMusicVisibility(){
@@ -3364,23 +3366,22 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
     if(!hasViceCityAccess||wallpaperSelect?.value!=='vice-city')return;
     const videoId=String(button.dataset.youtubeId||'').trim();
     const spotifyId=String(button.dataset.spotifyId||'').trim();
-    const isFallback=!videoId&&!spotifyId;
-    const resolvedVideoId=videoId||(isFallback?'nrLpdsEE0kI':'');
-    const provider=resolvedVideoId?'YouTube':'Spotify';
+    if(!videoId&&!spotifyId){if(viceCityMusicStatus)viceCityMusicStatus.textContent='אין לרצועה זו מקור מוטמע מאומת; לא ייפתח קישור חיצוני.';return;}
     const trackTitle=String(button.dataset.trackTitle||button.textContent.trim());
     if(music)music.pause();
     const iframe=document.createElement('iframe');
-    iframe.src=resolvedVideoId
-      ?'https://www.youtube.com/embed/'+encodeURIComponent(resolvedVideoId)+'?autoplay=1&playsinline=1&controls=1&rel=0'
+    iframe.src=videoId
+      ?'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(videoId)+'?autoplay=1&playsinline=1&controls=1&rel=0'
       :'https://open.spotify.com/embed/track/'+encodeURIComponent(spotifyId)+'?utm_source=generator';
-    iframe.title=trackTitle+' — '+provider+' music player';
+    iframe.title=trackTitle+' — נגן מוזיקה מוטמע באתר';
     iframe.loading='eager';
     iframe.referrerPolicy='strict-origin-when-cross-origin';
-    iframe.allow='autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share';
+    iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-presentation');
+    iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
     iframe.allowFullscreen=true;
     if(viceCityMusicPlayer){viceCityMusicPlayer.replaceChildren(iframe);viceCityMusicPlayer.hidden=false;}
-    if(viceCityMusicStatus)viceCityMusicStatus.textContent=isFallback?'לא נמצא מקור מוטמע לרצועה זו; מנגן כאן את אוסף הנעימות שסיפקת.':'מנגן בתוך האתר דרך '+provider+': '+trackTitle;
-    if(viceCityMusicSourceLink){viceCityMusicSourceLink.href=resolvedVideoId?'https://www.youtube.com/watch?v='+encodeURIComponent(resolvedVideoId):'https://open.spotify.com/track/'+encodeURIComponent(spotifyId);viceCityMusicSourceLink.textContent='אם הנגן לא עובד: פתיחה ישירה ב־'+provider;viceCityMusicSourceLink.hidden=false;}
+    if(viceCityMusicStatus)viceCityMusicStatus.textContent='מנגן בתוך האתר: '+trackTitle;
+    iframe.addEventListener('error',()=>{if(viceCityMusicStatus)viceCityMusicStatus.textContent='הנגן המוטמע לא נטען; לא נפתח אתר חיצוני.';});
     viceCityMusicList.classList.remove('open');
     viceCityMusicToggle?.setAttribute('aria-expanded','false');
   }));

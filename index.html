@@ -1581,21 +1581,15 @@ window.retzefCacheProfile=window.retzefCacheProfile||function(profile){try{if(pr
       </select>
       <p id="viceCityAccessStatus" style="font-size:12px;color:var(--muted);margin-top:6px;">🔒 הטפט זמין למנויי Premium ולבעלים.</p>
       <div id="viceCityMusicControls" hidden>
-        <button type="button" id="viceCityMusicToggle" class="btn btn-ghost glass" style="width:100%;justify-content:center;" aria-expanded="false" aria-controls="viceCityMusicList">🎵 בחירת מוזיקת GTA</button>
-        <div id="viceCityMusicList" role="group" aria-label="בחירת נעימת משחק GTA">
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-theme-compilation" data-youtube-id="nrLpdsEE0kI" data-track-title="All Iconic GTA Theme Songs — From GTA III to GTA VI" style="grid-column:1/-1;">▶ אוסף נעימות GTA — הסרטון ששלחת</button>
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-vi" data-youtube-id="Ip_Kc3EQiOI" data-search="Pusher feat Gesaffelstein from GTA VI official score" data-track-title="Pusher (feat. Gesaffelstein) — GTA VI Original Score">GTA VI · Pusher</button>
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-v" data-youtube-id="Ibaze-ZF3Vk" data-search="Welcome To Los Santos Oh No GTA V official soundtrack" data-track-title="Welcome To Los Santos (Oh No)">GTA V · Welcome To Los Santos</button>
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-iv" data-youtube-id="93TW692tQb8" data-search="Soviet Connection Theme from GTA IV Michael Hunter" data-track-title="Soviet Connection (Theme from GTA IV)">GTA IV · Soviet Connection</button>
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-san-andreas" data-youtube-id="7qfbi3HACV8" data-search="Grand Theft Auto San Andreas Official Theme Song Michael Hunter" data-track-title="Grand Theft Auto: San Andreas (Official Theme Song)">GTA San Andreas · Theme</button>
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-vice-city" data-spotify-id="0ufkz87eb3HoEX2HcKkcBx" data-search="Theme from Vice City Lex Horton" data-track-title="Theme from Vice City">GTA Vice City · Theme</button>
-          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-iii" data-spotify-id="2zTzKhqjrXKuGe8MLesd1k" data-search="GTA III theme song Craig Conner Stuart Ross" data-track-title="GTA III Theme">GTA III · Theme</button>
+        <button type="button" id="viceCityMusicToggle" class="btn btn-ghost glass" style="width:100%;justify-content:center;" aria-expanded="false" aria-controls="viceCityMusicList">🎵 ניגון אוסף מוזיקת GTA</button>
+        <div id="viceCityMusicList" role="group" aria-label="אוסף נעימות GTA III עד GTA VI">
+          <button type="button" class="btn btn-ghost glass" data-gta-track="gta-theme-compilation" data-youtube-id="nrLpdsEE0kI" data-track-title="All Iconic GTA Theme Songs — From GTA III to GTA VI" style="grid-column:1/-1;">▶ נגן אוסף נעימות GTA III–VI</button>
           <button type="button" class="btn btn-ghost glass" id="viceCityMusicReset" style="grid-column:1/-1;">↩ חזרה למוזיקת הרקע של האתר</button>
         </div>
         <p id="viceCityMusicStatus" style="font-size:12px;color:var(--muted);margin-top:8px;" aria-live="polite"></p>
         <div id="viceCityMusicPlayer" hidden></div>
         <a id="viceCityMusicSourceLink" hidden target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;color:#8edfff;font-size:12px;"></a>
-        <p style="font-size:11px;color:var(--muted);margin-top:6px;">הווידאו מתנגן כאן בתוך האתר. אם אין מקור לרצועה מסוימת, נפתח כאן אוסף הנעימות שסיפקת.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">האוסף כולל GTA VI, GTA V, GTA IV, GTA San Andreas, GTA Vice City ו־GTA III. השתמשו בפקדי הנגן כדי לעבור בין השירים.</p>
       </div>
       <label for="musicVolumeSlider" style="display:block;margin-top:14px;">עוצמת המוזיקה: <span id="musicVolumeValue">24%</span></label>
       <input type="range" id="musicVolumeSlider" min="0" max="100" value="24" step="1" style="width:100%;">

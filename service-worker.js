@@ -1,3 +1,4 @@
+self.addEventListener('message', event => { if (event.data === 'SKIP_WAITING') self.skipWaiting(); });
 const CACHE_NAME = 'retzef-pwa-v8-gta-music-fix';
 const APP_SHELL = [
   '/',
